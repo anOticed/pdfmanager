@@ -1,5 +1,6 @@
 package com.example.pdfmanager.feature.pdflist
 
+import android.annotation.SuppressLint
 import android.graphics.Bitmap
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -43,6 +44,7 @@ import com.example.pdfmanager.ui.theme.Colors
 import com.example.pdfmanager.ui.theme.PdfManagerTheme
 
 /* -------------------- ACTIVITY -------------------- */
+@SuppressLint("ViewModelConstructorInComposable")
 @Composable
 fun PdfListActivity(active: Screen, onSelect: (String) -> Unit) {
     Scaffold(

@@ -1,5 +1,6 @@
 package com.example.pdfmanager.feature.merge
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
@@ -50,6 +51,7 @@ fun MergeActivity(
 
 
 
+@SuppressLint("ViewModelConstructorInComposable")
 @Preview(showBackground = true)
 @Composable
 fun MergeActivityPreview() {

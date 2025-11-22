@@ -32,7 +32,7 @@ fun ProvidePickers(content: @Composable () -> Unit) {
             try {
                 context.contentResolver.takePersistableUriPermission(
                     uri,
-                    Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION
+                    Intent.FLAG_GRANT_READ_URI_PERMISSION
                 )
             } catch (_: Exception) { /* ignore */ }
 
