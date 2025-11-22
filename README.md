@@ -33,7 +33,10 @@ https://pdfmanager.dev
 
 ## Demo
 <!-- <img src = ".assets/demo.gif" width = "240"/> -->
-<video src = ".assets/demo_v0.3.7.mp4" width = "240"/>
+<video controls="" width="240" muted="" loop="" autoplay="">
+  <source src=".assets/demo_v0.3.7.mp4" type="video/mp4">
+</video>
+
 
 ---
 
