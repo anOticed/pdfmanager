@@ -32,11 +32,9 @@ https://pdfmanager.dev
 ---
 
 ## Demo
-<!-- <img src = ".assets/demo.gif" width = "240"/> -->
-<!-- <video controls="" width="240" muted="" loop="" autoplay="">
-  <source src=".assets/demo_v0.3.7.mp4" type="video/mp4">
-</video> -->
-[![Watch the video](https://raw.githubusercontent.com/anOticed/pdfmanager/refs/heads/main/.assets/screenshot-01.jpg)](https://github.com/anOticed/pdfmanager/raw/refs/heads/main/.assets/demo_v0.3.7.mp4)
+<img src = ".assets/demo_1.gif" width = "240"/> <img src = ".assets/demo_2.gif" width = "240"/> <img src = ".assets/demo_3.gif" width = "240"/> <img src = ".assets/demo_4.gif" width = "240"/>
+
+---
 
 ## Status
 
