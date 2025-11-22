@@ -27,12 +27,13 @@ https://pdfmanager.dev
 ---
 
 ## Screenshots
-<img src = ".assets/screenshot-01.jpg" width = "240"/> <img src = ".assets/screenshot-02.jpg" width = "240"/> <img src = ".assets/screenshot-03.jpg" width = "240"/>
+<img src = ".assets/screenshot-01.jpg" width = "240"/> <img src = ".assets/screenshot-02.jpg" width = "240"/> <img src = ".assets/screenshot-03.jpg" width = "240"/> <img src = ".assets/screenshot-04.jpg" width = "240"/>
 
 ---
 
 ## Demo
-<img src = ".assets/demo.gif" width = "240"/>
+<!-- <img src = ".assets/demo.gif" width = "240"/> -->
+<video src = ".assets/demo_v0.3.7.mp4" width = "240"></video>
 
 ---
 
