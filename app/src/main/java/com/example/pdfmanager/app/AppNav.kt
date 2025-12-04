@@ -39,6 +39,7 @@ import com.example.pdfmanager.feature.pdflist.OptionsOverlay
 import com.example.pdfmanager.feature.pdflist.PdfListScreen
 import com.example.pdfmanager.feature.pdflist.PdfListTopBar
 import com.example.pdfmanager.feature.pdflist.PdfListViewModel
+import com.example.pdfmanager.feature.pdflist.handleFileOptionAction
 import com.example.pdfmanager.feature.settings.SettingsScreen
 import com.example.pdfmanager.feature.settings.SettingsTopBar
 import com.example.pdfmanager.feature.split.SplitActiveScreen
@@ -137,7 +138,19 @@ fun App() = PdfManagerTheme {
         OptionsOverlay(
             visible = pdfListViewModel.optionsPanelVisible,
             pdf = pdfListViewModel.optionsPanelPdf,
-            onDismiss = { pdfListViewModel.closeOptions() }
+            onDismiss = { pdfListViewModel.closeOptions() },
+            onAction = {action ->
+                val pdf = pdfListViewModel.optionsPanelPdf ?: return@OptionsOverlay
+                handleFileOptionAction(
+                    action = action,
+                    pdf = pdf,
+                    splitViewModel = splitViewModel,
+                    mergeViewModel = mergeViewModel,
+                    scope = scope,
+                    pagerState = pagerState,
+                    tabs = tabs
+                )
+            }
         )
     }
 
