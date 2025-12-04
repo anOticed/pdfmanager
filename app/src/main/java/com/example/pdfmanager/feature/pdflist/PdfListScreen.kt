@@ -17,10 +17,10 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -44,7 +44,6 @@ import androidx.compose.material.icons.outlined.Print
 import androidx.compose.material.icons.outlined.Reorder
 import androidx.compose.material.icons.outlined.Share
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -305,8 +304,7 @@ fun OptionsOverlay(
     val sheetState = rememberModalBottomSheetState(
         skipPartiallyExpanded = true
     )
-
-
+    
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = sheetState,
@@ -319,8 +317,8 @@ fun OptionsOverlay(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .fillMaxHeight(0.75f)
                 .padding(16.dp)
+                .navigationBarsPadding()
         ) {
             OptionsOverlayHeader(pdf)
             HorizontalDivider(
@@ -565,7 +563,7 @@ fun handleFileOptionAction(
 fun OptionsOverlayPreview() {
     val pdfListViewModel: PdfListViewModel = viewModel()
 
-    val file: PdfFile = PdfFile(
+    val file = PdfFile(
         uri = Uri.parse(""),
         name = "document.pdf",
         sizeBytes = 100000000,
