@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.pdfmanager"
+    namespace = "me.anoticed.pdfmanager"
     compileSdk {
         version = release(36)
     }
@@ -15,7 +15,7 @@ android {
         minSdk = 30
         targetSdk = 36
         versionCode = 1
-        versionName = "0.3.7.1"
+        versionName = "0.3.7.2"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
