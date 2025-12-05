@@ -39,7 +39,6 @@ import com.example.pdfmanager.feature.pdflist.OptionsOverlay
 import com.example.pdfmanager.feature.pdflist.PdfListScreen
 import com.example.pdfmanager.feature.pdflist.PdfListTopBar
 import com.example.pdfmanager.feature.pdflist.PdfListViewModel
-import com.example.pdfmanager.feature.pdflist.handleFileOptionAction
 import com.example.pdfmanager.feature.settings.SettingsScreen
 import com.example.pdfmanager.feature.settings.SettingsTopBar
 import com.example.pdfmanager.feature.split.SplitActiveScreen
@@ -80,6 +79,14 @@ fun App() = PdfManagerTheme {
     val pdfListViewModel: PdfListViewModel = viewModel()
     val mergeViewModel: MergeViewModel = viewModel()
     val splitViewModel: SplitViewModel = viewModel()
+
+    PdfListEventHandler(
+        pdfListViewModel = pdfListViewModel,
+        mergeViewModel = mergeViewModel,
+        splitViewModel = splitViewModel,
+        pagerState = pagerState,
+        tabs = tabs
+    )
 
     Box(
         modifier = Modifier.fillMaxSize()
@@ -141,15 +148,7 @@ fun App() = PdfManagerTheme {
             onDismiss = { pdfListViewModel.closeOptions() },
             onAction = {action ->
                 val pdf = pdfListViewModel.optionsPanelPdf ?: return@OptionsOverlay
-                handleFileOptionAction(
-                    action = action,
-                    pdf = pdf,
-                    splitViewModel = splitViewModel,
-                    mergeViewModel = mergeViewModel,
-                    scope = scope,
-                    pagerState = pagerState,
-                    tabs = tabs
-                )
+                pdfListViewModel.onFileOptionSelected(action, pdf)
             }
         )
     }

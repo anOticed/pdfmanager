@@ -16,6 +16,13 @@ import com.example.pdfmanager.core.pdf.PdfRepository
 import com.example.pdfmanager.core.pdf.model.PdfFile
 import kotlinx.coroutines.launch
 
+
+sealed class PdfListEvent {
+    data class OpenMerge(val pdf: PdfFile) : PdfListEvent()
+    data class OpenSplit(val pdf: PdfFile) : PdfListEvent()
+}
+
+
 class PdfListViewModel : ViewModel() {
     var isLoading by mutableStateOf(false)
         private set
@@ -28,6 +35,9 @@ class PdfListViewModel : ViewModel() {
 
     var optionsPanelVisible by mutableStateOf(false)
     var optionsPanelPdf: PdfFile? by mutableStateOf(null)
+
+    var pendingEvent: PdfListEvent? by mutableStateOf(null)
+        private set
 
 
     fun loadAll(context: Context) {
@@ -71,5 +81,17 @@ class PdfListViewModel : ViewModel() {
             }
             manageAllFilesLauncher.launch(intent)
         }
+    }
+
+    fun onFileOptionSelected(action: PdfFileOptionAction, pdf: PdfFile) {
+        when(action) {
+            PdfFileOptionAction.MERGE -> pendingEvent = PdfListEvent.OpenMerge(pdf)
+            PdfFileOptionAction.SPLIT -> pendingEvent = PdfListEvent.OpenSplit(pdf)
+            else -> Unit
+        }
+    }
+
+    fun clearPendingEvent() {
+        pendingEvent = null
     }
 }
