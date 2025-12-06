@@ -22,16 +22,18 @@ data class PdfFile(
 
 /* -------------------- HELPERS -------------------- */
 fun PdfFile.metaLine(): String {
-    val pagesCount = if (pagesCount > 0) "$pagesCount" else "- pages"
-    return listOf(pagesCount, formatBytes(sizeBytes)).joinToString(separator = " • ")
+    val sizeText = formatBytes(sizeBytes)
+
+    return if (isLocked) {
+        sizeText
+    } else {
+        val pagesText = when(pagesCount) {
+            1 -> "1 page"
+            else -> "$pagesCount pages"
+        }
+        "$pagesText • $sizeText"
+    }
 }
-
-//fun PdfFile.metaLineWithCount(pagesCount: Int?): String {
-//    val pagesCount = pagesCount?.let { if (it > 0) "$pagesCount pages" else "- pages" }
-//    return listOf(pagesCount, formatBytes(sizeBytes)).joinToString(separator = " • ")
-//}
-
-fun PdfFile.createdDate(): String = formatDate(createdEpochSeconds)
 
 private fun formatBytes(bytes: Long): String {
     val kb = 1000.0
@@ -45,6 +47,8 @@ private fun formatBytes(bytes: Long): String {
         else -> String.format(Locale.US, "%.1f GB", bytes / gb)
     }
 }
+
+fun PdfFile.createdDate(): String = formatDate(createdEpochSeconds)
 
 private fun formatDate(epochSeconds: Long): String {
     val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.US)
