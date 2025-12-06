@@ -15,7 +15,7 @@ import androidx.compose.ui.platform.LocalContext
 
 
 
-/* -------------------- Color Scheme -------------------- */
+/* -------------------- COLOR SCHEME -------------------- */
 private val DarkColorScheme = darkColorScheme(
     background = Colors.backgroundColor,
     surface = Colors.cardColor,
@@ -39,7 +39,7 @@ private val LightColorScheme = lightColorScheme(
 
 
 
-/* -------------------- Typography / Shapes -------------------- */
+/* -------------------- TYPOGRAPHY / SHAPES -------------------- */
 private val appTypography = Typography
 private val appShapes = Shapes(
     extraSmall = RoundedCornerShape(6),
@@ -51,7 +51,7 @@ private val appShapes = Shapes(
 
 
 
-/* -------------------- Theme Wrapper -------------------- */
+/* -------------------- THEME WRAPPER -------------------- */
 @Composable
 fun PdfManagerTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),

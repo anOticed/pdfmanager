@@ -16,14 +16,9 @@ import me.anoticed.pdfmanager.core.pdf.PdfRepository
 import me.anoticed.pdfmanager.core.pdf.model.PdfFile
 import kotlinx.coroutines.launch
 
-
-sealed class PdfListEvent {
-    data class OpenMerge(val pdfs: List<PdfFile>) : PdfListEvent()
-    data class OpenSplit(val pdf: PdfFile) : PdfListEvent()
-}
-
-
 class PdfListViewModel : ViewModel() {
+
+    /* -------------------- LOADING / DATA -------------------- */
     var isLoading by mutableStateOf(false)
         private set
 
@@ -32,29 +27,6 @@ class PdfListViewModel : ViewModel() {
 
     var pdfFiles by mutableStateOf<List<PdfFile>>(emptyList())
         private set
-
-
-    var optionsPanelVisible by mutableStateOf(false)
-    var optionsPanelPdf: PdfFile? by mutableStateOf(null)
-
-    var pendingEvent: PdfListEvent? by mutableStateOf(null)
-        private set
-
-
-    var selectedPdfFiles by mutableStateOf<Set<PdfFile>>(mutableSetOf())
-        private set
-
-    var selectionMode by mutableStateOf(false)
-        private set
-    val isSelectionMode: Boolean
-        get() = selectionMode
-
-    val selectionCount: Int
-        get() = selectedPdfFiles.size
-
-    val isAllSelected: Boolean
-        get() = selectedPdfFiles.size == pdfFiles.size && pdfFiles.isNotEmpty()
-
 
     fun loadAll(context: Context) {
         isLoading = true
@@ -75,18 +47,11 @@ class PdfListViewModel : ViewModel() {
             }
         }
     }
+    /* -------------------------------------------------------- */
 
 
-    fun openOptions(pdf: PdfFile) {
-        optionsPanelVisible = true
-        optionsPanelPdf = pdf
-    }
 
-    fun closeOptions() {
-        optionsPanelVisible = false
-        optionsPanelPdf = null
-    }
-
+    /* -------------------- PERMISSIONS -------------------- */
     fun requestAllFilesAccess(
         context: Context,
         manageAllFilesLauncher: ManagedActivityResultLauncher<Intent, ActivityResult>
@@ -99,8 +64,23 @@ class PdfListViewModel : ViewModel() {
             manageAllFilesLauncher.launch(intent)
         }
     }
+    /* ------------------------------------------------------------- */
 
 
+
+    /* -------------------- OPTIONS PANEL -------------------- */
+    var optionsPanelVisible by mutableStateOf(false)
+    var optionsPanelPdf: PdfFile? by mutableStateOf(null)
+
+    fun openOptions(pdf: PdfFile) {
+        optionsPanelVisible = true
+        optionsPanelPdf = pdf
+    }
+
+    fun closeOptions() {
+        optionsPanelVisible = false
+        optionsPanelPdf = null
+    }
 
     fun onFileOptionSelected(action: PdfFileOptionAction, pdf: PdfFile) {
         when(action) {
@@ -109,12 +89,31 @@ class PdfListViewModel : ViewModel() {
             else -> Unit
         }
     }
+    /* ------------------------------------------------------- */
+
+
+
+    /* -------------------- EVENTS -------------------- */
+    var pendingEvent: PdfListEvent? by mutableStateOf(null)
+        private set
 
     fun clearPendingEvent() {
         pendingEvent = null
     }
+    /* ------------------------------------------------ */
 
 
+
+    /* -------------------- SELECTION -------------------- */
+    var selectedPdfFiles by mutableStateOf<Set<PdfFile>>(mutableSetOf())
+        private set
+
+    private var selectionMode by mutableStateOf(false)
+    val isSelectionMode: Boolean get() = selectionMode
+
+    val selectionCount: Int get() = selectedPdfFiles.size
+    val isAllSelected: Boolean
+        get() = selectedPdfFiles.size == pdfFiles.size && pdfFiles.isNotEmpty()
 
     fun isSelected(pdf: PdfFile): Boolean {
         return(selectedPdfFiles.contains(pdf))
@@ -128,19 +127,18 @@ class PdfListViewModel : ViewModel() {
     fun onItemClick(pdf: PdfFile) {
         if (!isSelectionMode) return
 
-        if (selectedPdfFiles.contains(pdf)) {
-            selectedPdfFiles = selectedPdfFiles - pdf
+        selectedPdfFiles = if (selectedPdfFiles.contains(pdf)) {
+            selectedPdfFiles - pdf
         } else {
-            selectedPdfFiles = selectedPdfFiles + pdf
+            selectedPdfFiles + pdf
         }
     }
 
     fun toggleSelectAll() {
-        if (isAllSelected) {
-            selectedPdfFiles = emptySet()
-        }
-        else {
-            selectedPdfFiles = pdfFiles.toSet()
+        selectedPdfFiles = if (isAllSelected) {
+            emptySet()
+        } else {
+            pdfFiles.toSet()
         }
     }
 
@@ -149,7 +147,6 @@ class PdfListViewModel : ViewModel() {
         selectionMode = false
     }
 
-    // TODO: implement methods below
     fun mergeSelected() {
         if (selectedPdfFiles.isEmpty()) return
 
@@ -157,4 +154,5 @@ class PdfListViewModel : ViewModel() {
     }
     fun shareSelected() { /* TODO */ }
     fun deleteSelectedPdfs() { /* TODO */ }
+    /* --------------------------------------------------- */
 }

@@ -13,6 +13,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.platform.LocalContext
 
+/* -------------------- PICKERS -------------------- */
 interface Pickers {
     fun pickPdf(onPicked: (Uri) -> Unit)
 }
@@ -51,3 +52,4 @@ fun ProvidePickers(content: @Composable () -> Unit) {
 
     CompositionLocalProvider(LocalPickers provides pickers) { content() }
 }
+/* ------------------------------------------------- */

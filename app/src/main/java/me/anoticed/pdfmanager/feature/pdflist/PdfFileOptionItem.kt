@@ -30,7 +30,7 @@ enum class PdfFileOptionAction {
 }
 
 
-data class PdfFileOptions(
+data class PdfFileOptionItem(
     val action: PdfFileOptionAction,
     val title: String,
     val icon: ImageVector,
@@ -38,58 +38,58 @@ data class PdfFileOptions(
 )
 
 
-val PdfFileOptionItems: List<PdfFileOptions> = listOf(
-    PdfFileOptions(
+val pdfFileOptionItems: List<PdfFileOptionItem> = listOf(
+    PdfFileOptionItem(
         action = PdfFileOptionAction.RENAME,
         title = "Rename",
         icon = Icons.Outlined.Edit
     ),
-    PdfFileOptions(
+    PdfFileOptionItem(
         action = PdfFileOptionAction.MERGE,
         title = "Merge",
         icon = Icons.Outlined.CallMerge
     ),
-    PdfFileOptions(
+    PdfFileOptionItem(
         action = PdfFileOptionAction.SPLIT,
         title = "Split",
         icon = Icons.Outlined.CallSplit
     ),
-    PdfFileOptions(
+    PdfFileOptionItem(
         action = PdfFileOptionAction.COMPRESS,
         title = "Compress PDF",
         icon = Icons.Outlined.Compress
     ),
-    PdfFileOptions(
+    PdfFileOptionItem(
         action = PdfFileOptionAction.REORDER_PAGES,
         title = "Reorder pages",
         icon = Icons.Outlined.Reorder
     ),
-    PdfFileOptions(
+    PdfFileOptionItem(
         action = PdfFileOptionAction.SET_PASSWORD,
         title = "Set password",
         icon = Icons.Outlined.Lock
     ),
-    PdfFileOptions(
+    PdfFileOptionItem(
         action = PdfFileOptionAction.REMOVE_PASSWORD,
         title = "Remove password",
         icon = Icons.Outlined.LockOpen
     ),
-    PdfFileOptions(
+    PdfFileOptionItem(
         action = PdfFileOptionAction.PRINT,
         title = "Print",
         icon = Icons.Outlined.Print
     ),
-    PdfFileOptions(
+    PdfFileOptionItem(
         action = PdfFileOptionAction.SHARE,
         title = "Share",
         icon = Icons.Outlined.Share
     ),
-    PdfFileOptions(
+    PdfFileOptionItem(
         action = PdfFileOptionAction.DETAILS,
         title = "Details",
         icon = Icons.Outlined.Info
     ),
-    PdfFileOptions(
+    PdfFileOptionItem(
         action = PdfFileOptionAction.DELETE,
         title = "Delete",
         icon = Icons.Outlined.Delete,
