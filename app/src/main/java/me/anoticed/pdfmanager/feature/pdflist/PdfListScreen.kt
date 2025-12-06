@@ -145,8 +145,7 @@ fun PdfListScreen(
             ) {
                 LazyColumn(
                     modifier = modifier
-                        .fillMaxSize()
-                        .padding(vertical = 8.dp),
+                        .fillMaxSize(),
                     contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
                     verticalArrangement = Arrangement.spacedBy(14.dp)
                 ) {
