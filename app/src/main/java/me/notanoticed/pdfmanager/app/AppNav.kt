@@ -1,5 +1,9 @@
 package me.notanoticed.pdfmanager.app
 
+import android.os.Build
+import android.os.Environment
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -7,8 +11,10 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import me.notanoticed.pdfmanager.feature.merge.MergeActiveScreen
 import me.notanoticed.pdfmanager.feature.merge.MergeScreen
@@ -34,6 +40,37 @@ fun App() = PdfManagerTheme {
     val pdfListViewModel: PdfListViewModel = viewModel()
     val mergeViewModel: MergeViewModel = viewModel()
     val splitViewModel: SplitViewModel = viewModel()
+
+    val context = LocalContext.current
+
+    // MANAGE_EXTERNAL_STORAGE launcher (API 30+)
+    val manageAllFilesLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R &&
+            Environment.isExternalStorageManager()
+        ) {
+            pdfListViewModel.onPermissionGranted()
+            pdfListViewModel.loadAll(context)
+        } else {
+            pdfListViewModel.onPermissionDenied()
+        }
+    }
+
+    // initial permission check
+    LaunchedEffect(Unit) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            if (Environment.isExternalStorageManager()) {
+                pdfListViewModel.loadAll(context)
+            }
+            else {
+                pdfListViewModel.showPermissionExplanation()
+            }
+        }
+        else {
+            pdfListViewModel.loadAll(context)
+        }
+    }
 
     PdfListEventHandler(
         pdfListViewModel = pdfListViewModel,
@@ -101,6 +138,19 @@ fun App() = PdfManagerTheme {
             }
         }
 
+        StoragePermissionDialog(
+            visible = pdfListViewModel.showPermissionDialog,
+            isBlocking = pdfListViewModel.permissionDialogBlocking,
+            onGrantClick = {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                    pdfListViewModel.requestAllFilesAccess(
+                        context = context,
+                        manageAllFilesLauncher = manageAllFilesLauncher
+                    )
+                }
+            },
+            onCancel = { pdfListViewModel.onPermissionDialogCancel() }
+        )
 
         OptionsOverlay(
             visible = pdfListViewModel.optionsPanelVisible,

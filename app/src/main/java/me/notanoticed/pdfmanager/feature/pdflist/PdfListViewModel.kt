@@ -22,26 +22,18 @@ class PdfListViewModel : ViewModel() {
     var isLoading by mutableStateOf(false)
         private set
 
-    var errorText by mutableStateOf<String?>(null)
-        private set
-
     var pdfFiles by mutableStateOf<List<PdfFile>>(emptyList())
         private set
 
     fun loadAll(context: Context) {
         isLoading = true
-        errorText = null
 
         viewModelScope.launch {
             isLoading = true
             try {
-                val files = PdfRepository.loadAllPdfs(context)
-                pdfFiles = files
-                errorText = null
-            } catch (_: SecurityException) {
-                errorText = "No permission to access storage"
-            } catch (exception: Exception) {
-                errorText = exception.message ?: "Failed to load PDFs"
+                pdfFiles = PdfRepository.loadAllPdfs(context)
+            } catch (_: Exception) {
+                /* ignore */
             } finally {
                 isLoading = false
             }
@@ -52,6 +44,33 @@ class PdfListViewModel : ViewModel() {
 
 
     /* -------------------- PERMISSIONS -------------------- */
+    var showPermissionDialog by mutableStateOf(false)
+        private set
+
+    var permissionDialogBlocking by mutableStateOf(false)
+        private set
+
+    fun showPermissionExplanation() {
+        showPermissionDialog = true
+        permissionDialogBlocking = false
+        isLoading = false
+    }
+
+    fun onPermissionDialogCancel() {
+        showPermissionDialog = true
+        permissionDialogBlocking = true
+    }
+    fun onPermissionGranted() {
+        showPermissionDialog = false
+        permissionDialogBlocking = false
+    }
+
+    fun onPermissionDenied() {
+        showPermissionDialog = true
+        permissionDialogBlocking = true
+        isLoading = false
+    }
+
     fun requestAllFilesAccess(
         context: Context,
         manageAllFilesLauncher: ManagedActivityResultLauncher<Intent, ActivityResult>

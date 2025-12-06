@@ -1,5 +1,6 @@
 package me.notanoticed.pdfmanager.feature.pdflist
 
+import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -24,9 +25,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import me.notanoticed.pdfmanager.core.pdf.model.PdfFile
 import me.notanoticed.pdfmanager.ui.theme.Colors
+import me.notanoticed.pdfmanager.ui.theme.PdfManagerTheme
 
 /* -------------------- OPTIONS PANEL -------------------- */
 @OptIn(ExperimentalMaterial3Api::class)
@@ -159,3 +163,32 @@ private fun FileOptionRow(
     }
 }
 /* ------------------------------------------------------- */
+
+
+
+@Preview(showBackground = true)
+@Composable
+fun OptionsOverlayPreview() {
+    val pdfListViewModel: PdfListViewModel = viewModel()
+
+    val file = PdfFile(
+        uri = Uri.parse(""),
+        name = "document.pdf",
+        sizeBytes = 100000000,
+        pagesCount = 100,
+        createdEpochSeconds = 1666666666,
+        bitmap = null,
+        isLocked = true
+    )
+
+    pdfListViewModel.openOptions(file)
+
+    PdfManagerTheme {
+        OptionsOverlay(
+            visible = pdfListViewModel.optionsPanelVisible,
+            pdf = pdfListViewModel.optionsPanelPdf,
+            onDismiss = { pdfListViewModel.closeOptions() },
+            onAction = {}
+        )
+    }
+}
