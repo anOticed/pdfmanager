@@ -37,6 +37,9 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.ModalBottomSheetProperties
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults.Indicator
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -119,33 +122,56 @@ fun PdfListScreen(
         }
     }
 
+    val hasData = pdfFiles.isNotEmpty()
+    val showFullscreenLoader = isLoading && !hasData
+    val showFullscreenError = errorText != null && !hasData
+
     when {
-        isLoading -> {
+        showFullscreenLoader -> {
             Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 CircularProgressIndicator(color = Colors.blueColor)
             }
         }
 
-        errorText != null -> {
+        showFullscreenError -> {
             Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 Text(text = errorText, color = Colors.textMutedColor)
             }
         }
 
         else -> {
-            LazyColumn(
-                modifier = modifier
-                    .fillMaxSize()
-                    .padding(vertical = 8.dp),
-                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-                verticalArrangement = Arrangement.spacedBy(14.dp)
-            ) {
-                items(pdfFiles) { pdf ->
-                    DocumentCard(
-                        pdf = pdf,
-                        onMoreClick = { viewModel.openOptions(pdf = pdf) })
+            val pullState = rememberPullToRefreshState()
+            val isRefreshing = isLoading && hasData
+
+            PullToRefreshBox(
+                modifier = modifier.fillMaxSize(),
+                state = pullState,
+                isRefreshing = isRefreshing,
+                onRefresh = { viewModel.loadAll(context) },
+                indicator = {
+                    Indicator(
+                        state = pullState,
+                        isRefreshing = isRefreshing,
+                        modifier = Modifier.align(Alignment.TopCenter),
+                        containerColor = Colors.cardColor,
+                        color = Colors.blueColor
+                    )
                 }
-                item { Spacer(modifier = Modifier.height(24.dp)) }
+            ) {
+                LazyColumn(
+                    modifier = modifier
+                        .fillMaxSize()
+                        .padding(vertical = 8.dp),
+                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+                    verticalArrangement = Arrangement.spacedBy(14.dp)
+                ) {
+                    items(pdfFiles) { pdf ->
+                        DocumentCard(
+                            pdf = pdf,
+                            onMoreClick = { viewModel.openOptions(pdf = pdf) })
+                    }
+                    item { Spacer(modifier = Modifier.height(24.dp)) }
+                }
             }
         }
     }
@@ -338,7 +364,7 @@ private fun OptionsOverlayList(
     ) {
         items.filterNot{ item ->
             (item.action == PdfFileOptionAction.SET_PASSWORD && isLocked) ||
-            (item.action == PdfFileOptionAction.REMOVE_PASSWORD && !isLocked)
+                    (item.action == PdfFileOptionAction.REMOVE_PASSWORD && !isLocked)
         }.forEach { item ->
             FileOptionRow(
                 item = item,
