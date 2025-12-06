@@ -12,7 +12,9 @@ import androidx.compose.material.icons.outlined.LockOpen
 import androidx.compose.material.icons.outlined.Print
 import androidx.compose.material.icons.outlined.Reorder
 import androidx.compose.material.icons.outlined.Share
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import me.notanoticed.pdfmanager.ui.theme.Colors
 
 /* -------------------- FILE OPTIONS -------------------- */
 enum class PdfFileOptionAction {
@@ -34,7 +36,7 @@ data class PdfFileOptionItem(
     val action: PdfFileOptionAction,
     val title: String,
     val icon: ImageVector,
-    val isDestructive: Boolean = false
+    val tint: Color = Colors.textMutedColor
 )
 
 
@@ -47,7 +49,8 @@ val pdfFileOptionItems: List<PdfFileOptionItem> = listOf(
     PdfFileOptionItem(
         action = PdfFileOptionAction.MERGE,
         title = "Merge",
-        icon = Icons.Outlined.CallMerge
+        icon = Icons.Outlined.CallMerge,
+        tint = Color(0xFF059568)
     ),
     PdfFileOptionItem(
         action = PdfFileOptionAction.SPLIT,
@@ -67,12 +70,14 @@ val pdfFileOptionItems: List<PdfFileOptionItem> = listOf(
     PdfFileOptionItem(
         action = PdfFileOptionAction.SET_PASSWORD,
         title = "Set password",
-        icon = Icons.Outlined.Lock
+        icon = Icons.Outlined.Lock,
+        tint = Color(0xFFFFB74D)
     ),
     PdfFileOptionItem(
         action = PdfFileOptionAction.REMOVE_PASSWORD,
         title = "Remove password",
-        icon = Icons.Outlined.LockOpen
+        icon = Icons.Outlined.LockOpen,
+        tint = Color(0xFFFFB74D)
     ),
     PdfFileOptionItem(
         action = PdfFileOptionAction.PRINT,
@@ -93,7 +98,7 @@ val pdfFileOptionItems: List<PdfFileOptionItem> = listOf(
         action = PdfFileOptionAction.DELETE,
         title = "Delete",
         icon = Icons.Outlined.Delete,
-        isDestructive = true
+        tint = Color(0xFFE82D2C)
     )
 )
 /* ------------------------------------------------------ */

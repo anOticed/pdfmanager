@@ -133,13 +133,6 @@ private fun FileOptionRow(
     item: PdfFileOptionItem,
     onClick: () -> Unit
 ) {
-    val color = if (item.isDestructive) {
-        Color(0xFFE82D2C)
-    }
-    else {
-        Colors.textMutedColor
-    }
-
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -150,7 +143,7 @@ private fun FileOptionRow(
         Icon(
             imageVector = item.icon,
             contentDescription = null,
-            tint = color,
+            tint = item.tint,
             modifier = Modifier.size(24.dp)
         )
 

@@ -46,7 +46,7 @@ fun PdfListSelectionBottomBar(
             ) {
                 PdfSelectionAction(
                     icon = Icons.Outlined.CallMerge,
-                    color = Color(0xFF059568),
+                    tint = Color(0xFF059568),
                     label = "Merge",
                     onClick = { viewModel.mergeSelected() },
                     enabled = viewModel.selectionCount > 0
@@ -59,7 +59,7 @@ fun PdfListSelectionBottomBar(
                 )
                 PdfSelectionAction(
                     icon = Icons.Outlined.Delete,
-                    color = Color(0xFFE82D2C),
+                    tint = Color(0xFFE82D2C),
                     label = "Delete",
                     onClick = { viewModel.deleteSelectedPdfs() },
                     enabled = viewModel.selectionCount > 0
@@ -73,7 +73,7 @@ fun PdfListSelectionBottomBar(
 @Composable
 fun RowScope.PdfSelectionAction(
     icon: ImageVector,
-    color: Color = Colors.textMutedColor,
+    tint: Color = Colors.textMutedColor,
     label: String,
     onClick: () -> Unit,
     enabled: Boolean
@@ -85,10 +85,10 @@ fun RowScope.PdfSelectionAction(
         enabled = enabled,
         selected = false,
         colors = NavigationBarItemDefaults.colors().copy(
-            unselectedIconColor = color,
-            unselectedTextColor = color,
-            disabledIconColor = color.copy(alpha = 0.5f),
-            disabledTextColor = color.copy(alpha = 0.5f),
+            unselectedIconColor = tint,
+            unselectedTextColor = tint,
+            disabledIconColor = tint.copy(alpha = 0.5f),
+            disabledTextColor = tint.copy(alpha = 0.5f),
         )
     )
 }
