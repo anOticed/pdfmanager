@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace = "me.anoticed.pdfmanager"
+    namespace = "me.notanoticed.pdfmanager"
     compileSdk {
         version = release(36)
     }
