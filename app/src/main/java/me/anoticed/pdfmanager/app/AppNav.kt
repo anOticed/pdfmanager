@@ -48,6 +48,7 @@ import me.anoticed.pdfmanager.feature.split.SplitViewModel
 import me.anoticed.pdfmanager.ui.theme.Colors
 import me.anoticed.pdfmanager.ui.theme.PdfManagerTheme
 import kotlinx.coroutines.launch
+import me.anoticed.pdfmanager.feature.pdflist.PdfListSelectionBottomBar
 
 
 /* -------------------- SCREENS & TABS -------------------- */
@@ -60,11 +61,11 @@ sealed class Screen(val route: String) {
 }
 
 private val tabs = listOf(
-    _root_ide_package_.me.anoticed.pdfmanager.app.Screen.PdfList.route,
-    _root_ide_package_.me.anoticed.pdfmanager.app.Screen.Merge.route,
-    _root_ide_package_.me.anoticed.pdfmanager.app.Screen.Split.route,
-    _root_ide_package_.me.anoticed.pdfmanager.app.Screen.Images.route,
-    _root_ide_package_.me.anoticed.pdfmanager.app.Screen.Settings.route
+    Screen.PdfList.route,
+    Screen.Merge.route,
+    Screen.Split.route,
+    Screen.Images.route,
+    Screen.Settings.route
 )
 /* -------------------------------------------------------- */
 
@@ -101,12 +102,17 @@ fun App() = PdfManagerTheme {
                 )
             },
             bottomBar = {
-                AppBottomBar(
-                    currentRoute = tabs[pagerState.currentPage]
-                ) { page ->
+                if (tabs[pagerState.currentPage] == Screen.PdfList.route && pdfListViewModel.isSelectionMode) {
+                    PdfListSelectionBottomBar(viewModel = pdfListViewModel)
+                }
+                else {
+                    AppBottomBar(
+                        currentRoute = tabs[pagerState.currentPage]
+                    ) { page ->
 
-                    scope.launch {
-                        pagerState.animateScrollToPage(page = tabs.indexOf(page))
+                        scope.launch {
+                            pagerState.animateScrollToPage(page = tabs.indexOf(page))
+                        }
                     }
                 }
             },
@@ -171,7 +177,10 @@ fun AppTopBar(
     val context = LocalContext.current
 
     when (currentRoute) {
-        Screen.PdfList.route -> PdfListTopBar(pdfListViewModel.pdfFiles.size)
+        Screen.PdfList.route -> PdfListTopBar(
+            viewModel = pdfListViewModel,
+            totalDocuments = pdfListViewModel.pdfFiles.size
+        )
         Screen.Merge.route -> MergeTopBar(
             total = mergeViewModel.pdfMergeFiles.size,
             isActive = mergeViewModel.isActive,

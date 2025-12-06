@@ -18,7 +18,7 @@ import kotlinx.coroutines.launch
 
 
 sealed class PdfListEvent {
-    data class OpenMerge(val pdf: PdfFile) : PdfListEvent()
+    data class OpenMerge(val pdfs: List<PdfFile>) : PdfListEvent()
     data class OpenSplit(val pdf: PdfFile) : PdfListEvent()
 }
 
@@ -33,11 +33,27 @@ class PdfListViewModel : ViewModel() {
     var pdfFiles by mutableStateOf<List<PdfFile>>(emptyList())
         private set
 
+
     var optionsPanelVisible by mutableStateOf(false)
     var optionsPanelPdf: PdfFile? by mutableStateOf(null)
 
     var pendingEvent: PdfListEvent? by mutableStateOf(null)
         private set
+
+
+    var selectedPdfFiles by mutableStateOf<Set<PdfFile>>(mutableSetOf())
+        private set
+
+    var selectionMode by mutableStateOf(false)
+        private set
+    val isSelectionMode: Boolean
+        get() = selectionMode
+
+    val selectionCount: Int
+        get() = selectedPdfFiles.size
+
+    val isAllSelected: Boolean
+        get() = selectedPdfFiles.size == pdfFiles.size && pdfFiles.isNotEmpty()
 
 
     fun loadAll(context: Context) {
@@ -59,6 +75,7 @@ class PdfListViewModel : ViewModel() {
             }
         }
     }
+
 
     fun openOptions(pdf: PdfFile) {
         optionsPanelVisible = true
@@ -83,9 +100,11 @@ class PdfListViewModel : ViewModel() {
         }
     }
 
+
+
     fun onFileOptionSelected(action: PdfFileOptionAction, pdf: PdfFile) {
         when(action) {
-            PdfFileOptionAction.MERGE -> pendingEvent = PdfListEvent.OpenMerge(pdf)
+            PdfFileOptionAction.MERGE -> pendingEvent = PdfListEvent.OpenMerge(listOf(pdf))
             PdfFileOptionAction.SPLIT -> pendingEvent = PdfListEvent.OpenSplit(pdf)
             else -> Unit
         }
@@ -94,4 +113,48 @@ class PdfListViewModel : ViewModel() {
     fun clearPendingEvent() {
         pendingEvent = null
     }
+
+
+
+    fun isSelected(pdf: PdfFile): Boolean {
+        return(selectedPdfFiles.contains(pdf))
+    }
+
+    fun onItemLongPress(pdf: PdfFile) {
+        selectionMode = true
+        selectedPdfFiles = selectedPdfFiles + pdf
+    }
+
+    fun onItemClick(pdf: PdfFile) {
+        if (!isSelectionMode) return
+
+        if (selectedPdfFiles.contains(pdf)) {
+            selectedPdfFiles = selectedPdfFiles - pdf
+        } else {
+            selectedPdfFiles = selectedPdfFiles + pdf
+        }
+    }
+
+    fun toggleSelectAll() {
+        if (isAllSelected) {
+            selectedPdfFiles = emptySet()
+        }
+        else {
+            selectedPdfFiles = pdfFiles.toSet()
+        }
+    }
+
+    fun exitSelectionMode() {
+        selectedPdfFiles = emptySet()
+        selectionMode = false
+    }
+
+    // TODO: implement methods below
+    fun mergeSelected() {
+        if (selectedPdfFiles.isEmpty()) return
+
+        pendingEvent = PdfListEvent.OpenMerge(selectedPdfFiles.toList())
+    }
+    fun shareSelected() { /* TODO */ }
+    fun deleteSelectedPdfs() { /* TODO */ }
 }

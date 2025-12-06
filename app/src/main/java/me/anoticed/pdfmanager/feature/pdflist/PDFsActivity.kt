@@ -17,7 +17,7 @@ import me.anoticed.pdfmanager.ui.theme.PdfManagerTheme
 fun PdfListActivity(active: Screen, onSelect: (String) -> Unit) {
     Scaffold(
         topBar = {
-            PdfListTopBar(totalDocuments = 0)
+            PdfListTopBar(viewModel = PdfListViewModel(), totalDocuments = 0)
         },
         bottomBar = {
             AppBottomBar(

@@ -48,8 +48,7 @@ import me.anoticed.pdfmanager.ui.theme.Colors
 data class MergeFile(
     val id: Int,
     val name: String,
-    val pages: String,
-    val size: String
+    val meta: String
 )
 
 @Composable
@@ -253,7 +252,7 @@ fun MergeFileCard(file: MergeFile) {
                     overflow = TextOverflow.Ellipsis
                 )
                 Text(
-                    text = "${file.pages} • ${file.size}",
+                    text = file.meta,
                     color = Colors.textMutedColor,
                     fontSize = 11.sp,
                 )

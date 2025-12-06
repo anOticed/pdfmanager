@@ -9,6 +9,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -28,6 +29,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Description
 import androidx.compose.material.icons.outlined.Lock
 import androidx.compose.material.icons.outlined.MoreVert
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -168,7 +171,12 @@ fun PdfListScreen(
                     items(pdfFiles) { pdf ->
                         DocumentCard(
                             pdf = pdf,
-                            onMoreClick = { viewModel.openOptions(pdf = pdf) })
+                            isSelectionMode = viewModel.isSelectionMode,
+                            isSelected = viewModel.isSelected(pdf),
+                            onClick = { viewModel.onItemClick(pdf) },
+                            onLongPress = { viewModel.onItemLongPress(pdf) },
+                            onMoreClick = { viewModel.openOptions(pdf = pdf) }
+                        )
                     }
                     item { Spacer(modifier = Modifier.height(24.dp)) }
                 }
@@ -181,6 +189,60 @@ fun PdfListScreen(
 
 
 /* -------------------- DOCUMENT CARD -------------------- */
+@Composable
+fun DocumentCard(
+    pdf: PdfFile,
+    isSelectionMode: Boolean,
+    isSelected: Boolean,
+    onClick: () -> Unit,
+    onLongPress: () -> Unit,
+    onMoreClick: () -> Unit
+) {
+    Surface(
+        shape = RoundedCornerShape(16.dp),
+        color = Colors.cardColor,
+        tonalElevation = 0.dp,
+        shadowElevation = 0.dp,
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        Row(
+            modifier = Modifier
+                .combinedClickable(
+                    onClick = onClick,
+                    onLongClick = onLongPress
+                )
+                .padding(14.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            DocumentInfoRow(
+                modifier = Modifier.weight(1f),
+                pdf = pdf
+            )
+            if (isSelectionMode) {
+                Checkbox(
+                    checked = isSelected,
+                    onCheckedChange = null,
+                    colors = CheckboxDefaults.colors().copy(
+                        checkedBoxColor = Colors.blueColor,
+                        checkedBorderColor = Colors.blueColor,
+                        checkedCheckmarkColor = Color.White
+                    )
+                )
+            }
+            else {
+                IconButton(onClick = onMoreClick /* TODO: options menu */ ) {
+                    Icon(
+                        Icons.Outlined.MoreVert,
+                        contentDescription = "More icon",
+                        tint = Colors.textMutedColor
+                    )
+                }
+            }
+        }
+    }
+}
+
+
 @Composable
 fun DocumentInfoRow(
     modifier: Modifier = Modifier,
@@ -241,37 +303,6 @@ fun DocumentInfoRow(
                 modifier = Modifier.size(16.dp)
             )
             Spacer(modifier = Modifier.width(6.dp))
-        }
-    }
-}
-
-@Composable
-fun DocumentCard(
-    pdf: PdfFile,
-    onMoreClick: () -> Unit
-) {
-    Surface(
-        shape = RoundedCornerShape(16.dp),
-        color = Colors.cardColor,
-        tonalElevation = 0.dp,
-        shadowElevation = 0.dp,
-        modifier = Modifier.fillMaxWidth(),
-    ) {
-        Row(
-            modifier = Modifier.padding(14.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            DocumentInfoRow(
-                modifier = Modifier.weight(1f),
-                pdf = pdf
-            )
-            IconButton(onClick = onMoreClick /* TODO: options menu */ ) {
-                Icon(
-                    Icons.Outlined.MoreVert,
-                    contentDescription = "More icon",
-                    tint = Colors.textMutedColor
-                )
-            }
         }
     }
 }
