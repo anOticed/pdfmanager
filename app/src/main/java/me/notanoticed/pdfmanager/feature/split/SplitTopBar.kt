@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -18,8 +19,10 @@ import androidx.compose.material.icons.outlined.Description
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
@@ -85,11 +88,18 @@ fun SplitTopBar(
                 Spacer(modifier = Modifier.width(8.dp))
 
                 if (isActive) {
-                    IconButton(onClick = onCloseClick) {
+                    FilledIconButton(
+                        onClick = onCloseClick,
+                        shape = RoundedCornerShape(10.dp),
+                        colors = IconButtonDefaults.filledIconButtonColors().copy(
+                            containerColor = Colors.Button.iconBackground,
+                            contentColor = Colors.Icon.white
+                        )
+                    ) {
                         Icon(
                             imageVector = Icons.Outlined.Close,
                             contentDescription = "Close File",
-                            tint = Colors.Icon.gray
+                            modifier = Modifier.fillMaxSize(0.5f)
                         )
                     }
                 }
