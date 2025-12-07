@@ -54,7 +54,7 @@ object Colors {
     }
 
     object Button {
-        val primary = Primary.blue
+        val blue = Primary.blue
         val primaryPressed = Primary.darkBlue
         val darkSlate = Primary.darkSlate
         val skyBlue = Color(0xFF79AFFF)
