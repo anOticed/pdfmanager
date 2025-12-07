@@ -44,6 +44,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import me.notanoticed.pdfmanager.BuildConfig
 import me.notanoticed.pdfmanager.ui.theme.Colors
 
 /* -------------------- SCREEN -------------------- */
@@ -85,7 +86,7 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
                     // TODO: add rate logic
                 )
                 HorizontalDivider(
-                    color = Colors.textMutedColor,
+                    color = Colors.Border.default,
                     thickness = 0.5.dp,
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -96,7 +97,7 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
                     // TODO: add share logic
                 )
                 HorizontalDivider(
-                    color = Colors.textMutedColor,
+                    color = Colors.Border.default,
                     thickness = 0.5.dp,
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -112,7 +113,7 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
         item {
             Surface(
                 modifier = Modifier.fillMaxWidth(),
-                color = Colors.cardColor,
+                color = Colors.Surface.card,
                 shape = RoundedCornerShape(16.dp)
             ) {
                 Column(
@@ -123,20 +124,20 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
                         modifier = Modifier
                             .size(54.dp)
                             .clip(CircleShape)
-                            .background(Colors.blueColor),
+                            .background(Colors.Primary.blue),
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
                             imageVector = Icons.Outlined.Description,
                             contentDescription = null,
-                            tint = Colors.textMainColor,
+                            tint = Colors.Icon.white,
                             modifier = Modifier.fillMaxSize(0.5f)
                         )
                     }
                     Spacer(modifier = Modifier.height(8.dp))
-                    Text(text = "PDF Manager", color = Colors.textMainColor, fontWeight = FontWeight.SemiBold)
-                    Text(text = "Version 0.1", color = Colors.textMutedColor, fontSize = 12.sp)
-                    Text(text = "Your complete PDF toolkit", color = Colors.textMutedColor, fontSize = 12.sp)
+                    Text(text = "PDF Manager", color = Colors.Text.primary, fontWeight = FontWeight.SemiBold)
+                    Text(text = "Version ${BuildConfig.VERSION_NAME}", color = Colors.Text.secondary, fontSize = 12.sp)
+                    Text(text = "Your complete PDF toolkit", color = Colors.Text.secondary, fontSize = 12.sp)
                 }
             }
         }
@@ -147,7 +148,7 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
 fun SectionHeader(text: String) {
     Text(
         text = text,
-        color = Colors.textMutedColor,
+        color = Colors.Text.secondary,
         fontSize = 12.sp,
         fontWeight = FontWeight.SemiBold,
         modifier = Modifier
@@ -160,7 +161,7 @@ fun SectionHeader(text: String) {
 fun CardBlock(text: String, content: @Composable ColumnScope.() -> Unit = {}) {
     SectionHeader(text = text)
     Surface(
-        color = Colors.cardColor,
+        color = Colors.Surface.card,
         shape = RoundedCornerShape(16.dp)
     ) {
         Column(
@@ -183,12 +184,12 @@ fun SwitchRow(icon: ImageVector, title: String, subtitle: String, checked: Boole
                 modifier = Modifier
                     .size(36.dp)
                     .clip(CircleShape)
-                    .background(Color(0xFF2A2F37)) // TODO: change
+                    .background(Colors.Surface.thumbnail)
             ) {
                 Icon(
                     imageVector = icon,
                     contentDescription = null,
-                    tint = Color(0xFFD7DEE8), // TODO: change
+                    tint = Colors.Icon.white,
                     modifier = Modifier
                         .fillMaxSize(0.65f)
                         .align(Alignment.Center)
@@ -196,24 +197,26 @@ fun SwitchRow(icon: ImageVector, title: String, subtitle: String, checked: Boole
             }
         },
         headlineContent = {
-            Text(text = title, color = Colors.textMainColor, fontWeight = FontWeight.SemiBold) }
+            Text(text = title, color = Colors.Text.primary, fontWeight = FontWeight.SemiBold) }
         ,
         supportingContent = {
-            Text(text = subtitle, color = Colors.textMutedColor, fontSize = 12.sp)
+            Text(text = subtitle, color = Colors.Text.secondary, fontSize = 12.sp)
         },
         trailingContent = {
             Switch(
                 checked = checked,
                 onCheckedChange = { checked = it  /* TODO: save to settings */ },
                 colors = SwitchDefaults.colors().copy(
-                    checkedTrackColor = Colors.blueColor,
-                    uncheckedThumbColor = Color.White,
-                    uncheckedTrackColor = Color(55, 65, 81) // TODO: change
+                    checkedThumbColor = Colors.Primary.white,
+                    checkedTrackColor = Colors.Primary.blue,
+                    uncheckedThumbColor = Colors.Primary.white,
+                    uncheckedTrackColor = Colors.Primary.slateGray,
+                    uncheckedBorderColor = Colors.Border.gray
                 ),
             )
         },
         colors = ListItemDefaults.colors().copy(
-            containerColor = Colors.cardColor
+            containerColor = Colors.Surface.card
         ),
         modifier = Modifier
             .fillMaxWidth()
@@ -229,12 +232,12 @@ fun ArrowRow(icon: ImageVector, title: String, subtitle: String) {
                 modifier = Modifier
                     .size(36.dp)
                     .clip(CircleShape)
-                    .background(Color(0xFF2A2F37)) // TODO: change
+                    .background(Colors.Surface.thumbnail)
             ) {
                 Icon(
                     imageVector = icon,
                     contentDescription = null,
-                    tint = Color(0xFFD7DEE8), // TODO: change
+                    tint = Colors.Icon.white,
                     modifier = Modifier
                         .fillMaxSize(0.65f)
                         .align(Alignment.Center)
@@ -242,19 +245,19 @@ fun ArrowRow(icon: ImageVector, title: String, subtitle: String) {
             }
         },
         headlineContent = {
-            Text(text = title, color = Colors.textMainColor, fontWeight = FontWeight.SemiBold) }
+            Text(text = title, color = Colors.Text.primary, fontWeight = FontWeight.SemiBold) }
         ,
         supportingContent = {
-            Text(text = subtitle, color = Colors.textMutedColor, fontSize = 12.sp)
+            Text(text = subtitle, color = Colors.Text.secondary, fontSize = 12.sp)
         },
         trailingContent = {
             Icon(
                 imageVector = Icons.Outlined.ChevronRight,
                 contentDescription = null,
-                tint = Colors.textMutedColor
+                tint = Colors.Text.secondary
             )
         },
-        colors = ListItemDefaults.colors().copy(containerColor = Colors.cardColor),
+        colors = ListItemDefaults.colors().copy(containerColor = Colors.Surface.card),
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 4.dp)

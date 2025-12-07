@@ -25,7 +25,7 @@ fun SettingsActivity(active: Screen, onSelect: (String) -> Unit) {
                 onItemClick = onSelect
             )
         },
-        containerColor = Colors.backgroundColor
+        containerColor = Colors.Background.app
     ) { pads -> SettingsScreen(Modifier.padding(pads)) }
 }
 /* -------------------------------------------------- */

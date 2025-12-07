@@ -26,12 +26,12 @@ fun SettingsTopBar() {
             title = {
                 Column {
                     Text(text = "Settings", fontSize = 22.sp, fontWeight = FontWeight.ExtraBold)
-                    Text(text = "Customize your experience", fontSize = 12.sp, color = Colors.textMutedColor)
+                    Text(text = "Customize your experience", fontSize = 12.sp, color = Colors.Text.secondary)
                 }
             },
             colors = TopAppBarDefaults.topAppBarColors(
-                containerColor = Colors.cardColor,
-                titleContentColor = Colors.textMainColor,
+                containerColor = Colors.Surface.card,
+                titleContentColor = Colors.Primary.white,
             )
         )
 
@@ -39,7 +39,7 @@ fun SettingsTopBar() {
             modifier = Modifier
                 .fillMaxWidth()
                 .height(2.dp)
-                .background(Color.Gray.copy(alpha = 0.2f)) // TODO: change
+                .background(Colors.Border.subtle)
         )
     }
 }

@@ -40,25 +40,25 @@ fun MergeTopBar(
             title = {
                 Column {
                     Text(text = "Merge PDFs", fontSize = 22.sp, fontWeight = FontWeight.ExtraBold)
-                    Text(text = "$total files selected", fontSize = 12.sp, color = Colors.textMutedColor)
+                    Text(text = "$total files selected", fontSize = 12.sp, color = Colors.Text.secondary)
                 }
             },
             actions = {
                 Button(
                     onClick = onAddClick  /* TODO: SAF picker */ ,
-                    colors = ButtonDefaults.buttonColors(containerColor = Colors.blueColor),
+                    colors = ButtonDefaults.buttonColors(containerColor = Colors.Button.primary),
                     contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp),
                     shape = RoundedCornerShape(10.dp)
                 ) {
-                    Icon(Icons.Outlined.Add, contentDescription = "Add PDFs", tint = Color.White)
+                    Icon(Icons.Outlined.Add, contentDescription = "Add PDFs", tint = Colors.Icon.white)
                     Spacer(modifier = Modifier.size(6.dp))
-                    Text(text = if (isActive) "Change" else "Add PDFs", color = Color.White)
+                    Text(text = if (isActive) "Change" else "Add PDFs", color = Colors.Text.primary)
                 }
                 Spacer(modifier = Modifier.width(8.dp))
             },
             colors = TopAppBarDefaults.topAppBarColors(
-                containerColor = Colors.cardColor,
-                titleContentColor = Colors.textMainColor,
+                containerColor = Colors.Surface.card,
+                titleContentColor = Colors.Primary.white,
             )
         )
 
@@ -66,7 +66,7 @@ fun MergeTopBar(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(2.dp)
-                .background(Color.Gray.copy(alpha = 0.2f)) // TODO: change
+                .background(Colors.Border.subtle)
         )
     }
 

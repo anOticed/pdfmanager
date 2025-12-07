@@ -76,7 +76,7 @@ fun SplitActiveScreen(
         item {
             Surface(
                 shape = RoundedCornerShape(10.dp),
-                color = Color(0xB01F2937), // TODO: change
+                color = Colors.Surface.charcoalSlate,
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Row(
@@ -89,12 +89,12 @@ fun SplitActiveScreen(
                             .width(48.dp)
                             .height(64.dp)
                             .clip(RoundedCornerShape(10.dp))
-                            .background(Color(0xFF2A2F37))
+                            .background(Colors.Surface.thumbnail)
                     ) {
                         Icon(
                             imageVector = Icons.Outlined.Description,
                             contentDescription = "",
-                            tint = Color(0xFF7D8592)
+                            tint = Colors.Icon.gray,
                         )
                     }
 
@@ -106,14 +106,14 @@ fun SplitActiveScreen(
                     ) {
                         Text(
                             text = selectedSplitPdf.name,
-                            color = Colors.textMainColor,
+                            color = Colors.Text.primary,
                             fontSize = 14.sp,
                             fontWeight = FontWeight.SemiBold
                         )
 
                         Text(
                             text = selectedSplitPdf.metaLine(),
-                            color = Colors.textMutedColor,
+                            color = Colors.Text.secondary,
                             fontSize = 12.sp
                         )
                     }
@@ -124,7 +124,7 @@ fun SplitActiveScreen(
         item {
             Text(
                 text = "Split Method",
-                color = Colors.textMainColor,
+                color = Colors.Text.primary,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.SemiBold,
                 modifier = Modifier.padding(top = 4.dp, bottom = 8.dp)
@@ -136,7 +136,7 @@ fun SplitActiveScreen(
         item {
             Surface(
                 shape = RoundedCornerShape(10.dp),
-                color = Color(0xB01F2937),
+                color = Colors.Surface.charcoalSlate,
                 tonalElevation = 0.dp,
                 shadowElevation = 0.dp,
                 modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
@@ -148,7 +148,7 @@ fun SplitActiveScreen(
                     Button(
                         onClick = { /* TODO: preview */ },
                         colors = ButtonDefaults.buttonColors().copy(
-                            containerColor = Color(0xFF374050)
+                            containerColor = Colors.Button.darkSlate
                         ),
                         modifier = Modifier.weight(1f),
                         contentPadding = PaddingValues(vertical = 10.dp),
@@ -157,21 +157,21 @@ fun SplitActiveScreen(
                         Icon(
                             imageVector = Icons.Outlined.Visibility,
                             contentDescription = "PDF icon",
-                            tint = Color.White, // TODO: change
+                            tint = Colors.Icon.white,
                             modifier = Modifier.size(18.dp)
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
                             text = "Preview",
-                            color = Color.White,
+                            color = Colors.Text.primary,
                             fontSize = 14.sp
                         )
                     }
 
                     Button(
-                        onClick = { /* TODO: merge */ },
+                        onClick = { /* TODO: split */ },
                         colors = ButtonDefaults.buttonColors().copy(
-                            containerColor = Color(0xFFE82D2C)
+                            containerColor = Colors.Button.red
                         ),
                         modifier = Modifier.weight(1.75f),
                         contentPadding = PaddingValues(vertical = 10.dp),
@@ -180,13 +180,13 @@ fun SplitActiveScreen(
                         Icon(
                             imageVector = Icons.Outlined.FileDownload,
                             contentDescription = "PDF icon",
-                            tint = Color.White, // TODO: change
+                            tint = Colors.Icon.white,
                             modifier = Modifier.size(20.dp)
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
                             text = "Split PDF",
-                            color = Color.White,
+                            color = Colors.Text.primary,
                             fontSize = 14.sp
                         )
                     }
@@ -272,7 +272,7 @@ fun RadioButtonSingleSelection(
 
         Surface(
             shape = RoundedCornerShape(10.dp),
-            color = Color(0xB01F2937), // TODO: change
+            color = Colors.Surface.charcoalSlate,
             modifier = Modifier.fillMaxWidth().padding(top = 24.dp)
         ) {
             Row(
@@ -285,14 +285,14 @@ fun RadioButtonSingleSelection(
                 ) {
                     Text(
                         text = methodView[selectedOptionId].title,
-                        color = Colors.blueColor,
+                        color = Colors.Text.blue,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.SemiBold,
                     )
 
                     Text(
                         text = methodView[selectedOptionId].description,
-                        color = Colors.textMutedColor,
+                        color = Colors.Text.secondary,
                         fontSize = 12.sp
                     )
 
@@ -303,15 +303,15 @@ fun RadioButtonSingleSelection(
                             state = textFieldState,
                             lineLimits = TextFieldLineLimits.SingleLine,
                             textStyle = LocalTextStyle.current.copy(
-                                color = Color.White,
+                                color = Colors.Text.primary,
                                 textAlign = TextAlign.Start
                             ),
-                            cursorBrush = SolidColor(Color.White),
+                            cursorBrush = SolidColor(Colors.Primary.white),
                             modifier = Modifier
                                 .width(220.dp)
                                 .height(40.dp)
                                 .clip(RoundedCornerShape(10.dp))
-                                .background(Color(0xFF374050))
+                                .background(Colors.Primary.darkSlate)
                                 .padding(horizontal = 10.dp),
                             decorator = { innerTextField ->
 
@@ -322,7 +322,7 @@ fun RadioButtonSingleSelection(
                                     placeholder = {
                                         Text(
                                             text = "1-5, 10-15, 20",
-                                            color = Color(0xFF8D96A5),
+                                            color = Colors.Text.secondary,
                                             fontSize = 13.sp,
                                             textAlign = TextAlign.Start,
                                             modifier = Modifier.fillMaxWidth()
@@ -333,9 +333,9 @@ fun RadioButtonSingleSelection(
                                     interactionSource = remember { MutableInteractionSource() },
                                     contentPadding = PaddingValues(0.dp),
                                     colors = TextFieldDefaults.colors().copy(
-                                        focusedContainerColor = Color(0xFF374050),
-                                        unfocusedContainerColor = Color(0xFF374050),
-                                        disabledContainerColor = Color(0xFF374050),
+                                        focusedContainerColor = Colors.Primary.darkSlate,
+                                        unfocusedContainerColor = Colors.Primary.darkSlate,
+                                        disabledContainerColor = Colors.Primary.darkSlate,
                                         focusedIndicatorColor = Color.Transparent,
                                         unfocusedIndicatorColor = Color.Transparent,
                                         disabledIndicatorColor = Color.Transparent,
@@ -352,15 +352,15 @@ fun RadioButtonSingleSelection(
                             state = textFieldState,
                             lineLimits = TextFieldLineLimits.SingleLine,
                             textStyle = LocalTextStyle.current.copy(
-                                color = Color.White,
+                                color = Colors.Text.primary,
                                 textAlign = TextAlign.Start
                             ),
-                            cursorBrush = SolidColor(Color.White),
+                            cursorBrush = SolidColor(Colors.Primary.white),
                             modifier = Modifier
                                 .width(80.dp)
                                 .height(40.dp)
                                 .clip(RoundedCornerShape(10.dp))
-                                .background(Color(0xFF374050))
+                                .background(Colors.Primary.darkSlate)
                                 .padding(horizontal = 10.dp),
                             decorator = { innerTextField ->
 
@@ -371,7 +371,7 @@ fun RadioButtonSingleSelection(
                                     placeholder = {
                                         Text(
                                             text = "5",
-                                            color = Color(0xFF8D96A5),
+                                            color = Colors.Text.secondary,
                                             fontSize = 13.sp,
                                             textAlign = TextAlign.Start,
                                             modifier = Modifier.fillMaxWidth()
@@ -382,9 +382,9 @@ fun RadioButtonSingleSelection(
                                     interactionSource = remember { MutableInteractionSource() },
                                     contentPadding = PaddingValues(0.dp),
                                     colors = TextFieldDefaults.colors().copy(
-                                        focusedContainerColor = Color(0xFF374050),
-                                        unfocusedContainerColor = Color(0xFF374050),
-                                        disabledContainerColor = Color(0xFF374050),
+                                        focusedContainerColor = Colors.Primary.darkSlate,
+                                        unfocusedContainerColor = Colors.Primary.darkSlate,
+                                        disabledContainerColor = Colors.Primary.darkSlate,
                                         focusedIndicatorColor = Color.Transparent,
                                         unfocusedIndicatorColor = Color.Transparent,
                                         disabledIndicatorColor = Color.Transparent,
@@ -408,9 +408,9 @@ fun MethodCard(
 ) {
     val selectedOptionId = viewModel.selectedSplitMethodId
 
-    val surfaceColor = if (method.id == selectedOptionId) Color(0xFF195CCD) else Colors.cardColor
-    val borderColor = if (method.id == selectedOptionId) Color(0xFF3379FF) else Color(0xFF252832)
-    val iconBGColor = if (method.id == selectedOptionId) Colors.blueColor else Color(0xFF2A2F37)
+    val surfaceColor = if (method.id == selectedOptionId) Colors.Surface.selectedCard else Colors.Surface.card
+    val borderColor = if (method.id == selectedOptionId) Colors.Border.lightBlue else Colors.Border.darkGray
+    val iconBGColor = if (method.id == selectedOptionId) Colors.Icon.blue else Colors.Icon.darkGray
 
     Surface(
         color = surfaceColor,
@@ -431,12 +431,12 @@ fun MethodCard(
                     modifier = Modifier
                         .size(36.dp)
                         .clip(CircleShape)
-                        .background(iconBGColor) // TODO: change
+                        .background(iconBGColor)
                 ) {
                     Icon(
                         imageVector = method.icon,
                         contentDescription = null,
-                        tint = Color(0xFFD7DEE8), // TODO: change
+                        tint = Colors.Icon.white,
                         modifier = Modifier
                             .fillMaxSize(0.65f)
                             .align(Alignment.Center)
@@ -444,17 +444,17 @@ fun MethodCard(
                 }
             },
             headlineContent = {
-                Text(text = method.title, color = Colors.textMainColor, fontWeight = FontWeight.SemiBold) }
+                Text(text = method.title, color = Colors.Text.primary, fontWeight = FontWeight.SemiBold) }
             ,
             supportingContent = {
-                Text(text = method.description, color = Colors.textMutedColor, fontSize = 12.sp)
+                Text(text = method.description, color = Colors.Text.secondary, fontSize = 12.sp)
             },
             trailingContent = {
                 RadioButton(
                     selected = (method.id == selectedOptionId),
                     onClick = null,
                     colors = RadioButtonDefaults.colors(
-                        selectedColor = Color(0xFF79AFFF)
+                        selectedColor = Colors.Button.skyBlue
                     )
                 )
             },
@@ -485,20 +485,20 @@ fun SplitScreen(modifier: Modifier = Modifier) {
         Icon(
             imageVector = Icons.AutoMirrored.Outlined.CallSplit,
             contentDescription = null,
-            tint = Colors.textMutedColor,
+            tint = Colors.Icon.default,
             modifier = Modifier.size(80.dp)
         )
         Spacer(modifier = Modifier.height(8.dp))
         Text(
             text = "No PDF selected",
-            color = Colors.textMutedColor,
+            color = Colors.Text.secondary,
             fontSize = 24.sp,
             fontWeight = FontWeight.ExtraBold
         )
         Spacer(modifier = Modifier.height(10.dp))
         Text(
             text = "Select a PDF to split it into multiple files using different methods.",
-            color = Colors.subtextMutedColor,
+            color = Colors.Text.muted,
             fontSize = 12.sp,
             fontWeight = FontWeight.SemiBold,
             textAlign = TextAlign.Center,

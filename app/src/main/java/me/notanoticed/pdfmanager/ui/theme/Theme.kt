@@ -17,23 +17,23 @@ import androidx.compose.ui.platform.LocalContext
 
 /* -------------------- COLOR SCHEME -------------------- */
 private val DarkColorScheme = darkColorScheme(
-    background = Colors.backgroundColor,
-    surface = Colors.cardColor,
-    primary = Colors.blueColor,
-    onPrimary = Color.White,
-    onSurface = Colors.textMainColor,
-    onBackground = Colors.textMainColor,
-    secondary = Colors.accentGradientStartColor
+    background = Colors.Background.app,
+    surface = Colors.Surface.card,
+    primary = Colors.Primary.blue,
+    onPrimary = Colors.Primary.white,
+    onSurface = Colors.Primary.white,
+    onBackground = Colors.Primary.white,
+    secondary = Colors.Primary.darkBlue
 )
 
 private val LightColorScheme = lightColorScheme(
     background = Color(0xFFF7F9FC),
     surface = Color(0xFFFFFFFF),
-    primary = Colors.blueColor,
+    primary = Colors.Primary.blue,
     onPrimary = Color.White,
     onBackground = Color(0xFF0E1624),
     onSurface = Color(0xFF0E1624),
-    secondary = Colors.accentGradientStartColor
+    secondary = Colors.Primary.darkBlue
 )
 /* ------------------------------------------------------ */
 

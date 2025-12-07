@@ -34,7 +34,7 @@ fun SplitActivity(
                 onItemClick = onSelect
             )
         },
-        containerColor = Colors.backgroundColor
+        containerColor = Colors.Background.app
     ) { pads ->
 
         if (selectedSplitPdf == null) {

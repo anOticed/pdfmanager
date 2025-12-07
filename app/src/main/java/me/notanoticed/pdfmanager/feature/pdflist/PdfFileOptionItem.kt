@@ -36,7 +36,7 @@ data class PdfFileOptionItem(
     val action: PdfFileOptionAction,
     val title: String,
     val icon: ImageVector,
-    val tint: Color = Colors.textMutedColor
+    val tint: Color = Colors.Icon.default
 )
 
 
@@ -50,7 +50,7 @@ val pdfFileOptionItems: List<PdfFileOptionItem> = listOf(
         action = PdfFileOptionAction.MERGE,
         title = "Merge",
         icon = Icons.Outlined.CallMerge,
-        tint = Color(0xFF059568)
+        tint = Colors.Icon.merge
     ),
     PdfFileOptionItem(
         action = PdfFileOptionAction.SPLIT,
@@ -71,13 +71,13 @@ val pdfFileOptionItems: List<PdfFileOptionItem> = listOf(
         action = PdfFileOptionAction.SET_PASSWORD,
         title = "Set password",
         icon = Icons.Outlined.Lock,
-        tint = Color(0xFFFFB74D)
+        tint = Colors.Icon.lock
     ),
     PdfFileOptionItem(
         action = PdfFileOptionAction.REMOVE_PASSWORD,
         title = "Remove password",
         icon = Icons.Outlined.LockOpen,
-        tint = Color(0xFFFFB74D)
+        tint = Colors.Icon.lock
     ),
     PdfFileOptionItem(
         action = PdfFileOptionAction.PRINT,
@@ -98,7 +98,7 @@ val pdfFileOptionItems: List<PdfFileOptionItem> = listOf(
         action = PdfFileOptionAction.DELETE,
         title = "Delete",
         icon = Icons.Outlined.Delete,
-        tint = Color(0xFFE82D2C)
+        tint = Colors.Icon.delete
     )
 )
 /* ------------------------------------------------------ */

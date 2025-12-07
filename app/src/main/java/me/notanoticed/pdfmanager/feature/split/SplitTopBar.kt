@@ -46,7 +46,7 @@ fun SplitTopBar(
                     Text(
                         text = if (isActive) fileName else "No file selected",
                         fontSize = 12.sp,
-                        color = Colors.textMutedColor,
+                        color = Colors.Text.secondary,
                         modifier = Modifier.padding(start = 4.dp)
                     )
                 }
@@ -54,19 +54,19 @@ fun SplitTopBar(
             actions = {
                 Button(
                     onClick = onAddClick  /* TODO: SAF picker */ ,
-                    colors = ButtonDefaults.buttonColors(containerColor = Colors.blueColor),
+                    colors = ButtonDefaults.buttonColors(containerColor = Colors.Button.primary),
                     contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp),
                     shape = RoundedCornerShape(10.dp)
                 ) {
-                    Icon(Icons.Outlined.Description, contentDescription = "Change", tint = Color.White)
+                    Icon(Icons.Outlined.Description, contentDescription = "Change", tint = Colors.Icon.white)
                     Spacer(modifier = Modifier.size(6.dp))
-                    Text(text = if (isActive) "Change" else "Select PDF", color = Color.White)
+                    Text(text = if (isActive) "Change" else "Select PDF", color = Colors.Text.primary)
                 }
                 Spacer(modifier = Modifier.width(8.dp))
             },
             colors = TopAppBarDefaults.topAppBarColors(
-                containerColor = Colors.cardColor,
-                titleContentColor = Colors.textMainColor,
+                containerColor = Colors.Surface.card,
+                titleContentColor = Colors.Text.primary,
             )
         )
 
@@ -74,7 +74,7 @@ fun SplitTopBar(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(2.dp)
-                .background(Color.Gray.copy(alpha = 0.2f)) // TODO: change
+                .background(Colors.Border.subtle)
         )
     }
 

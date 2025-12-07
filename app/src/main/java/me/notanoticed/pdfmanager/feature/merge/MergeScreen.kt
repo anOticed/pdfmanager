@@ -64,7 +64,7 @@ fun MergeActiveScreen(
     ) {
         Surface(
             shape = RoundedCornerShape(10.dp),
-            color = Color(0xB01F2937),
+            color = Colors.Surface.charcoalSlate,
             tonalElevation = 0.dp,
             shadowElevation = 0.dp,
             modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp)
@@ -74,14 +74,14 @@ fun MergeActiveScreen(
             ) {
                 Text(
                     text = "Merge Order",
-                    color = Colors.blueColor,
+                    color = Colors.Text.blue,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.SemiBold
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
                     text = "Drag files up or down to reorder them. The final PDF will follow this exact order.",
-                    color = Colors.textMutedColor,
+                    color = Colors.Text.secondary,
                     fontSize = 12.sp
                 )
             }
@@ -90,7 +90,7 @@ fun MergeActiveScreen(
         Surface(
             shape = RoundedCornerShape(10.dp),
             color = Color.Transparent,
-            border = BorderStroke(width = 2.dp, color = Color(0xFF202B4C)),
+            border = BorderStroke(width = 2.dp, color = Colors.Border.darkBlue),
             tonalElevation = 0.dp,
             shadowElevation = 0.dp,
             modifier = Modifier
@@ -116,14 +116,14 @@ fun MergeActiveScreen(
             Button(
                 onClick = { viewModel.clear() },
                 colors = ButtonDefaults.buttonColors().copy(
-                    containerColor = Color(0xFF374050)
+                    containerColor = Colors.Button.darkSlate
                 ),
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(10.dp)
             ) {
                 Text(
                     text = "Clear All Files",
-                    color = Colors.textMutedColor,
+                    color = Colors.Text.secondary,
                     fontSize = 16.sp
                 )
             }
@@ -131,7 +131,7 @@ fun MergeActiveScreen(
 
         Surface(
             shape = RoundedCornerShape(10.dp),
-            color = Color(0xB01F2937),
+            color = Colors.Surface.charcoalSlate,
             tonalElevation = 0.dp,
             shadowElevation = 0.dp,
             modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp)
@@ -143,7 +143,7 @@ fun MergeActiveScreen(
                 Button(
                     onClick = { /* TODO: preview */ },
                     colors = ButtonDefaults.buttonColors().copy(
-                        containerColor = Color(0xFF374050)
+                        containerColor = Colors.Button.darkSlate
                     ),
                     modifier = Modifier.weight(1f),
                     contentPadding = PaddingValues(vertical = 10.dp),
@@ -152,13 +152,13 @@ fun MergeActiveScreen(
                     Icon(
                         imageVector = Icons.Outlined.Visibility,
                         contentDescription = "PDF icon",
-                        tint = Color.White, // TODO: change
+                        tint = Colors.Icon.white,
                         modifier = Modifier.size(18.dp)
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
                         text = "Preview",
-                        color = Color.White,
+                        color = Colors.Text.primary,
                         fontSize = 14.sp
                     )
                 }
@@ -166,7 +166,7 @@ fun MergeActiveScreen(
                 Button(
                     onClick = { /* TODO: merge */ },
                     colors = ButtonDefaults.buttonColors().copy(
-                        containerColor = Color(0xFF059568)
+                        containerColor = Colors.Button.green
                     ),
                     modifier = Modifier.weight(1.75f),
                     contentPadding = PaddingValues(vertical = 10.dp),
@@ -175,13 +175,13 @@ fun MergeActiveScreen(
                     Icon(
                         imageVector = Icons.Outlined.FileDownload,
                         contentDescription = "PDF icon",
-                        tint = Color.White, // TODO: change
+                        tint = Colors.Icon.white,
                         modifier = Modifier.size(20.dp)
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
                         text = "Merge PDFs",
-                        color = Color.White,
+                        color = Colors.Text.primary,
                         fontSize = 14.sp
                     )
                 }
@@ -195,7 +195,7 @@ fun MergeActiveScreen(
 fun MergeFileCard(file: MergeFile) {
     Surface(
         shape = RoundedCornerShape(10.dp),
-        color = Colors.cardColor,
+        color = Colors.Surface.card,
         tonalElevation = 0.dp,
         shadowElevation = 0.dp,
         modifier = Modifier.fillMaxWidth()
@@ -208,12 +208,12 @@ fun MergeFileCard(file: MergeFile) {
                 modifier = Modifier
                     .size(24.dp)
                     .clip(CircleShape)
-                    .background(Colors.blueColor),
+                    .background(Colors.Primary.blue),
                 contentAlignment = Alignment.Center
             ) {
                 Text(
                     text = file.id.toString(),
-                    color = Color.White,
+                    color = Colors.Text.primary,
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Bold
                 )
@@ -226,13 +226,13 @@ fun MergeFileCard(file: MergeFile) {
                     .width(34.dp)
                     .height(48.dp)
                     .clip(RoundedCornerShape(6.dp))
-                    .background(Color(0xFF2A2F37)), // TODO: change
+                    .background(Colors.Icon.darkGray),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
                     imageVector = Icons.Outlined.Description,
                     contentDescription = "PDF icon",
-                    tint = Color(0xFF7D8592), // TODO: change
+                    tint = Colors.Icon.gray,
                     modifier = Modifier.size(24.dp)
                 )
             }
@@ -245,7 +245,7 @@ fun MergeFileCard(file: MergeFile) {
             ) {
                 Text(
                     text = file.name,
-                    color = Colors.textMainColor,
+                    color = Colors.Text.primary,
                     fontSize = 14.sp,
                     fontWeight = FontWeight.SemiBold,
                     maxLines = 1,
@@ -253,7 +253,7 @@ fun MergeFileCard(file: MergeFile) {
                 )
                 Text(
                     text = file.meta,
-                    color = Colors.textMutedColor,
+                    color = Colors.Text.secondary,
                     fontSize = 11.sp,
                 )
             }
@@ -264,10 +264,10 @@ fun MergeFileCard(file: MergeFile) {
                 shape = RoundedCornerShape(8.dp),
                 enabled = file.id > 1,
                 colors = IconButtonDefaults.iconButtonColors().copy(
-                    containerColor = Color(0xFF4A5462), // TODO: change
-                    contentColor = Color(0xFFE0E1E3),
-                    disabledContainerColor = Color(0xFF2F343C),
-                    disabledContentColor = Color(0xFF696C6F),
+                    containerColor = Colors.Button.iconBackground,
+                    contentColor = Colors.Icon.white,
+                    disabledContainerColor = Colors.Button.iconBackgroundDisabled,
+                    disabledContentColor = Colors.Icon.disabledGray,
                 )
             ) {
                 Box(
@@ -292,10 +292,10 @@ fun MergeFileCard(file: MergeFile) {
                 shape = RoundedCornerShape(8.dp),
                 enabled = file.id <= 1,
                 colors = IconButtonDefaults.iconButtonColors().copy(
-                    containerColor = Color(0xFF4A5462), // TODO: change
-                    contentColor = Color(0xFFE0E1E3),
-                    disabledContainerColor = Color(0xFF2F343C),
-                    disabledContentColor = Color(0xFF696C6F),
+                    containerColor = Colors.Button.iconBackground,
+                    contentColor = Colors.Icon.white,
+                    disabledContainerColor = Colors.Button.iconBackgroundDisabled,
+                    disabledContentColor = Colors.Icon.disabledGray,
                 )
             ) {
                 Box(
@@ -319,8 +319,8 @@ fun MergeFileCard(file: MergeFile) {
                 modifier = Modifier.size(26.dp),
                 shape = RoundedCornerShape(8.dp),
                 colors = IconButtonDefaults.iconButtonColors().copy(
-                    containerColor = Color(0xFFDA2626), // TODO: change
-                    contentColor = Color(0xFFE0E1E3),
+                    containerColor = Colors.Icon.red,
+                    contentColor = Colors.Icon.white,
                 )
             ) {
                 Box(
@@ -352,26 +352,26 @@ fun MergeScreen(modifier: Modifier = Modifier) {
         Icon(
             imageVector = Icons.AutoMirrored.Outlined.CallMerge,
             contentDescription = null,
-            tint = Colors.textMutedColor,
+            tint = Colors.Icon.default,
             modifier = Modifier.size(80.dp)
         )
         Spacer(modifier = Modifier.height(8.dp))
         Text(
             text = "No PDFs selected",
-            color = Colors.textMutedColor,
+            color = Colors.Text.secondary,
             fontSize = 24.sp,
             fontWeight = FontWeight.ExtraBold
         )
         Spacer(modifier = Modifier.height(10.dp))
         Text(
             text = "Add PDFs to merge them into a single document.",
-            color = Colors.subtextMutedColor,
+            color = Colors.Text.muted,
             fontSize = 12.sp,
             fontWeight = FontWeight.SemiBold
         )
         Text(
             text = "You can reorder them by dragging.",
-            color = Colors.subtextMutedColor,
+            color = Colors.Text.muted,
             fontSize = 12.sp,
             fontWeight = FontWeight.SemiBold
         )

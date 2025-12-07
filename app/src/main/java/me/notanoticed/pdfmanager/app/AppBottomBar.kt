@@ -40,10 +40,10 @@ fun AppBottomBar(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(2.dp)
-                .background(Color.Gray.copy(alpha = 0.2f)) // TODO: change
+                .background(Colors.Border.subtle)
         )
         NavigationBar(
-            containerColor = Colors.cardColor.copy(alpha = 0.9f)
+            containerColor = Colors.Background.surface
         ) {
             val items = listOf(
                 BottomNavItem(title = "PDFs", route = Screen.PdfList.route, icon = Icons.Outlined.Description),
@@ -61,11 +61,11 @@ fun AppBottomBar(
                     icon = { Icon(imageVector = item.icon, contentDescription = item.title) },
                     label = { Text(text = item.title) },
                     colors = NavigationBarItemDefaults.colors(
-                        selectedIconColor = Colors.blueColor,
-                        selectedTextColor = Colors.blueColor,
+                        selectedIconColor = Colors.Icon.blue,
+                        selectedTextColor = Colors.Text.blue,
                         indicatorColor = Color.Transparent,
-                        unselectedIconColor = Colors.textMutedColor,
-                        unselectedTextColor = Colors.textMutedColor
+                        unselectedIconColor = Colors.Icon.default,
+                        unselectedTextColor = Colors.Text.secondary
                     )
                 )
             }

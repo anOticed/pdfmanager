@@ -44,13 +44,13 @@ fun DocumentInfoRow(
                 .width(56.dp)
                 .height(76.dp)
                 .clip(RoundedCornerShape(10.dp))
-                .background(Color(0xFF2A2F37)), // TODO: change
+                .background(Colors.Surface.thumbnail),
             contentAlignment = Alignment.Center
         ) {
             Icon(
                 imageVector = Icons.Outlined.Description,
                 contentDescription = "PDF icon",
-                tint = Color(0xFF7D8592), // TODO: change
+                tint = Colors.Icon.gray,
                 modifier = Modifier.size(30.dp)
             )
         }
@@ -62,7 +62,7 @@ fun DocumentInfoRow(
         ) {
             Text(
                 text = pdf.name,
-                color = Color.White,
+                color = Colors.Text.primary,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
                 fontWeight = FontWeight.SemiBold,
@@ -71,12 +71,12 @@ fun DocumentInfoRow(
 
             Text(
                 text = pdf.metaLine(),
-                color = Colors.textMutedColor,
+                color = Colors.Text.secondary,
                 fontSize = 12.sp
             )
             Text(
                 text = pdf.createdDate(),
-                color = Colors.textMutedColor,
+                color = Colors.Text.secondary,
                 fontSize = 11.sp,
             )
         }
@@ -86,7 +86,7 @@ fun DocumentInfoRow(
             Icon(
                 imageVector = Icons.Outlined.Lock,
                 contentDescription = "Locked icon",
-                tint = Color(0xFFFFB74D), // TODO: change
+                tint = Colors.Icon.lock,
                 modifier = Modifier.size(16.dp)
             )
             Spacer(modifier = Modifier.width(6.dp))

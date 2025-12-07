@@ -50,8 +50,8 @@ fun OptionsOverlay(
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = sheetState,
-        containerColor = Colors.cardColor,
-        contentColor = Colors.blueColor,
+        containerColor = Colors.Surface.card,
+        contentColor = Colors.Primary.blue,
         dragHandle = null,
         properties = ModalBottomSheetProperties(
             isAppearanceLightStatusBars = false,
@@ -69,7 +69,7 @@ fun OptionsOverlay(
                 pdf = pdf
             )
             HorizontalDivider(
-                color = Color.White,
+                color = Colors.Border.default,
                 modifier = Modifier.padding(bottom = 8.dp)
             )
             OptionsOverlayList(
@@ -98,7 +98,7 @@ private fun SheetHandle() {
                 .width(32.dp)
                 .height(4.dp)
                 .clip(RoundedCornerShape(2.dp))
-                .background(Colors.blueColor)
+                .background(Colors.Primary.blue)
         )
     }
 }
@@ -151,7 +151,7 @@ private fun FileOptionRow(
 
         Text(
             text = item.title,
-            color = Colors.textMainColor
+            color = Colors.Text.primary
         )
     }
 }

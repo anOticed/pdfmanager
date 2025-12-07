@@ -25,7 +25,7 @@ fun PdfListActivity(active: Screen, onSelect: (String) -> Unit) {
                 onItemClick = onSelect
             )
         },
-        containerColor = Colors.backgroundColor
+        containerColor = Colors.Background.app
     ) { paddingValues ->
         PdfListScreen(
             Modifier.padding(paddingValues),

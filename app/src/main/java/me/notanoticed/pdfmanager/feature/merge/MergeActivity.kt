@@ -33,7 +33,7 @@ fun MergeActivity(
                 onItemClick = onSelect
             )
         },
-        containerColor = Colors.backgroundColor
+        containerColor = Colors.Background.app
     ) { pads ->
         if (viewModel.pdfMergeFiles.isEmpty()) {
             MergeScreen(Modifier.padding(pads))

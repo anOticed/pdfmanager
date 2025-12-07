@@ -107,7 +107,7 @@ fun App() = PdfManagerTheme {
                     }
                 }
             },
-            containerColor = Colors.backgroundColor
+            containerColor = Colors.Background.app
         ) { paddingValues ->
             HorizontalPager(
                 state = pagerState,

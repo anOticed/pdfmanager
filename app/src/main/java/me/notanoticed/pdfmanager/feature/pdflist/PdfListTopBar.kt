@@ -41,7 +41,7 @@ fun PdfListTopBar(
                         text = "${viewModel.selectionCount} Selected",
                         fontSize = 22.sp,
                         fontWeight = FontWeight.ExtraBold,
-                        color = Colors.textMainColor
+                        color = Colors.Text.primary
                     )
                 }
                 else {
@@ -50,12 +50,12 @@ fun PdfListTopBar(
                             text = "All Files",
                             fontSize = 22.sp,
                             fontWeight = FontWeight.ExtraBold,
-                            color = Colors.textMainColor
+                            color = Colors.Text.primary
                         )
                         Text(
                             text = "$totalDocuments documents",
                             fontSize = 12.sp,
-                            color = Colors.textMutedColor
+                            color = Colors.Text.secondary
                         )
                     }
                 }
@@ -76,24 +76,24 @@ fun PdfListTopBar(
                         Text(
                             text = "Select All",
                             fontSize = 14.sp,
-                            color = Colors.textMainColor
+                            color = Colors.Text.primary
                         )
 
                         Checkbox(
                             checked = viewModel.isAllSelected,
                             onCheckedChange = { viewModel.toggleSelectAll() },
                             colors = CheckboxDefaults.colors().copy(
-                                checkedBoxColor = Color.White,
-                                checkedBorderColor = Color.White,
-                                checkedCheckmarkColor = Colors.cardColor
+                                checkedBoxColor = Colors.Primary.white,
+                                checkedBorderColor = Colors.Primary.white,
+                                checkedCheckmarkColor = Colors.Primary.charcoal
                             )
                         )
                     }
                 }
             },
             colors = TopAppBarDefaults.topAppBarColors(
-                containerColor = Colors.cardColor,
-                titleContentColor = Colors.textMainColor,
+                containerColor = Colors.Surface.card,
+                titleContentColor = Colors.Primary.white,
             )
         )
 
@@ -101,7 +101,7 @@ fun PdfListTopBar(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(2.dp)
-                .background(Color.Gray.copy(alpha = 0.2f)) // TODO: change
+                .background(Colors.Border.subtle)
         )
     }
 }

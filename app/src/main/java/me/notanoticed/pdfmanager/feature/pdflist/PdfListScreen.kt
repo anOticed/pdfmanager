@@ -50,7 +50,7 @@ fun PdfListScreen(
 
     if (showFullscreenLoader) {
         Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            CircularProgressIndicator(color = Colors.blueColor)
+            CircularProgressIndicator(color = Colors.Primary.blue)
         }
     }
     else {
@@ -67,8 +67,8 @@ fun PdfListScreen(
                     state = pullState,
                     isRefreshing = isRefreshing,
                     modifier = Modifier.align(Alignment.TopCenter),
-                    containerColor = Colors.cardColor,
-                    color = Colors.blueColor
+                    containerColor = Colors.Surface.card,
+                    color = Colors.Primary.blue
                 )
             }
         ) {
@@ -110,7 +110,7 @@ fun DocumentCard(
 ) {
     Surface(
         shape = RoundedCornerShape(16.dp),
-        color = Colors.cardColor,
+        color = Colors.Surface.card,
         tonalElevation = 0.dp,
         shadowElevation = 0.dp,
         modifier = Modifier.fillMaxWidth(),
@@ -133,9 +133,9 @@ fun DocumentCard(
                     checked = isSelected,
                     onCheckedChange = null,
                     colors = CheckboxDefaults.colors().copy(
-                        checkedBoxColor = Colors.blueColor,
-                        checkedBorderColor = Colors.blueColor,
-                        checkedCheckmarkColor = Color.White
+                        checkedBoxColor = Colors.Primary.blue,
+                        checkedBorderColor = Colors.Primary.blue,
+                        checkedCheckmarkColor = Colors.Primary.white
                     )
                 )
             }
@@ -144,7 +144,7 @@ fun DocumentCard(
                     Icon(
                         Icons.Outlined.MoreVert,
                         contentDescription = "More icon",
-                        tint = Colors.textMutedColor
+                        tint = Colors.Icon.default
                     )
                 }
             }

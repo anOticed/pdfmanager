@@ -66,7 +66,7 @@ fun StoragePermissionDialog(
             Surface(
                 modifier = Modifier.fillMaxWidth(0.9f),
                 shape = RoundedCornerShape(24.dp),
-                color = Colors.cardColor,
+                color = Colors.Surface.card,
                 tonalElevation = 8.dp
             ) {
                 Column(
@@ -81,7 +81,7 @@ fun StoragePermissionDialog(
                             modifier = Modifier
                                 .size(72.dp)
                                 .background(
-                                    color = Colors.blueColor.copy(alpha = 0.18f),
+                                    color = Colors.Primary.lightBlue,
                                     shape = CircleShape
                                 )
                         )
@@ -89,7 +89,7 @@ fun StoragePermissionDialog(
                             modifier = Modifier
                                 .size(44.dp)
                                 .background(
-                                    color = Colors.blueColor,
+                                    color = Colors.Primary.blue,
                                     shape = CircleShape
                                 ),
                             contentAlignment = Alignment.Center
@@ -97,7 +97,7 @@ fun StoragePermissionDialog(
                             Icon(
                                 imageVector = Icons.Outlined.Folder,
                                 contentDescription = null,
-                                tint = Color.White,
+                                tint = Colors.Icon.white,
                             )
                         }
                     }
@@ -122,7 +122,7 @@ fun StoragePermissionDialog(
                         text = title,
                         fontSize = 20.sp,
                         fontWeight = FontWeight.SemiBold,
-                        color = Colors.textMainColor
+                        color = Colors.Text.primary
                     )
 
                     Spacer(modifier = Modifier.height(10.dp))
@@ -130,7 +130,7 @@ fun StoragePermissionDialog(
                     Text(
                         text = message,
                         fontSize = 14.sp,
-                        color = Colors.textMutedColor
+                        color = Colors.Text.secondary
                     )
 
                     Spacer(modifier = Modifier.height(24.dp))
@@ -143,7 +143,7 @@ fun StoragePermissionDialog(
                                 onClick = onCancel,
                                 modifier = Modifier.weight(0.5f),
                                 shape = RoundedCornerShape(50.dp),
-                                border = BorderStroke(1.5.dp, Colors.blueColor),
+                                border = BorderStroke(1.5.dp, Colors.Border.blue),
                                 colors = ButtonDefaults.buttonColors().copy(
                                     containerColor = Color.Transparent
                                 )
@@ -151,7 +151,7 @@ fun StoragePermissionDialog(
                                 Text(
                                     text = "Cancel",
                                     fontSize = 14.sp,
-                                    color = Colors.blueColor
+                                    color = Colors.Text.blue
                                 )
                             }
 
@@ -160,13 +160,13 @@ fun StoragePermissionDialog(
                                 modifier = Modifier.weight(1f),
                                 shape = RoundedCornerShape(50.dp),
                                 colors = ButtonDefaults.buttonColors().copy(
-                                    containerColor = Colors.blueColor
+                                    containerColor = Colors.Button.primary
                                 )
                             ) {
                                 Text(
                                     text = "Grant All Files Access",
                                     fontSize = 14.sp,
-                                    color = Colors.textMainColor
+                                    color = Colors.Text.primary
                                 )
                             }
                         }
@@ -178,13 +178,13 @@ fun StoragePermissionDialog(
                                 .fillMaxWidth(),
                             shape = RoundedCornerShape(50.dp),
                             colors = ButtonDefaults.buttonColors().copy(
-                                containerColor = Colors.blueColor
+                                containerColor = Colors.Button.primary
                             )
                         ) {
                             Text(
                                 text = "Grant All Files Access",
                                 fontSize = 14.sp,
-                                color = Colors.textMainColor
+                                color = Colors.Text.primary
                             )
                         }
                     }
