@@ -4,6 +4,8 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import me.notanoticed.pdfmanager.core.pickers.LocalPickers
+import me.notanoticed.pdfmanager.feature.images.ImagesTopBar
+import me.notanoticed.pdfmanager.feature.images.ImagesViewModel
 import me.notanoticed.pdfmanager.feature.merge.MergeTopBar
 import me.notanoticed.pdfmanager.feature.merge.MergeViewModel
 import me.notanoticed.pdfmanager.feature.pdflist.PdfListTopBar
@@ -19,7 +21,8 @@ fun AppTopBar(
     currentRoute: String,
     pdfListViewModel: PdfListViewModel,
     splitViewModel: SplitViewModel,
-    mergeViewModel: MergeViewModel
+    mergeViewModel: MergeViewModel,
+    imagesViewModel: ImagesViewModel
 ) {
     val pickers = LocalPickers.current
     val context = LocalContext.current
@@ -46,7 +49,11 @@ fun AppTopBar(
             onAddClick = { splitViewModel.pickSplitPdf(context, pickers) },
             onCloseClick = { splitViewModel.closeSelectedSplitPdf() }
         )
-        Screen.Images.route -> null
+        Screen.Images.route -> ImagesTopBar(
+            selectedCount = 0,
+            onCameraClick = {},
+            onGalleryClick = {}
+        )
         Screen.Settings.route -> SettingsTopBar()
     }
 }

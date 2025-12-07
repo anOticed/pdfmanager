@@ -28,6 +28,8 @@ import me.notanoticed.pdfmanager.feature.split.SplitViewModel
 import me.notanoticed.pdfmanager.ui.theme.Colors
 import me.notanoticed.pdfmanager.ui.theme.PdfManagerTheme
 import kotlinx.coroutines.launch
+import me.notanoticed.pdfmanager.feature.images.ImagesScreen
+import me.notanoticed.pdfmanager.feature.images.ImagesViewModel
 import me.notanoticed.pdfmanager.feature.pdflist.OptionsOverlay
 import me.notanoticed.pdfmanager.feature.pdflist.PdfListSelectionBottomBar
 
@@ -40,6 +42,7 @@ fun App() = PdfManagerTheme {
     val pdfListViewModel: PdfListViewModel = viewModel()
     val mergeViewModel: MergeViewModel = viewModel()
     val splitViewModel: SplitViewModel = viewModel()
+    val imagesViewModel: ImagesViewModel = viewModel()
 
     val context = LocalContext.current
 
@@ -89,7 +92,8 @@ fun App() = PdfManagerTheme {
                     currentRoute = appScreens[pagerState.currentPage],
                     pdfListViewModel = pdfListViewModel,
                     splitViewModel = splitViewModel,
-                    mergeViewModel = mergeViewModel
+                    mergeViewModel = mergeViewModel,
+                    imagesViewModel = imagesViewModel
                 )
             },
             bottomBar = {
@@ -132,7 +136,7 @@ fun App() = PdfManagerTheme {
                         }
                         else SplitScreen()
                     }
-                    Screen.Images.route -> null
+                    Screen.Images.route -> ImagesScreen(viewModel = imagesViewModel)
                     Screen.Settings.route -> SettingsScreen()
                 }
             }
