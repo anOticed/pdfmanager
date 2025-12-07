@@ -21,7 +21,6 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -46,7 +45,7 @@ fun MergeTopBar(
             actions = {
                 Button(
                     onClick = onAddClick  /* TODO: SAF picker */ ,
-                    colors = ButtonDefaults.buttonColors(containerColor = Colors.Button.primary),
+                    colors = ButtonDefaults.buttonColors(containerColor = Colors.Button.blue),
                     contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp),
                     shape = RoundedCornerShape(10.dp)
                 ) {
