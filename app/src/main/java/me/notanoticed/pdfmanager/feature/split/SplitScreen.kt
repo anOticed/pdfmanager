@@ -502,7 +502,7 @@ fun SplitScreen(modifier: Modifier = Modifier) {
             fontSize = 12.sp,
             fontWeight = FontWeight.SemiBold,
             textAlign = TextAlign.Center,
-            modifier = Modifier.padding(horizontal = 36.dp)
+            modifier = Modifier.padding(horizontal = 48.dp)
         )
     }
 }
