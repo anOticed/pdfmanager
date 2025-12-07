@@ -44,6 +44,7 @@ fun AppTopBar(
         Screen.Split.route -> SplitTopBar(
             viewModel = splitViewModel,
             onAddClick = { splitViewModel.pickSplitPdf(context, pickers) },
+            onCloseClick = { splitViewModel.closeSelectedSplitPdf() }
         )
         Screen.Images.route -> null
         Screen.Settings.route -> SettingsTopBar()

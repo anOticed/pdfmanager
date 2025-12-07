@@ -27,6 +27,11 @@ class SplitViewModel : ViewModel() {
         selectedSplitPdf = pdfFile
     }
 
+    fun closeSelectedSplitPdf() {
+        selectedSplitPdf = null
+        selectSplitMethod(SPLIT_METHOD_RANGES)
+    }
+
     fun selectSplitMethod(method: Int) {
         selectedSplitMethodId = method
     }

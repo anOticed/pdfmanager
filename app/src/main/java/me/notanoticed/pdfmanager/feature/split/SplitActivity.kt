@@ -25,7 +25,8 @@ fun SplitActivity(
         topBar = {
             SplitTopBar(
                 viewModel = viewModel,
-                onAddClick = {}
+                onAddClick = {},
+                onCloseClick = {}
             )
         },
         bottomBar = {

@@ -12,12 +12,16 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Close
+import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Description
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -33,7 +37,8 @@ import me.notanoticed.pdfmanager.ui.theme.Colors
 @Composable
 fun SplitTopBar(
     viewModel: SplitViewModel,
-    onAddClick: () -> Unit
+    onAddClick: () -> Unit,
+    onCloseClick: () -> Unit
 ) {
     val isActive = viewModel.selectedSplitPdf != null
     val fileName = viewModel.selectedSplitPdf?.name ?: ""
@@ -42,7 +47,12 @@ fun SplitTopBar(
         TopAppBar(
             title = {
                 Column {
-                    Text(text = "Split PDF", fontSize = 22.sp, fontWeight = FontWeight.ExtraBold)
+                    Text(
+                        text = "Split PDF",
+                        fontSize = 22.sp,
+                        fontWeight = FontWeight.ExtraBold
+                    )
+
                     Text(
                         text = if (isActive) fileName else "No file selected",
                         fontSize = 12.sp,
@@ -58,11 +68,31 @@ fun SplitTopBar(
                     contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp),
                     shape = RoundedCornerShape(10.dp)
                 ) {
-                    Icon(Icons.Outlined.Description, contentDescription = "Change", tint = Colors.Icon.white)
+                    Icon(
+                        imageVector = Icons.Outlined.Description,
+                        contentDescription = "Change",
+                        tint = Colors.Icon.white
+                    )
+
                     Spacer(modifier = Modifier.size(6.dp))
-                    Text(text = if (isActive) "Change" else "Select PDF", color = Colors.Text.primary)
+
+                    Text(
+                        text = if (isActive) "Change" else "Select PDF",
+                        color = Colors.Text.primary
+                    )
                 }
+
                 Spacer(modifier = Modifier.width(8.dp))
+
+                if (isActive) {
+                    IconButton(onClick = onCloseClick) {
+                        Icon(
+                            imageVector = Icons.Outlined.Close,
+                            contentDescription = "Close File",
+                            tint = Colors.Icon.gray
+                        )
+                    }
+                }
             },
             colors = TopAppBarDefaults.topAppBarColors(
                 containerColor = Colors.Surface.card,
