@@ -134,7 +134,7 @@ fun App() = PdfManagerTheme {
                         if (selected != null) {
                             SplitActiveScreen(viewModel = splitViewModel)
                         }
-                        else SplitScreen()
+                        else SplitScreen(viewModel = splitViewModel)
                     }
                     Screen.Images.route -> ImagesScreen(viewModel = imagesViewModel)
                     Screen.Settings.route -> SettingsScreen()

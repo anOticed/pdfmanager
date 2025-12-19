@@ -104,6 +104,22 @@ private fun SheetHandle() {
 }
 
 
+private fun isOptionVisible(action: PdfFileOptionAction, isLocked: Boolean): Boolean {
+    return when(action) {
+        PdfFileOptionAction.SET_PASSWORD -> !isLocked
+        PdfFileOptionAction.REMOVE_PASSWORD -> isLocked
+
+        PdfFileOptionAction.MERGE,
+        PdfFileOptionAction.SPLIT,
+        PdfFileOptionAction.COMPRESS,
+        PdfFileOptionAction.REORDER_PAGES,
+        PdfFileOptionAction.PRINT -> !isLocked
+
+        else -> true
+    }
+}
+
+
 @Composable
 private fun OptionsOverlayList(
     items: List<PdfFileOptionItem>,
@@ -115,10 +131,9 @@ private fun OptionsOverlayList(
             .fillMaxWidth()
             .padding(bottom = 12.dp)
     ) {
-        items.filterNot{ item ->
-            (item.action == PdfFileOptionAction.SET_PASSWORD && isLocked) ||
-                    (item.action == PdfFileOptionAction.REMOVE_PASSWORD && !isLocked)
-        }.forEach { item ->
+        val visibleItems = items.filter { item -> isOptionVisible(item.action, isLocked) }
+
+        visibleItems.forEach { item ->
             FileOptionRow(
                 item = item,
                 onClick = { onItemClick(item.action) }

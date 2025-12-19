@@ -58,6 +58,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import me.notanoticed.pdfmanager.core.pdf.model.metaLine
+import me.notanoticed.pdfmanager.core.toast.BindViewModelToasts
 import me.notanoticed.pdfmanager.ui.theme.Colors
 
 /* -------------------- SCREEN -------------------- */
@@ -66,6 +67,7 @@ fun SplitActiveScreen(
     modifier: Modifier = Modifier,
     viewModel: SplitViewModel
 ) {
+    BindViewModelToasts(viewModel)
     val selectedSplitPdf = viewModel.selectedSplitPdf ?: return
 
     LazyColumn(
@@ -476,7 +478,12 @@ fun MethodCard(
 
 
 @Composable
-fun SplitScreen(modifier: Modifier = Modifier) {
+fun SplitScreen(
+    modifier: Modifier = Modifier,
+    viewModel: SplitViewModel
+) {
+    BindViewModelToasts(viewModel)
+
     Column(
         modifier = modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,

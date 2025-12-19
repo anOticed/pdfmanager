@@ -49,7 +49,7 @@ fun PdfListSelectionBottomBar(
                     tint = Colors.Primary.green,
                     label = "Merge",
                     onClick = { viewModel.mergeSelected() },
-                    enabled = viewModel.selectionCount > 0
+                    enabled = viewModel.canMergeSelected
                 )
                 PdfSelectionAction(
                     icon = Icons.Outlined.Share,

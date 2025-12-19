@@ -39,7 +39,10 @@ fun SplitActivity(
     ) { pads ->
 
         if (selectedSplitPdf == null) {
-            SplitScreen(modifier = Modifier.padding(pads))
+            SplitScreen(
+                modifier = Modifier.padding(pads),
+                viewModel = viewModel
+            )
         }
         else {
             SplitActiveScreen(

@@ -10,6 +10,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.tooling.preview.Preview
 import me.notanoticed.pdfmanager.core.pickers.ProvidePickers
+import me.notanoticed.pdfmanager.core.toast.ProvideToasts
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -19,8 +20,10 @@ class MainActivity : ComponentActivity() {
             navigationBarStyle = SystemBarStyle.dark(Color.Transparent.toArgb())
         )
         setContent {
-            ProvidePickers {
-                App()
+            ProvideToasts {
+                ProvidePickers {
+                    App()
+                }
             }
         }
     }

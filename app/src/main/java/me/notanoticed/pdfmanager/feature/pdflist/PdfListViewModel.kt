@@ -134,6 +134,9 @@ class PdfListViewModel : ViewModel() {
     val isAllSelected: Boolean
         get() = selectedPdfFiles.size == pdfFiles.size && pdfFiles.isNotEmpty()
 
+    val canMergeSelected: Boolean
+        get() = selectedPdfFiles.isNotEmpty() && selectedPdfFiles.none { it.isLocked }
+
     fun isSelected(pdf: PdfFile): Boolean {
         return(selectedPdfFiles.contains(pdf))
     }
@@ -167,7 +170,7 @@ class PdfListViewModel : ViewModel() {
     }
 
     fun mergeSelected() {
-        if (selectedPdfFiles.isEmpty()) return
+        if (!canMergeSelected) return
 
         pendingEvent = PdfListEvent.OpenMerge(selectedPdfFiles.toList())
     }
