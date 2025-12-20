@@ -39,7 +39,7 @@ fun SplitTopBar(
     onAddClick: () -> Unit,
     onCloseClick: () -> Unit
 ) {
-    val isActive = viewModel.selectedSplitPdf != null
+    val isActive = viewModel.isActive
     val fileName = viewModel.selectedSplitPdf?.name ?: ""
 
     Column {

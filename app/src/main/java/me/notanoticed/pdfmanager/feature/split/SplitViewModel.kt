@@ -20,6 +20,8 @@ class SplitViewModel : ViewModel(), ToastBindable {
     var selectedSplitPdf: PdfFile? by mutableStateOf(null)
         private set
 
+    val isActive: Boolean get() = selectedSplitPdf != null
+
     var selectedSplitMethodId by mutableStateOf(SPLIT_METHOD_RANGES) // 0: ranges, 1: one page per file, 2: every N pages
     var splitRangesText by mutableStateOf("")
     var splitPagesPerFileText by mutableStateOf("")
