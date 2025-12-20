@@ -3,8 +3,6 @@ package me.notanoticed.pdfmanager.app
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import me.notanoticed.pdfmanager.core.pdf.model.metaLine
-import me.notanoticed.pdfmanager.feature.merge.MergeFile
 import me.notanoticed.pdfmanager.feature.merge.MergeViewModel
 import me.notanoticed.pdfmanager.feature.pdflist.PdfListEvent
 import me.notanoticed.pdfmanager.feature.pdflist.PdfListViewModel
@@ -24,14 +22,7 @@ fun PdfListEventHandler(
     LaunchedEffect(event) {
         when (event) {
             is PdfListEvent.OpenMerge -> {
-                val mergeFiles = event.pdfs.mapIndexed { index, pdf ->
-                    MergeFile(
-                        id = index + 1,
-                        name = pdf.name,
-                        meta = pdf.metaLine()
-                    )
-                }
-                mergeViewModel.setMergeFiles(mergeFiles)
+                mergeViewModel.addMergeFiles(pdfFiles = event.pdfs)
 
                 val page = tabs.indexOf(Screen.Merge.route)
                 if (page >= 0) pagerState.animateScrollToPage(page)

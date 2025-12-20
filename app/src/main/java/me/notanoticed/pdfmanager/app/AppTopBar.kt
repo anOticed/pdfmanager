@@ -33,16 +33,9 @@ fun AppTopBar(
             totalDocuments = pdfListViewModel.pdfFiles.size
         )
         Screen.Merge.route -> MergeTopBar(
-            total = mergeViewModel.pdfMergeFiles.size,
-            isActive = mergeViewModel.isActive,
-            onAddClick = {
-                if (mergeViewModel.isActive) {
-                    mergeViewModel.clear()
-                }
-                else {
-                    mergeViewModel.setMergeFiles(mergeViewModel.sampleMergeFiles)
-                }
-            }
+            viewModel = mergeViewModel,
+            onAddClick = { mergeViewModel.pickMergePdfs(context, pickers) },
+            onCloseClick = { mergeViewModel.clear() }
         )
         Screen.Split.route -> SplitTopBar(
             viewModel = splitViewModel,

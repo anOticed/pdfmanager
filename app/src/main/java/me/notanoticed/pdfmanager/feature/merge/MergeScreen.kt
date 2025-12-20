@@ -15,15 +15,15 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.CallMerge
-import androidx.compose.material.icons.outlined.ArrowDownward
-import androidx.compose.material.icons.outlined.ArrowUpward
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.Description
+import androidx.compose.material.icons.outlined.DragHandle
 import androidx.compose.material.icons.outlined.FileDownload
 import androidx.compose.material.icons.outlined.Visibility
 import androidx.compose.material3.Button
@@ -38,25 +38,35 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import me.notanoticed.pdfmanager.core.pdf.model.PdfFile
+import me.notanoticed.pdfmanager.core.pdf.model.metaLine
+import me.notanoticed.pdfmanager.core.toast.BindViewModelToasts
 import me.notanoticed.pdfmanager.ui.theme.Colors
+import sh.calvin.reorderable.ReorderableItem
+import sh.calvin.reorderable.rememberReorderableLazyListState
 
 /* -------------------- SCREEN -------------------- */
-data class MergeFile(
-    val id: Int,
-    val name: String,
-    val meta: String
-)
-
 @Composable
 fun MergeActiveScreen(
     modifier: Modifier = Modifier,
     viewModel: MergeViewModel
 ) {
+    BindViewModelToasts(viewModel)
+
     val mergeFiles = viewModel.pdfMergeFiles
+    val listState = rememberLazyListState()
+
+    val reorderableState = rememberReorderableLazyListState(
+        lazyListState = listState,
+        scrollThresholdPadding = PaddingValues(top = 16.dp, bottom = 16.dp)
+    ) { from, to ->
+        viewModel.move(from.index, to.index)
+    }
 
     Column(
         modifier = modifier.fillMaxSize().padding(vertical = 12.dp),
@@ -99,33 +109,38 @@ fun MergeActiveScreen(
                 .padding(horizontal = 16.dp, vertical = 8.dp)
         ) {
             LazyColumn(
-                modifier = Modifier.weight(1f).fillMaxWidth(),
+                state = listState,
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth(),
                 contentPadding = PaddingValues(horizontal = 16.dp, vertical = 16.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                items(mergeFiles) { file ->
-                    MergeFileCard(file)
-                }
-            }
-        }
+                itemsIndexed(
+                    items = mergeFiles,
+                    key = { _, file -> file.uri.toString() }
+                ) { index, file ->
+                    ReorderableItem(
+                        state = reorderableState,
+                        key = file.uri.toString()
+                    ) { isDragging ->
+                        val elevation = if (isDragging) 8.dp else 0.dp
 
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp).padding(top = 12.dp)
-        ) {
-            Button(
-                onClick = { viewModel.clear() },
-                colors = ButtonDefaults.buttonColors().copy(
-                    containerColor = Colors.Button.darkSlate
-                ),
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(10.dp)
-            ) {
-                Text(
-                    text = "Clear All Files",
-                    color = Colors.Text.secondary,
-                    fontSize = 16.sp
-                )
+                        MergeFileCard(
+                            file = file,
+                            index = index + 1,
+                            onRemove = { viewModel.removeMergeFile(file) },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .graphicsLayer {
+                                    shadowElevation = elevation.toPx()
+                                    scaleX = if (isDragging) 1.05f else 1f
+                                    scaleY = if (isDragging) 1.05f else 1f
+                                },
+                            dragHandleModifier = Modifier.draggableHandle()
+                        )
+                    }
+                }
             }
         }
 
@@ -192,13 +207,19 @@ fun MergeActiveScreen(
 
 
 @Composable
-fun MergeFileCard(file: MergeFile) {
+fun MergeFileCard(
+    file: PdfFile,
+    index: Int,
+    onRemove: () -> Unit,
+    modifier: Modifier = Modifier,
+    dragHandleModifier: Modifier = Modifier
+) {
     Surface(
         shape = RoundedCornerShape(10.dp),
         color = Colors.Surface.card,
         tonalElevation = 0.dp,
         shadowElevation = 0.dp,
-        modifier = Modifier.fillMaxWidth()
+        modifier = modifier.fillMaxWidth()
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -212,7 +233,7 @@ fun MergeFileCard(file: MergeFile) {
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = file.id.toString(),
+                    text = index.toString(),
                     color = Colors.Text.primary,
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Bold
@@ -252,70 +273,33 @@ fun MergeFileCard(file: MergeFile) {
                     overflow = TextOverflow.Ellipsis
                 )
                 Text(
-                    text = file.meta,
+                    text = file.metaLine(),
                     color = Colors.Text.secondary,
                     fontSize = 11.sp,
                 )
             }
 
-            IconButton(
-                onClick = { /* TODO: move up */ },
-                modifier = Modifier.size(26.dp),
-                shape = RoundedCornerShape(8.dp),
-                enabled = file.id > 1,
-                colors = IconButtonDefaults.iconButtonColors().copy(
-                    containerColor = Colors.Button.iconBackground,
-                    contentColor = Colors.Icon.white,
-                    disabledContainerColor = Colors.Button.iconBackgroundDisabled,
-                    disabledContentColor = Colors.Icon.disabledGray,
-                )
+            Spacer(modifier = Modifier.width(12.dp))
+
+            Box(
+                modifier = dragHandleModifier
+                    .size(26.dp)
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(Colors.Button.iconBackground),
+                contentAlignment = Alignment.Center
             ) {
-                Box(
-                    modifier = Modifier
-                        .size(32.dp)
-                        .background(Color.Transparent),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        Icons.Outlined.ArrowUpward,
-                        contentDescription = "Move up",
-                        modifier = Modifier.size(16.dp)
-                    )
-                }
+                Icon(
+                    Icons.Outlined.DragHandle,
+                    contentDescription = "Reorder",
+                    tint = Colors.Icon.white,
+                    modifier = Modifier.size(16.dp)
+                )
             }
 
             Spacer(modifier = Modifier.width(12.dp))
 
             IconButton(
-                onClick = { /* TODO: move down */ },
-                modifier = Modifier.size(26.dp),
-                shape = RoundedCornerShape(8.dp),
-                enabled = file.id <= 1,
-                colors = IconButtonDefaults.iconButtonColors().copy(
-                    containerColor = Colors.Button.iconBackground,
-                    contentColor = Colors.Icon.white,
-                    disabledContainerColor = Colors.Button.iconBackgroundDisabled,
-                    disabledContentColor = Colors.Icon.disabledGray,
-                )
-            ) {
-                Box(
-                    modifier = Modifier
-                        .size(32.dp)
-                        .background(Color.Transparent),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        Icons.Outlined.ArrowDownward,
-                        contentDescription = "Move up",
-                        modifier = Modifier.size(16.dp)
-                    )
-                }
-            }
-
-            Spacer(modifier = Modifier.width(12.dp))
-
-            IconButton(
-                onClick = { /* TODO: delete file */ },
+                onClick = onRemove,
                 modifier = Modifier.size(26.dp),
                 shape = RoundedCornerShape(8.dp),
                 colors = IconButtonDefaults.iconButtonColors().copy(
@@ -323,18 +307,11 @@ fun MergeFileCard(file: MergeFile) {
                     contentColor = Colors.Icon.white,
                 )
             ) {
-                Box(
-                    modifier = Modifier
-                        .size(32.dp)
-                        .background(Color.Transparent),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        Icons.Outlined.Close,
-                        contentDescription = "Move up",
-                        modifier = Modifier.size(16.dp)
-                    )
-                }
+                Icon(
+                    Icons.Outlined.Close,
+                    contentDescription = "Remove",
+                    modifier = Modifier.size(16.dp)
+                )
             }
         }
     }
@@ -343,7 +320,12 @@ fun MergeFileCard(file: MergeFile) {
 
 
 @Composable
-fun MergeScreen(modifier: Modifier = Modifier) {
+fun MergeScreen(
+    modifier: Modifier = Modifier,
+    viewModel: MergeViewModel
+) {
+    BindViewModelToasts(viewModel)
+
     Column(
         modifier = modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,

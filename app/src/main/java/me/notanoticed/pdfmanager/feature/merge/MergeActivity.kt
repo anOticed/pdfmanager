@@ -22,9 +22,9 @@ fun MergeActivity(
     Scaffold(
         topBar = {
             MergeTopBar(
-                total = viewModel.pdfMergeFiles.size,
-                isActive = viewModel.isActive,
-                onAddClick = {}
+                viewModel = viewModel,
+                onAddClick = {},
+                onCloseClick = {}
             )
         },
         bottomBar = {
@@ -36,7 +36,10 @@ fun MergeActivity(
         containerColor = Colors.Background.app
     ) { pads ->
         if (viewModel.pdfMergeFiles.isEmpty()) {
-            MergeScreen(Modifier.padding(pads))
+            MergeScreen(
+                modifier = Modifier.padding(pads),
+                viewModel = viewModel
+            )
         }
         else {
             MergeActiveScreen(

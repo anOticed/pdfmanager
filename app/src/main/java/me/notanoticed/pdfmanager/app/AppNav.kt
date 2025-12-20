@@ -126,7 +126,7 @@ fun App() = PdfManagerTheme {
                             MergeActiveScreen(viewModel = mergeViewModel)
                         }
                         else {
-                            MergeScreen()
+                            MergeScreen(viewModel = mergeViewModel)
                         }
                     }
                     Screen.Split.route -> {
