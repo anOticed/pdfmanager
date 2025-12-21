@@ -1,5 +1,12 @@
 package me.notanoticed.pdfmanager.core.toast
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -22,8 +29,12 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -31,6 +42,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import me.notanoticed.pdfmanager.ui.theme.Colors
 
@@ -48,16 +60,13 @@ fun ProvideToasts(
         Box(modifier = Modifier.fillMaxSize()) {
             content()
 
-            SnackbarHost(
+            ToastHost(
                 hostState = hostState,
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
                     .padding(horizontal = 16.dp)
                     .padding(bottom = 72.dp)
                     .windowInsetsPadding(WindowInsets.navigationBars),
-                snackbar = { data ->
-                    AppToast(message = data.visuals.message)
-                }
             )
         }
     }
@@ -79,6 +88,41 @@ fun rememberToast(): ToastMessage {
                 )
             }
         }
+    }
+}
+
+@Composable
+private fun ToastHost(
+    hostState: SnackbarHostState,
+    modifier: Modifier = Modifier
+) {
+    val data = hostState.currentSnackbarData
+
+    var lastMessage by remember { mutableStateOf<String?>(null) }
+    if (data != null) {
+        lastMessage = data.visuals.message
+    }
+
+    LaunchedEffect(data) {
+        val current = data ?: return@LaunchedEffect
+
+        when (current.visuals.duration) {
+            SnackbarDuration.Short -> delay(2500)
+            SnackbarDuration.Long -> delay(4500)
+            SnackbarDuration.Indefinite -> return@LaunchedEffect
+        }
+
+        current.dismiss()
+    }
+
+    AnimatedVisibility(
+        visible = data != null,
+        modifier = modifier,
+        enter = fadeIn() + slideInVertically(initialOffsetY = { it / 2 }) + scaleIn(initialScale = 0.98f),
+        exit = fadeOut() + slideOutVertically(targetOffsetY = { it / 2 }) + scaleOut(targetScale = 0.98f)
+    ) {
+        val message = data?.visuals?.message ?: lastMessage ?: return@AnimatedVisibility
+        AppToast(message = message)
     }
 }
 
