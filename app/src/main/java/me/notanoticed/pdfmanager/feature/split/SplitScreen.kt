@@ -59,6 +59,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import me.notanoticed.pdfmanager.core.pdf.model.metaLine
 import me.notanoticed.pdfmanager.core.toast.BindViewModelToasts
+import me.notanoticed.pdfmanager.feature.preview.LocalPreviewNav
 import me.notanoticed.pdfmanager.ui.theme.Colors
 
 /* -------------------- SCREEN -------------------- */
@@ -69,6 +70,8 @@ fun SplitActiveScreen(
 ) {
     BindViewModelToasts(viewModel)
     val selectedSplitPdf = viewModel.selectedSplitPdf ?: return
+    val selectedSplitMethodId = viewModel.selectedSplitMethodId
+    val previewNav = LocalPreviewNav.current
 
     LazyColumn(
         modifier = modifier.fillMaxSize(),
@@ -148,7 +151,7 @@ fun SplitActiveScreen(
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     Button(
-                        onClick = { /* TODO: preview */ },
+                        onClick = { previewNav.openSplit(pdf = selectedSplitPdf, splitMethodId = selectedSplitMethodId) },
                         colors = ButtonDefaults.buttonColors().copy(
                             containerColor = Colors.Button.darkSlate
                         ),

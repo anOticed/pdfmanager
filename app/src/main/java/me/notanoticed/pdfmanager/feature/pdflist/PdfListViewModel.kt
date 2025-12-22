@@ -147,7 +147,10 @@ class PdfListViewModel : ViewModel() {
     }
 
     fun onItemClick(pdf: PdfFile) {
-        if (!isSelectionMode) return
+        if (!isSelectionMode) {
+            pendingEvent = PdfListEvent.OpenPreview(pdf)
+            return
+        }
 
         selectedPdfFiles = if (selectedPdfFiles.contains(pdf)) {
             selectedPdfFiles - pdf

@@ -46,6 +46,7 @@ import androidx.compose.ui.unit.sp
 import me.notanoticed.pdfmanager.core.pdf.model.PdfFile
 import me.notanoticed.pdfmanager.core.pdf.model.metaLine
 import me.notanoticed.pdfmanager.core.toast.BindViewModelToasts
+import me.notanoticed.pdfmanager.feature.preview.LocalPreviewNav
 import me.notanoticed.pdfmanager.ui.theme.Colors
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
@@ -60,6 +61,7 @@ fun MergeActiveScreen(
 
     val mergeFiles = viewModel.pdfMergeFiles
     val listState = rememberLazyListState()
+    val previewNav = LocalPreviewNav.current
 
     val reorderableState = rememberReorderableLazyListState(
         lazyListState = listState,
@@ -156,7 +158,7 @@ fun MergeActiveScreen(
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 Button(
-                    onClick = { /* TODO: preview */ },
+                    onClick = { previewNav.openMerge(pdfs = mergeFiles) },
                     colors = ButtonDefaults.buttonColors().copy(
                         containerColor = Colors.Button.darkSlate
                     ),

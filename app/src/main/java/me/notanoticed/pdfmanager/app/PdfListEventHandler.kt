@@ -6,6 +6,7 @@ import androidx.compose.runtime.LaunchedEffect
 import me.notanoticed.pdfmanager.feature.merge.MergeViewModel
 import me.notanoticed.pdfmanager.feature.pdflist.PdfListEvent
 import me.notanoticed.pdfmanager.feature.pdflist.PdfListViewModel
+import me.notanoticed.pdfmanager.feature.preview.LocalPreviewNav
 import me.notanoticed.pdfmanager.feature.split.SplitViewModel
 
 /* -------------------- EVENT HANDLER -------------------- */
@@ -18,6 +19,7 @@ fun PdfListEventHandler(
     tabs: List<String>
 ) {
     val event = pdfListViewModel.pendingEvent
+    val previewNav = LocalPreviewNav.current
 
     LaunchedEffect(event) {
         when (event) {
@@ -34,6 +36,10 @@ fun PdfListEventHandler(
                 val page = tabs.indexOf(Screen.Split.route)
                 if (page >= 0) pagerState.animateScrollToPage(page)
 
+                handleAfterNavigation(pdfListViewModel, clearSelection = false)
+            }
+            is PdfListEvent.OpenPreview -> {
+                previewNav.openSingle(pdf = event.pdf)
                 handleAfterNavigation(pdfListViewModel, clearSelection = false)
             }
             null -> Unit
