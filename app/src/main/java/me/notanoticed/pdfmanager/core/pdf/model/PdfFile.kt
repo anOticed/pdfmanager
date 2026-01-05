@@ -12,46 +12,48 @@ data class PdfFile(
     val name: String,
     val sizeBytes: Long,
     val pagesCount: Int,
+    val storagePath: String,
+    val lastModifiedEpochSeconds: Long,
     val createdEpochSeconds: Long,
     val bitmap: Bitmap? = null,
     val isLocked: Boolean
-)
-/* -------------------------------------------------- */
+) {
+    fun metaLine(): String {
+        val sizeText = size()
 
-
-
-/* -------------------- HELPERS -------------------- */
-fun PdfFile.metaLine(): String {
-    val sizeText = formatBytes(sizeBytes)
-
-    return if (isLocked) {
-        sizeText
-    } else {
-        val pagesText = when(pagesCount) {
-            1 -> "1 page"
-            else -> "$pagesCount pages"
+        return if (isLocked) {
+            sizeText
+        } else {
+            val pagesText = when(pagesCount) {
+                1 -> "1 page"
+                else -> "$pagesCount pages"
+            }
+            "$pagesText • $sizeText"
         }
-        "$pagesText • $sizeText"
     }
-}
 
-private fun formatBytes(bytes: Long): String {
-    val kb = 1000.0
-    val mb = kb * 1000
-    val gb = mb * 1000
+    fun createdDate(): String = formatDate(createdEpochSeconds)
 
-    return when {
-        bytes < kb -> "$bytes B"
-        bytes < mb -> String.format(Locale.US, "%.1f KB", bytes / kb)
-        bytes < gb -> String.format(Locale.US, "%.1f MB", bytes / mb)
-        else -> String.format(Locale.US, "%.1f GB", bytes / gb)
+    fun lastModifiedDate(): String = formatDate(lastModifiedEpochSeconds)
+
+    fun size(): String = formatBytes(sizeBytes)
+
+    private fun formatBytes(bytes: Long): String {
+        val kb = 1000.0
+        val mb = kb * 1000
+        val gb = mb * 1000
+
+        return when {
+            bytes < kb -> "$bytes B"
+            bytes < mb -> String.format(Locale.US, "%.1f KB", bytes / kb)
+            bytes < gb -> String.format(Locale.US, "%.1f MB", bytes / mb)
+            else -> String.format(Locale.US, "%.1f GB", bytes / gb)
+        }
     }
-}
 
-fun PdfFile.createdDate(): String = formatDate(createdEpochSeconds)
-
-private fun formatDate(epochSeconds: Long): String {
-    val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.US)
-    return sdf.format(Date(epochSeconds * 1000L))
+    private fun formatDate(epochSeconds: Long): String {
+        val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.US)
+        return sdf.format(Date(epochSeconds * 1000L))
+    }
 }
 /* ------------------------------------------------- */

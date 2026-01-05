@@ -105,8 +105,29 @@ class PdfListViewModel : ViewModel() {
         when(action) {
             PdfFileOptionAction.MERGE -> pendingEvent = PdfListEvent.OpenMerge(listOf(pdf))
             PdfFileOptionAction.SPLIT -> pendingEvent = PdfListEvent.OpenSplit(pdf)
+            PdfFileOptionAction.DETAILS -> pendingEvent = PdfListEvent.OpenDetails(pdf)
             else -> Unit
         }
+    }
+    /* ------------------------------------------------------- */
+
+
+
+    /* -------------------- DETAILS PANEL -------------------- */
+    var detailsPanelVisible by mutableStateOf(false)
+        private set
+
+    var detailsPanelPdf: PdfFile? by mutableStateOf(null)
+        private set
+
+    fun openDetails(pdf: PdfFile) {
+        detailsPanelVisible = true
+        detailsPanelPdf = pdf
+    }
+
+    fun closeDetails() {
+        detailsPanelVisible = false
+        detailsPanelPdf = null
     }
     /* ------------------------------------------------------- */
 

@@ -42,6 +42,10 @@ fun PdfListEventHandler(
                 previewNav.openSingle(pdf = event.pdf)
                 handleAfterNavigation(pdfListViewModel, clearSelection = false)
             }
+            is PdfListEvent.OpenDetails -> {
+                pdfListViewModel.openDetails(event.pdf)
+                handleAfterNavigation(pdfListViewModel, clearSelection = false)
+            }
             null -> Unit
         }
     }

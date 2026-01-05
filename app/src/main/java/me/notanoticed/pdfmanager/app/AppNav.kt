@@ -31,6 +31,7 @@ import kotlinx.coroutines.launch
 import me.notanoticed.pdfmanager.feature.images.ImagesScreen
 import me.notanoticed.pdfmanager.feature.images.ImagesViewModel
 import me.notanoticed.pdfmanager.feature.pdflist.OptionsOverlay
+import me.notanoticed.pdfmanager.feature.pdflist.PdfDetailsOverlay
 import me.notanoticed.pdfmanager.feature.pdflist.PdfListSelectionBottomBar
 
 /* -------------------- APP -------------------- */
@@ -162,8 +163,15 @@ fun App() = PdfManagerTheme {
             onDismiss = { pdfListViewModel.closeOptions() },
             onAction = {action ->
                 val pdf = pdfListViewModel.optionsPanelPdf ?: return@OptionsOverlay
+                pdfListViewModel.closeOptions()
                 pdfListViewModel.onFileOptionSelected(action, pdf)
             }
+        )
+
+        PdfDetailsOverlay(
+            visible = pdfListViewModel.detailsPanelVisible,
+            pdf = pdfListViewModel.detailsPanelPdf,
+            onDismiss = { pdfListViewModel.closeDetails() }
         )
     }
 

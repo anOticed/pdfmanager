@@ -5,6 +5,7 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.pdf.PdfRenderer
 import android.net.Uri
+import android.os.Environment
 import android.provider.DocumentsContract
 import android.provider.MediaStore
 import android.provider.OpenableColumns
@@ -38,13 +39,15 @@ object PdfRepository {
             var name = "document.pdf"
             var size = 0L
             var createdEpochSeconds = 0L
+            var lastModifiedEpochSeconds = 0L
+            val storagePath = uri.toString()
 
             val projection = arrayOf(
                 OpenableColumns.DISPLAY_NAME,
                 OpenableColumns.SIZE,
-                DocumentsContract.Document.COLUMN_LAST_MODIFIED,
+                MediaStore.MediaColumns.DATE_ADDED,
                 MediaStore.MediaColumns.DATE_MODIFIED,
-                MediaStore.MediaColumns.DATE_ADDED
+                DocumentsContract.Document.COLUMN_LAST_MODIFIED
             )
 
             contentResolver.query(uri, projection, null, null, null)?.use { cursor ->
@@ -57,23 +60,28 @@ object PdfRepository {
                         size = if (!cursor.isNull(index)) cursor.getLong(index) else 0L
                     }
 
-                    cursor.getColumnIndex(DocumentsContract.Document.COLUMN_LAST_MODIFIED).takeIf { it >= 0 }?.let { index ->
-                        if (!cursor.isNull(index)) createdEpochSeconds = (cursor.getLong(index) / 1000L).coerceAtLeast(0L)
+                    cursor.getColumnIndex(MediaStore.MediaColumns.DATE_ADDED).takeIf { it >= 0 }?.let { idx ->
+                        if (!cursor.isNull(idx)) createdEpochSeconds = cursor.getLong(idx).coerceAtLeast(0L)
                     }
-                    if (createdEpochSeconds == 0L) {
-                        cursor.getColumnIndex(MediaStore.MediaColumns.DATE_MODIFIED).takeIf { it >= 0 }?.let { index ->
-                            if (!cursor.isNull(index)) createdEpochSeconds = cursor.getLong(index).coerceAtLeast(0L)
-                        }
+
+                    cursor.getColumnIndex(DocumentsContract.Document.COLUMN_LAST_MODIFIED).takeIf { it >= 0 }?.let { idx ->
+                        if (!cursor.isNull(idx)) lastModifiedEpochSeconds = (cursor.getLong(idx) / 1000L).coerceAtLeast(0L)
                     }
-                    if (createdEpochSeconds == 0L) {
-                        cursor.getColumnIndex(MediaStore.MediaColumns.DATE_ADDED).takeIf { it >= 0 }?.let { index ->
-                            if (!cursor.isNull(index)) createdEpochSeconds = cursor.getLong(index).coerceAtLeast(0L)
+                    if (lastModifiedEpochSeconds == 0L) {
+                        cursor.getColumnIndex(MediaStore.MediaColumns.DATE_MODIFIED).takeIf { it >= 0 }?.let { idx ->
+                            if (!cursor.isNull(idx)) lastModifiedEpochSeconds = cursor.getLong(idx).coerceAtLeast(0L)
                         }
                     }
                 }
             }
+            val now = System.currentTimeMillis() / 1000L
 
-            if (createdEpochSeconds == 0L) createdEpochSeconds = System.currentTimeMillis() / 1000L
+            if (createdEpochSeconds == 0L) {
+                createdEpochSeconds = if (lastModifiedEpochSeconds != 0L) lastModifiedEpochSeconds else now
+            }
+            if (lastModifiedEpochSeconds == 0L) {
+                lastModifiedEpochSeconds = createdEpochSeconds
+            }
 
             var pagesCount = 0
             var locked = false
@@ -93,6 +101,8 @@ object PdfRepository {
                 sizeBytes = size,
                 pagesCount = pagesCount,
                 createdEpochSeconds = createdEpochSeconds,
+                storagePath = storagePath,
+                lastModifiedEpochSeconds = lastModifiedEpochSeconds,
                 isLocked = locked
             )
         }
@@ -111,6 +121,9 @@ object PdfRepository {
                 MediaStore.Files.FileColumns.DISPLAY_NAME,
                 MediaStore.Files.FileColumns.SIZE,
                 MediaStore.Files.FileColumns.DATE_ADDED,
+                MediaStore.Files.FileColumns.DATE_MODIFIED,
+                MediaStore.MediaColumns.DATA,
+                MediaStore.MediaColumns.RELATIVE_PATH,
                 MediaStore.Files.FileColumns.MIME_TYPE
             )
 
@@ -125,6 +138,10 @@ object PdfRepository {
                 val nameColumn = cursor.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DISPLAY_NAME)
                 val sizeColumn = cursor.getColumnIndexOrThrow(MediaStore.Files.FileColumns.SIZE)
                 val dateColumn = cursor.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DATE_ADDED)
+                val dateModifiedColumn = cursor.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DATE_MODIFIED)
+                val dataColumn = cursor.getColumnIndex(MediaStore.MediaColumns.DATA)
+                val relativePathColumn = cursor.getColumnIndex(MediaStore.MediaColumns.RELATIVE_PATH)
+
 
                 while (cursor.moveToNext()) {
                     val id = cursor.getLong(idColumn)
@@ -132,6 +149,20 @@ object PdfRepository {
                     val name = cursor.getString(nameColumn)
                     val size = cursor.getLong(sizeColumn)
                     val createdEpoch = cursor.getLong(dateColumn)
+                    val lastModifiedEpoch = cursor.getLong(dateModifiedColumn)
+
+                    val dataPath = if (dataColumn >= 0 && !cursor.isNull(dataColumn)) cursor.getString(dataColumn) else null
+                    val relativePath = if (relativePathColumn >= 0 && !cursor.isNull(relativePathColumn)) cursor.getString(relativePathColumn) else null
+
+                    val storagePath = when {
+                        !dataPath.isNullOrBlank() -> dataPath
+                        !relativePath.isNullOrBlank() -> {
+                            val root = Environment.getExternalStorageDirectory().absolutePath.trimEnd('/')
+                            val rel = relativePath.trimStart('/')
+                            "$root/$rel$name"
+                        }
+                        else -> uri.toString()
+                    }
 
                     tasks += async {
                         var pdfFile = getCachedPdf(uri)
@@ -184,6 +215,8 @@ object PdfRepository {
                                 sizeBytes = size,
                                 pagesCount = pagesCount,
                                 createdEpochSeconds = createdEpoch,
+                                storagePath = storagePath,
+                                lastModifiedEpochSeconds = if (lastModifiedEpoch > 0L) lastModifiedEpoch else createdEpoch,
                                 bitmap = bitmap,
                                 isLocked = locked
                             )
