@@ -3,6 +3,7 @@ package me.notanoticed.pdfmanager.feature.split
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -32,8 +33,11 @@ import androidx.compose.material.icons.outlined.FileCopy
 import androidx.compose.material.icons.outlined.FileDownload
 import androidx.compose.material.icons.outlined.Tag
 import androidx.compose.material.icons.outlined.Visibility
+import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
@@ -416,18 +420,20 @@ fun MethodCard(
     val borderColor = if (method.id == selectedOptionId) Colors.Border.lightBlue else Colors.Border.darkGray
     val iconBGColor = if (method.id == selectedOptionId) Colors.Icon.blue else Colors.Icon.darkGray
 
-    Surface(
-        color = surfaceColor,
+    Card(
+        onClick = { viewModel.selectSplitMethod(method.id) },
         shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = surfaceColor
+        ),
+        border = BorderStroke(
+            width = 2.dp,
+            color = borderColor
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
         modifier = Modifier
+            .fillMaxWidth()
             .padding(bottom = 10.dp)
-            .border(
-                border = BorderStroke(
-                    width = 2.dp,
-                    color = borderColor
-                ),
-                shape = RoundedCornerShape(10.dp)
-            ),
     ) {
         ListItem(
             leadingContent = {
@@ -462,17 +468,12 @@ fun MethodCard(
                     )
                 )
             },
-            colors = ListItemDefaults.colors().copy(
+            colors = ListItemDefaults.colors(
                 containerColor = Color.Transparent
             ),
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 4.dp)
-                .selectable(
-                    selected = (method.id == selectedOptionId),
-                    onClick = { viewModel.selectSplitMethod(method.id) },
-                    role = Role.RadioButton
-                )
         )
 
     }
