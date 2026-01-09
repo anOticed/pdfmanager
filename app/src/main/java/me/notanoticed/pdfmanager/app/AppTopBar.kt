@@ -43,9 +43,10 @@ fun AppTopBar(
             onCloseClick = { splitViewModel.closeSelectedSplitPdf() }
         )
         Screen.Images.route -> ImagesTopBar(
-            selectedCount = 0,
-            onCameraClick = {},
-            onGalleryClick = {}
+            viewModel = imagesViewModel,
+            onCameraClick = { /* TODO: camera */ },
+            onGalleryClick = { imagesViewModel.pickFromGalleryStub() },
+            onCloseClick = { imagesViewModel.clear() }
         )
         Screen.Settings.route -> SettingsTopBar()
     }

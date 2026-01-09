@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -13,17 +14,21 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.CameraAlt
+import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.Image
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import me.notanoticed.pdfmanager.ui.theme.Colors
@@ -32,18 +37,24 @@ import me.notanoticed.pdfmanager.ui.theme.Colors
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ImagesTopBar(
-    selectedCount: Int,
+    viewModel: ImagesViewModel,
     onCameraClick: () -> Unit,
-    onGalleryClick: () -> Unit
+    onGalleryClick: () -> Unit,
+    onCloseClick: () -> Unit
 ) {
+    val isActive = viewModel.isActive
+    val selectedCount = viewModel.selectedCount
+
     Column {
         TopAppBar(
             title = {
                 Column {
                     Text(
                         text = "Images to PDF",
-                        fontSize = 22.sp,
-                        fontWeight = FontWeight.ExtraBold
+                        fontSize = 19.sp,
+                        fontWeight = FontWeight.ExtraBold,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
                     )
 
                     val subtitle = when (selectedCount) {
@@ -55,14 +66,15 @@ fun ImagesTopBar(
                         text = subtitle,
                         fontSize = 12.sp,
                         color = Colors.Text.secondary,
-                        modifier = Modifier.padding(start = 4.dp)
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
                     )
                 }
             },
             actions = {
                 Button(
                     onClick = onCameraClick,
-                    colors = ButtonDefaults.buttonColors().copy(
+                    colors = ButtonDefaults.buttonColors(
                         containerColor = Colors.Button.green
                     ),
                     contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp),
@@ -86,7 +98,7 @@ fun ImagesTopBar(
 
                 Button(
                     onClick = onGalleryClick,
-                    colors = ButtonDefaults.buttonColors().copy(
+                    colors = ButtonDefaults.buttonColors(
                         containerColor = Colors.Button.blue
                     ),
                     contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp),
@@ -102,8 +114,27 @@ fun ImagesTopBar(
 
                     Text(
                         text = "Gallery",
-                        color = Colors.Text.primary
+                        color = Colors.Text.primary,
                     )
+                }
+
+                Spacer(modifier = Modifier.width(8.dp))
+
+                if (isActive) {
+                    FilledIconButton(
+                        onClick = onCloseClick,
+                        shape = RoundedCornerShape(10.dp),
+                        colors = IconButtonDefaults.filledIconButtonColors(
+                            containerColor = Colors.Button.iconBackground,
+                            contentColor = Colors.Icon.white
+                        )
+                    ) {
+                        Icon(
+                            imageVector = Icons.Outlined.Close,
+                            contentDescription = "Close Files",
+                            modifier = Modifier.fillMaxSize(0.5f)
+                        )
+                    }
                 }
             },
             colors = TopAppBarDefaults.topAppBarColors(

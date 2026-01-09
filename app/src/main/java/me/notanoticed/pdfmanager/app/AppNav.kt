@@ -28,6 +28,7 @@ import me.notanoticed.pdfmanager.feature.split.SplitViewModel
 import me.notanoticed.pdfmanager.ui.theme.Colors
 import me.notanoticed.pdfmanager.ui.theme.PdfManagerTheme
 import kotlinx.coroutines.launch
+import me.notanoticed.pdfmanager.feature.images.ImageActiveScreen
 import me.notanoticed.pdfmanager.feature.images.ImagesScreen
 import me.notanoticed.pdfmanager.feature.images.ImagesViewModel
 import me.notanoticed.pdfmanager.feature.pdflist.OptionsOverlay
@@ -137,7 +138,14 @@ fun App() = PdfManagerTheme {
                         }
                         else SplitScreen(viewModel = splitViewModel)
                     }
-                    Screen.Images.route -> ImagesScreen(viewModel = imagesViewModel)
+                    Screen.Images.route -> {
+                        if (imagesViewModel.isActive) {
+                            ImageActiveScreen(viewModel = imagesViewModel)
+                        }
+                        else {
+                            ImagesScreen(viewModel = imagesViewModel)
+                        }
+                    }
                     Screen.Settings.route -> SettingsScreen()
                 }
             }
