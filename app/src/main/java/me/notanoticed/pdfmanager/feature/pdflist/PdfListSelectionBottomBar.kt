@@ -84,7 +84,7 @@ fun RowScope.PdfSelectionAction(
         onClick = { onClick() },
         enabled = enabled,
         selected = false,
-        colors = NavigationBarItemDefaults.colors().copy(
+        colors = NavigationBarItemDefaults.colors(
             unselectedIconColor = tint,
             unselectedTextColor = tint,
             disabledIconColor = tint.copy(alpha = 0.5f),

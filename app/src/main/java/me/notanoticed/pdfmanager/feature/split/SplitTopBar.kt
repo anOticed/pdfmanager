@@ -63,7 +63,9 @@ fun SplitTopBar(
             actions = {
                 Button(
                     onClick = onAddClick  /* TODO: SAF picker */ ,
-                    colors = ButtonDefaults.buttonColors(containerColor = Colors.Button.blue),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Colors.Button.blue
+                    ),
                     contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp),
                     shape = RoundedCornerShape(10.dp)
                 ) {
@@ -87,7 +89,7 @@ fun SplitTopBar(
                     FilledIconButton(
                         onClick = onCloseClick,
                         shape = RoundedCornerShape(10.dp),
-                        colors = IconButtonDefaults.filledIconButtonColors().copy(
+                        colors = IconButtonDefaults.filledIconButtonColors(
                             containerColor = Colors.Button.iconBackground,
                             contentColor = Colors.Icon.white
                         )

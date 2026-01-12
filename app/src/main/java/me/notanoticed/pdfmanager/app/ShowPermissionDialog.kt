@@ -144,7 +144,7 @@ fun StoragePermissionDialog(
                                 modifier = Modifier.weight(0.5f),
                                 shape = RoundedCornerShape(50.dp),
                                 border = BorderStroke(1.5.dp, Colors.Border.blue),
-                                colors = ButtonDefaults.buttonColors().copy(
+                                colors = ButtonDefaults.buttonColors(
                                     containerColor = Color.Transparent
                                 )
                             ) {
@@ -159,7 +159,7 @@ fun StoragePermissionDialog(
                                 onClick = onGrantClick,
                                 modifier = Modifier.weight(1f),
                                 shape = RoundedCornerShape(50.dp),
-                                colors = ButtonDefaults.buttonColors().copy(
+                                colors = ButtonDefaults.buttonColors(
                                     containerColor = Colors.Button.blue
                                 )
                             ) {
@@ -177,7 +177,7 @@ fun StoragePermissionDialog(
                             modifier = Modifier
                                 .fillMaxWidth(),
                             shape = RoundedCornerShape(50.dp),
-                            colors = ButtonDefaults.buttonColors().copy(
+                            colors = ButtonDefaults.buttonColors(
                                 containerColor = Colors.Button.blue
                             )
                         ) {

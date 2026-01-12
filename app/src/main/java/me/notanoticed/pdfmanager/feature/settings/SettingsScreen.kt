@@ -205,7 +205,7 @@ fun SwitchRow(icon: ImageVector, title: String, subtitle: String, checked: Boole
             Switch(
                 checked = checked,
                 onCheckedChange = { checked = it  /* TODO: save to settings */ },
-                colors = SwitchDefaults.colors().copy(
+                colors = SwitchDefaults.colors(
                     checkedThumbColor = Colors.Primary.white,
                     checkedTrackColor = Colors.Primary.blue,
                     uncheckedThumbColor = Colors.Primary.white,
@@ -214,7 +214,7 @@ fun SwitchRow(icon: ImageVector, title: String, subtitle: String, checked: Boole
                 ),
             )
         },
-        colors = ListItemDefaults.colors().copy(
+        colors = ListItemDefaults.colors(
             containerColor = Colors.Surface.card
         ),
         modifier = Modifier
@@ -256,7 +256,9 @@ fun ArrowRow(icon: ImageVector, title: String, subtitle: String) {
                 tint = Colors.Text.secondary
             )
         },
-        colors = ListItemDefaults.colors().copy(containerColor = Colors.Surface.card),
+        colors = ListItemDefaults.colors(
+            containerColor = Colors.Surface.card
+        ),
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 4.dp)
