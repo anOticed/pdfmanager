@@ -1,3 +1,9 @@
+/**
+ * Options overlay for a single PDF item.
+ *
+ * Shows a modal sheet with available actions for a PDF (preview/details/merge/split/etc.).
+ */
+
 package me.notanoticed.pdfmanager.feature.pdflist
 
 import android.net.Uri

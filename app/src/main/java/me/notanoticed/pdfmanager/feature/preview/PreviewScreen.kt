@@ -1,3 +1,10 @@
+/**
+ * Preview screen implementation.
+ *
+ * Interprets PreviewRequest and renders the appropriate preview UI (currently using
+ * PdfPreview for single/merge previews; split preview is stubbed).
+ */
+
 package me.notanoticed.pdfmanager.feature.preview
 
 import androidx.compose.foundation.layout.Arrangement
@@ -45,7 +52,7 @@ fun PreviewScreen(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Icon(
-                   imageVector = Icons.Outlined.Visibility,
+                    imageVector = Icons.Outlined.Visibility,
                     contentDescription = null,
                     tint = Colors.Icon.default
                 )

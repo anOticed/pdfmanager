@@ -1,3 +1,10 @@
+/**
+ * Images tab "empty" state.
+ *
+ * Entry screen for the "Images to PDF" workflow. The gallery pick action currently
+ * switches to the active screen with placeholder items.
+ */
+
 package me.notanoticed.pdfmanager.feature.images
 
 import androidx.compose.foundation.layout.Arrangement

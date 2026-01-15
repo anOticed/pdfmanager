@@ -1,3 +1,9 @@
+/**
+ * Bottom bar used inside the preview overlay.
+ *
+ * Currently kept as a placeholder to match the app scaffold structure.
+ */
+
 package me.notanoticed.pdfmanager.feature.preview
 
 import androidx.compose.foundation.background

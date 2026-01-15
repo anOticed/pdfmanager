@@ -1,3 +1,7 @@
+/**
+ * Preview-only wrapper composable for the Merge tab.
+ */
+
 package me.notanoticed.pdfmanager.feature.merge
 
 import android.annotation.SuppressLint

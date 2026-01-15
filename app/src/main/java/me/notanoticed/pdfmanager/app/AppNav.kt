@@ -1,3 +1,11 @@
+/**
+ * Top-level app composition.
+ *
+ * Creates feature ViewModels, performs the initial storage-permission / first-load flow,
+ * and renders the main tabbed UI using a HorizontalPager inside a single Scaffold.
+ * This file also hosts global overlays (PDF options, PDF details, permission dialog).
+ */
+
 package me.notanoticed.pdfmanager.app
 
 import android.os.Build

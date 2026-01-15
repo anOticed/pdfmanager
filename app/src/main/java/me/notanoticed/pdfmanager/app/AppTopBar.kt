@@ -1,3 +1,10 @@
+/**
+ * Top bar switcher for the main Scaffold.
+ *
+ * Selects the appropriate top bar based on the current tab and feature state
+ * (for example, merge/split/images "active" states).
+ */
+
 package me.notanoticed.pdfmanager.app
 
 import androidx.compose.material3.ExperimentalMaterial3Api

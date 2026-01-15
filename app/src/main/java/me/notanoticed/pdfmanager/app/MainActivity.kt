@@ -1,3 +1,11 @@
+/**
+ * Entry point Activity.
+ *
+ * This Activity configures edge-to-edge system bars and hosts the entire Compose UI.
+ * It also installs app-wide CompositionLocals (toasts, pickers, preview overlay) before
+ * rendering the main App() composable.
+ */
+
 package me.notanoticed.pdfmanager.app
 
 import android.os.Bundle

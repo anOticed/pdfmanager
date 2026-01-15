@@ -1,3 +1,9 @@
+/**
+ * Settings tab UI.
+ *
+ * Currently a minimal placeholder screen used to reserve the tab and demonstrate layout.
+ */
+
 package me.notanoticed.pdfmanager.feature.settings
 
 import androidx.compose.foundation.background

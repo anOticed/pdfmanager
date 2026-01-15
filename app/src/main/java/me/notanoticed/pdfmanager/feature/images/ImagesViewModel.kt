@@ -1,3 +1,10 @@
+/**
+ * ViewModel for the Images tab.
+ *
+ * Stores the selected images (currently represented as placeholder items) and supports
+ * basic list operations such as clear/remove/reorder. Gallery selection is stubbed.
+ */
+
 package me.notanoticed.pdfmanager.feature.images
 
 import androidx.compose.runtime.getValue

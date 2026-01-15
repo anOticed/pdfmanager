@@ -1,3 +1,9 @@
+/**
+ * Material theme setup.
+ *
+ * Applies the project color scheme and typography through MaterialTheme.
+ */
+
 package me.notanoticed.pdfmanager.ui.theme
 
 import android.os.Build

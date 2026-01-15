@@ -1,3 +1,9 @@
+/**
+ * Bottom bar shown during PDF multi-selection.
+ *
+ * Provides contextual actions for the current selection.
+ */
+
 package me.notanoticed.pdfmanager.feature.pdflist
 
 import androidx.compose.foundation.background

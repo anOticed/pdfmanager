@@ -1,3 +1,10 @@
+/**
+ * Design tokens (colors).
+ *
+ * Centralizes the app color palette so feature UI can reference semantic color values
+ * instead of hard-coded ARGB literals.
+ */
+
 package me.notanoticed.pdfmanager.ui.theme
 
 import androidx.compose.ui.graphics.Color

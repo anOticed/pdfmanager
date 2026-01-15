@@ -1,3 +1,10 @@
+/**
+ * Preview overlay controller.
+ *
+ * Installs a PreviewNav into composition and renders PreviewActivity above the main UI
+ * using slide animations. Any screen can open preview via LocalPreviewNav.
+ */
+
 package me.notanoticed.pdfmanager.feature.preview
 
 import androidx.compose.animation.AnimatedVisibility

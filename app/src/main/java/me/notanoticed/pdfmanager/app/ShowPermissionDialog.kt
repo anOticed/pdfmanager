@@ -1,3 +1,10 @@
+/**
+ * UI dialog for storage permissions.
+ *
+ * Explains why broad storage access is needed (on newer Android versions) and
+ * routes the user to the appropriate system screen when permission is requested.
+ */
+
 package me.notanoticed.pdfmanager.app
 
 import androidx.compose.foundation.BorderStroke

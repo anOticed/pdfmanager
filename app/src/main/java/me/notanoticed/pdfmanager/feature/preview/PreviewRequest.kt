@@ -1,3 +1,10 @@
+/**
+ * Preview input model.
+ *
+ * Defines the supported preview modes (single PDF, merge list, split stub) and the data
+ * needed to render each mode.
+ */
+
 package me.notanoticed.pdfmanager.feature.preview
 
 import me.notanoticed.pdfmanager.core.pdf.model.PdfFile

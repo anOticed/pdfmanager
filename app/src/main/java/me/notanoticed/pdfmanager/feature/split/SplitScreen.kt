@@ -1,3 +1,9 @@
+/**
+ * Split tab "empty" state.
+ *
+ * Displayed when no PDF is selected for splitting.
+ */
+
 package me.notanoticed.pdfmanager.feature.split
 
 import androidx.compose.foundation.layout.Arrangement

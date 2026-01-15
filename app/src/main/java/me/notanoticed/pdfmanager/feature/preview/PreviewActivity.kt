@@ -1,3 +1,10 @@
+/**
+ * Preview overlay container.
+ *
+ * A Scaffold that swaps the main app bars with preview-specific bars and renders
+ * PreviewScreen as its content.
+ */
+
 package me.notanoticed.pdfmanager.feature.preview
 
 import androidx.activity.compose.BackHandler

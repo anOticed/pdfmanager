@@ -1,3 +1,10 @@
+/**
+ * ViewModel for the Split tab.
+ *
+ * Holds the selected PDF and the chosen split method. The Split tab switches between
+ * SplitScreen (no PDF selected) and SplitActiveScreen (PDF selected).
+ */
+
 package me.notanoticed.pdfmanager.feature.split
 
 import android.content.Context

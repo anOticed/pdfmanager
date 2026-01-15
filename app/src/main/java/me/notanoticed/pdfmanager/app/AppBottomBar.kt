@@ -1,3 +1,9 @@
+/**
+ * Bottom tab bar for the main Scaffold.
+ *
+ * Renders the primary app tabs and exposes a simple callback when a tab is selected.
+ */
+
 package me.notanoticed.pdfmanager.app
 
 import androidx.compose.foundation.background

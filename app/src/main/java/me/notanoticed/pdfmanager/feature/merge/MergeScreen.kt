@@ -1,3 +1,9 @@
+/**
+ * Merge tab "empty" state.
+ *
+ * Displayed when no PDFs are selected for merging yet.
+ */
+
 package me.notanoticed.pdfmanager.feature.merge
 
 import androidx.compose.foundation.layout.Arrangement

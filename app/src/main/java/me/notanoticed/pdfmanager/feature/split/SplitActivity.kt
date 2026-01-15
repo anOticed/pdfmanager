@@ -1,3 +1,7 @@
+/**
+ * Preview-only wrapper composable for the Split tab.
+ */
+
 package me.notanoticed.pdfmanager.feature.split
 
 

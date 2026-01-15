@@ -1,3 +1,9 @@
+/**
+ * Top bar for the Images tab.
+ *
+ * Shows selection count and a close action that clears the current image selection.
+ */
+
 package me.notanoticed.pdfmanager.feature.images
 
 import androidx.compose.foundation.background

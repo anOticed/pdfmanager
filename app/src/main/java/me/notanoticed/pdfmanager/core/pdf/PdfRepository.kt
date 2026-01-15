@@ -1,3 +1,10 @@
+/**
+ * PDF metadata access layer.
+ *
+ * Loads a list of PDFs from MediaStore and reads per-file metadata via ContentResolver.
+ * This module deliberately focuses on metadata (name/size/timestamps/page count).
+ */
+
 package me.notanoticed.pdfmanager.core.pdf
 
 import android.content.ContentUris

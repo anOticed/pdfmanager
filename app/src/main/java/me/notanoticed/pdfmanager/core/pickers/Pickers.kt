@@ -1,3 +1,11 @@
+/**
+ * Storage Access Framework (SAF) pickers.
+ *
+ * Provides a small abstraction for opening the system document picker for single or
+ * multiple PDFs. The selected Uris are granted persistable read permission when possible
+ * and exposed via a CompositionLocal.
+ */
+
 package me.notanoticed.pdfmanager.core.pickers
 
 import android.content.Intent

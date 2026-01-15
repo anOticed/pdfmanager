@@ -1,3 +1,10 @@
+/**
+ * ViewModel for the PDF list tab.
+ *
+ * Owns the loaded PDF list, selection mode, and the state for file option overlays.
+ * It also exposes one-shot navigation/events (pendingEvent) consumed by App-level code.
+ */
+
 package me.notanoticed.pdfmanager.feature.pdflist
 
 import android.content.Context
@@ -15,6 +22,17 @@ import androidx.lifecycle.viewModelScope
 import me.notanoticed.pdfmanager.core.pdf.PdfRepository
 import me.notanoticed.pdfmanager.core.pdf.model.PdfFile
 import kotlinx.coroutines.launch
+
+
+/**
+ * State holder for the PDF list tab.
+ *
+ * Owns:
+ * - The currently loaded list of PdfFile entries
+ * - Selection mode (multi-select) and the selected set
+ * - Visibility/state for the options and details overlays
+ * - A one-shot pendingEvent used for actions that must be handled once
+ */
 
 class PdfListViewModel : ViewModel() {
 

@@ -1,3 +1,11 @@
+/**
+ * Shared PDF model used across the UI.
+ *
+ * PdfFile represents a single document selected from MediaStore or SAF and contains
+ * metadata needed by the UI (name, size, page count, timestamps, storage path).
+ * It also provides small formatting helpers for consistent UI display.
+ */
+
 package me.notanoticed.pdfmanager.core.pdf.model
 
 import android.graphics.Bitmap
@@ -7,6 +15,12 @@ import java.util.Date
 import java.util.Locale
 
 /* -------------------- PDF FILE -------------------- */
+
+/**
+ * Contains the Uri identity and the metadata needed by the UI (size, page count,
+ * storage label/path, timestamps, and a flag indicating whether the file is locked).
+ */
+
 data class PdfFile(
     var uri: Uri,
     val name: String,

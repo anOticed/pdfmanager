@@ -1,3 +1,9 @@
+/**
+ * Top bar for the Merge tab.
+ *
+ * Shows selection count, add button (picker), and a close action that clears the selection.
+ */
+
 package me.notanoticed.pdfmanager.feature.merge
 
 import androidx.compose.foundation.background

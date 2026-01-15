@@ -1,3 +1,9 @@
+/**
+ * Top bar used inside the preview overlay.
+ *
+ * Provides a back button and an optional title.
+ */
+
 package me.notanoticed.pdfmanager.feature.preview
 
 import androidx.compose.foundation.background

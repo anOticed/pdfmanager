@@ -1,3 +1,13 @@
+/**
+ * Images-to-PDF "active" state.
+ *
+ * Displayed once images are selected.
+ * The current implementation is a UI stub:
+ * - Shows placeholder items
+ * - Uses drag-and-drop reordering
+ * - Actions (Preview / Create PDF) are present but not implemented yet
+ */
+
 package me.notanoticed.pdfmanager.feature.images
 
 import androidx.compose.foundation.BorderStroke

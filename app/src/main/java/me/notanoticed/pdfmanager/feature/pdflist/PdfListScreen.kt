@@ -1,3 +1,15 @@
+/**
+ * PDF list tab UI.
+ *
+ * Renders the list of PDFs loaded from PdfRepository and supports:
+ * - single-tap open options
+ * - long-press selection mode
+ * - multi-selection actions (merge, etc.)
+ *
+ * One-shot actions (open merge/split/preview/details) are emitted via PdfListViewModel.pendingEvent
+ * and handled at the app layer by PdfListEventHandler.
+ */
+
 package me.notanoticed.pdfmanager.feature.pdflist
 
 import androidx.compose.foundation.combinedClickable

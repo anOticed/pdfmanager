@@ -1,3 +1,9 @@
+/**
+ * Typography tokens.
+ *
+ * Defines the baseline text styles used by the app theme.
+ */
+
 package me.notanoticed.pdfmanager.ui.theme
 
 import androidx.compose.material3.Typography

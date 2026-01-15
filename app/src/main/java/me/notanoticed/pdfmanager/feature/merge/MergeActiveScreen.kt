@@ -1,3 +1,13 @@
+/**
+ * Merge tab "active" state.
+ *
+ * Displayed once at least one PDFs are selected.
+ *
+ * - Shows the selected files in a vertical list.
+ * - Supports drag-and-drop reordering (updates MergeViewModel.movePdf).
+ * - Provides the main actions (Preview / Merge).
+ */
+
 package me.notanoticed.pdfmanager.feature.merge
 
 import androidx.compose.foundation.BorderStroke

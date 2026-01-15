@@ -1,3 +1,10 @@
+/**
+ * ViewModel for the Merge tab.
+ *
+ * Holds the list of selected PDFs, supports reordering/removal, and exposes the
+ * "active" state used to switch between MergeScreen and MergeActiveScreen.
+ */
+
 package me.notanoticed.pdfmanager.feature.merge
 
 import android.content.Context

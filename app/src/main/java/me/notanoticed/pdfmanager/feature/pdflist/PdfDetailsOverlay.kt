@@ -1,3 +1,10 @@
+/**
+ * PDF details overlay.
+ *
+ * Shows a lightweight read-only view of PDF metadata (file name, size, path, timestamps).
+ * The overlay is controlled by PdfListViewModel.
+ */
+
 package me.notanoticed.pdfmanager.feature.pdflist
 
 import android.net.Uri

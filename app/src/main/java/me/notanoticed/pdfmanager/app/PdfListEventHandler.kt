@@ -1,3 +1,11 @@
+/**
+ * One-shot event bridge for the PDF list.
+ *
+ * Consumes pending events emitted by PdfListViewModel (open merge/split/preview/details)
+ * and performs the corresponding side effects: switching tabs, updating other ViewModels,
+ * or opening the preview overlay.
+ */
+
 package me.notanoticed.pdfmanager.app
 
 import androidx.compose.foundation.pager.PagerState

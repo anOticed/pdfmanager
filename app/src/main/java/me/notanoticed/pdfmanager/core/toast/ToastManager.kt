@@ -1,3 +1,10 @@
+/**
+ * In-app toast system.
+ *
+ * Implements a lightweight, app-wide toast host (built on SnackbarHostState) and
+ * exposes rememberToast() so composables / ViewModels can trigger short messages.
+ */
+
 package me.notanoticed.pdfmanager.core.toast
 
 import androidx.compose.animation.AnimatedVisibility

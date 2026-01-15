@@ -1,3 +1,9 @@
+/**
+ * Preview-only wrapper composable.
+ *
+ * This file contains a standalone Scaffold used for Compose previews / local testing.
+ */
+
 package me.notanoticed.pdfmanager.feature.pdflist
 
 import android.annotation.SuppressLint

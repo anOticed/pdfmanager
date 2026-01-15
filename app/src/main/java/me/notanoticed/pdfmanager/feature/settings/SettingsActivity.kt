@@ -1,3 +1,7 @@
+/**
+ * Preview-only wrapper composable for the Settings tab.
+ */
+
 package me.notanoticed.pdfmanager.feature.settings
 
 import androidx.compose.foundation.layout.padding

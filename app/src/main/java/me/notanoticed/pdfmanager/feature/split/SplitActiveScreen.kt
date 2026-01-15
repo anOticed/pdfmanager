@@ -1,3 +1,13 @@
+/**
+ * Split tab "active" state.
+ *
+ * Displayed once a PDF is selected.
+ *
+ * - Shows the selected file summary.
+ * - Lets the user choose a split method.
+ * - Exposes actions (Preview / Split).
+ */
+
 package me.notanoticed.pdfmanager.feature.split
 
 import androidx.compose.foundation.BorderStroke

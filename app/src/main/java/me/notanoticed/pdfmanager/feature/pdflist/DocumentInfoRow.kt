@@ -1,3 +1,7 @@
+/**
+ * Small UI helper for rendering a label/value metadata row.
+ */
+
 package me.notanoticed.pdfmanager.feature.pdflist
 
 import androidx.compose.foundation.background

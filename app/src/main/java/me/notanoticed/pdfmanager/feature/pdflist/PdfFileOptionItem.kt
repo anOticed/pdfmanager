@@ -1,3 +1,7 @@
+/**
+ * Reusable UI row used in the PDF options overlay.
+ */
+
 package me.notanoticed.pdfmanager.feature.pdflist
 
 import androidx.compose.material.icons.Icons

@@ -1,3 +1,11 @@
+/**
+ * PDF page renderer used by the preview overlay.
+ *
+ * Pages are rendered into Bitmaps and displayed in a vertical list.
+ * This implementation renders all pages upfront when the input changes to avoid
+ * re-rendering while scrolling (trade-off: higher memory usage for large PDFs).
+ */
+
 package me.notanoticed.pdfmanager.feature.preview
 
 import android.graphics.Bitmap
@@ -109,6 +117,9 @@ fun PdfPreview(
         }
 
         LaunchedEffect(pdfs, targetWidthPx) {
+            // render all pages once and keep bitmaps in memory
+            // this avoids background work during scroll, at the cost of higher RAM usage on large PDFs
+
             ready.value = false
 
             rendered.forEach { rp -> runCatching { if (!rp.bitmap.isRecycled) rp.bitmap.recycle() } }

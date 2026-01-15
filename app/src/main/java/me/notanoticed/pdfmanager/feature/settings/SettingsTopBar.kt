@@ -1,3 +1,7 @@
+/**
+ * Top bar for the Settings tab.
+ */
+
 package me.notanoticed.pdfmanager.feature.settings
 
 import androidx.compose.foundation.background

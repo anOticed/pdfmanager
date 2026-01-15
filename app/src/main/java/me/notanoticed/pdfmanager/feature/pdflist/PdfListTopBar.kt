@@ -1,3 +1,10 @@
+/**
+ * Top bar for the PDF list tab.
+ *
+ * Shows the current mode (normal vs selection), provides basic actions,
+ * and reflects counts such as total documents or selected items.
+ */
+
 package me.notanoticed.pdfmanager.feature.pdflist
 
 import androidx.compose.foundation.background
