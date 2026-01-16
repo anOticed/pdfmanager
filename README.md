@@ -55,3 +55,6 @@ https://pdfmanager.dev
 This app is under active development. 
 The demo and screenshots are illustrative and do not represent the final product. 
 Features, UI, and performance will continue to evolve, and changes may occur between previews.
+
+## License
+GPL-3.0. See LICENSE.
