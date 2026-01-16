@@ -1,6 +1,6 @@
 # PDF Manager - Android
 
-The application works completely offline. The user opens a PDF through the system file dialog, sees page previews, sets the desired operation, and saves the result.
+The application works completely offline. The user opens a PDF through the system file dialog, previews pages, chooses an operation, and saves the result back to storage.
 
 ## Planned features:
 
@@ -40,7 +40,18 @@ https://pdfmanager.dev
 
 ---
 
+## Documentation
+- [Project overview](docs/01_Project_Overview.md)
+- [Architecture](docs/02_Architecture.md)
+- [Kotlin concepts used in this codebase](docs/03_Kotlin_Concepts_Used.md)
+- [Android + Jetpack Compose basics](docs/04_Android_and_Compose_Basics.md)
+- [Code tour](docs/05_Code_Tour.md)
+- [Known limitations / trade-offs](docs/06_Known_Limitations_and_Tradeoffs.md)
+
+---
+
 ## Status
 
-This app is under active development. The demo and screenshots are illustrative and do not represent the final product. Features, UI, and performance will continue to evolve, and changes may occur between previews.
-Detailed code comments and inline documentation will be added in later iterations of the project.
+This app is under active development. 
+The demo and screenshots are illustrative and do not represent the final product. 
+Features, UI, and performance will continue to evolve, and changes may occur between previews.
