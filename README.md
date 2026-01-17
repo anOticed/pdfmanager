@@ -36,7 +36,7 @@ https://pdfmanager.dev
 ## Demo
 <img src = ".assets/demo_1.gif" width = "240"/> <img src = ".assets/demo_2.gif" width = "240"/> <img src = ".assets/demo_3.gif" width = "240"/> 
 <img src = ".assets/demo_4.gif" width = "240"/> <img src = ".assets/demo_5.gif" width = "240"/> <img src = ".assets/demo_6.gif" width = "240"/>
-<img src = ".assets/demo_7.gif" width = "240"/> <img src = ".assets/demo_8.gif" width = "240"/> <img src = ".assets/demo_9.gif" width = "240"/>
+<img src = ".assets/demo_7.gif" width = "240"/> <img src = ".assets/demo_8.gif" width = "240"/>
 
 ---
 
