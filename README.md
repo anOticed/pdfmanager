@@ -27,16 +27,16 @@ https://pdfmanager.dev
 ---
 
 ## Screenshots
-<img src = ".assets/screenshot-01.jpg" width = "240"/> <img src = ".assets/screenshot-02.jpg" width = "240"/> <img src = ".assets/screenshot-03.jpg" width = "240"/> 
-<img src = ".assets/screenshot-04.jpg" width = "240"/> <img src = ".assets/screenshot-05.jpg" width = "240"/> <img src = ".assets/screenshot-06.jpg" width = "240"/>
-<img src = ".assets/screenshot-07.jpg" width = "240"/>
+<img src = ".assets/screenshot-01.jpg?" width = "240"/> <img src = ".assets/screenshot-02.jpg?" width = "240"/> <img src = ".assets/screenshot-03.jpg?" width = "240"/> 
+<img src = ".assets/screenshot-04.jpg?" width = "240"/> <img src = ".assets/screenshot-05.jpg?" width = "240"/> <img src = ".assets/screenshot-06.jpg?" width = "240"/>
+<img src = ".assets/screenshot-07.jpg?" width = "240"/>
 
 ---
 
 ## Demo
-<img src = ".assets/demo_1.gif" width = "240"/> <img src = ".assets/demo_2.gif" width = "240"/> <img src = ".assets/demo_3.gif" width = "240"/> 
-<img src = ".assets/demo_4.gif" width = "240"/> <img src = ".assets/demo_5.gif" width = "240"/> <img src = ".assets/demo_6.gif" width = "240"/>
-<img src = ".assets/demo_7.gif" width = "240"/> <img src = ".assets/demo_8.gif" width = "240"/> <img src = ".assets/demo_9.gif" width = "240"/>
+<img src = ".assets/demo_1.gif?" width = "240"/> <img src = ".assets/demo_2.gif?" width = "240"/> <img src = ".assets/demo_3.gif?" width = "240"/> 
+<img src = ".assets/demo_4.gif?" width = "240"/> <img src = ".assets/demo_5.gif?" width = "240"/> <img src = ".assets/demo_6.gif?" width = "240"/>
+<img src = ".assets/demo_7.gif?" width = "240"/> <img src = ".assets/demo_8.gif?" width = "240"/> <img src = ".assets/demo_9.gif?" width = "240"/>
 
 ---
 
