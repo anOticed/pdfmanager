@@ -1,8 +1,8 @@
 /**
  * Preview screen implementation.
  *
- * Interprets PreviewRequest and renders the appropriate preview UI (currently using
- * PdfPreview for single/merge previews; split preview is stubbed).
+ * Interprets PreviewRequest and renders the appropriate preview UI
+ * (single PDF preview; split preview is currently stubbed).
  */
 
 package me.notanoticed.pdfmanager.feature.preview
@@ -26,20 +26,15 @@ import me.notanoticed.pdfmanager.ui.theme.Colors
 @Composable
 fun PreviewScreen(
     modifier: Modifier = Modifier,
-    request: PreviewRequest
+    request: PreviewRequest,
+    searchToggleRequestNonce: Int = 0
 ) {
     when (request) {
         is PreviewRequest.Single -> {
             PdfPreview(
                 modifier = modifier.fillMaxSize(),
-                pdfs = listOf(request.pdf)
-            )
-        }
-
-        is PreviewRequest.Merge -> {
-            PdfPreview(
-                modifier = modifier.fillMaxSize(),
-                pdfs = request.pdfs
+                pdf = request.pdf,
+                searchToggleRequestNonce = searchToggleRequestNonce
             )
         }
 

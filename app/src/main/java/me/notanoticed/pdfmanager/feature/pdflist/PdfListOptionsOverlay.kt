@@ -36,6 +36,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import me.notanoticed.pdfmanager.core.pdf.model.PdfFile
 import me.notanoticed.pdfmanager.ui.theme.Colors
 import me.notanoticed.pdfmanager.ui.theme.PdfManagerTheme
+import androidx.core.net.toUri
 
 /* -------------------- OPTIONS PANEL -------------------- */
 @OptIn(ExperimentalMaterial3Api::class)
@@ -185,14 +186,14 @@ fun OptionsOverlayPreview() {
     val pdfListViewModel: PdfListViewModel = viewModel()
 
     val file = PdfFile(
-        uri = Uri.parse(""),
+        uri = "".toUri(),
         name = "document.pdf",
         sizeBytes = 100000000,
         pagesCount = 100,
         storagePath = "/storage/emulated/0/Download/document.pdf",
         lastModifiedEpochSeconds = 1666666666,
         createdEpochSeconds = 1666666666,
-        bitmap = null,
+        thumbnailBitmap = null,
         isLocked = true
     )
 

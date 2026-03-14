@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ArrowBack
+import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -37,6 +38,8 @@ import me.notanoticed.pdfmanager.ui.theme.Colors
 fun PreviewTopBar(
     title: String,
     onBack: () -> Unit,
+    showSearch: Boolean = false,
+    onSearchClick: () -> Unit = {}
 ) {
     Column {
         TopAppBar(
@@ -66,7 +69,22 @@ fun PreviewTopBar(
                 )
             },
             actions = {
-                Spacer(modifier = Modifier.width(48.dp))
+                if (showSearch) {
+                    IconButton(
+                        onClick = onSearchClick,
+                        colors = IconButtonDefaults.iconButtonColors(
+                            containerColor = Colors.Surface.card,
+                            contentColor = Colors.Icon.white
+                        )
+                    ) {
+                        Icon(
+                            imageVector = Icons.Outlined.Search,
+                            contentDescription = "Search in PDF"
+                        )
+                    }
+                } else {
+                    Spacer(modifier = Modifier.width(48.dp))
+                }
             },
             colors = TopAppBarDefaults.topAppBarColors(
                 containerColor = Colors.Surface.card,

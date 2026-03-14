@@ -8,12 +8,6 @@
 package me.notanoticed.pdfmanager.feature.pdflist
 
 import android.content.Context
-import android.content.Intent
-import android.net.Uri
-import android.os.Environment
-import android.provider.Settings
-import androidx.activity.compose.ManagedActivityResultLauncher
-import androidx.activity.result.ActivityResult
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -21,18 +15,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import me.notanoticed.pdfmanager.core.pdf.PdfRepository
 import me.notanoticed.pdfmanager.core.pdf.model.PdfFile
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
 
-/**
- * State holder for the PDF list tab.
- *
- * Owns:
- * - The currently loaded list of PdfFile entries
- * - Selection mode (multi-select) and the selected set
- * - Visibility/state for the options and details overlays
- * - A one-shot pendingEvent used for actions that must be handled once
- */
 
 class PdfListViewModel : ViewModel() {
 
@@ -40,68 +26,167 @@ class PdfListViewModel : ViewModel() {
     var isLoading by mutableStateOf(false)
         private set
 
+    private var loadJob: Job? = null
+    private var loadRevision = 0L
+
     var pdfFiles by mutableStateOf<List<PdfFile>>(emptyList())
         private set
 
-    fun loadAll(context: Context) {
-        isLoading = true
+    var visiblePdfFiles by mutableStateOf<List<PdfFile>>(emptyList())
+        private set
 
-        viewModelScope.launch {
+    fun loadAll(context: Context) {
+        loadJob?.cancel()
+        val revision = ++loadRevision
+
+        loadJob = viewModelScope.launch {
             isLoading = true
             try {
-                pdfFiles = PdfRepository.loadAllPdfs(context)
+                val initial = PdfRepository.loadAllPdfs(
+                    context = context,
+                    renderMissingVisuals = false
+                )
+
+                if (revision != loadRevision) return@launch
+                applyPdfFiles(initial)
+                isLoading = false
+
+                initial.forEach { pdf ->
+                    if (revision != loadRevision) return@launch
+                    if (hasCompleteVisual(pdf)) return@forEach
+
+                    val updated = try {
+                        PdfRepository.enrichPdfVisual(context, pdf)
+                    } catch (_: Exception) {
+                        null
+                    } ?: return@forEach
+
+                    if (revision != loadRevision) return@launch
+                    applyVisualUpdate(updated)
+                }
             } catch (_: Exception) {
                 /* ignore */
             } finally {
-                isLoading = false
+                if (revision == loadRevision) {
+                    isLoading = false
+                }
             }
         }
+    }
+
+    private fun applyPdfFiles(newFiles: List<PdfFile>) {
+        val selectedUris = selectedPdfFiles.map { it.uri }.toHashSet()
+
+        pdfFiles = newFiles
+
+        selectedPdfFiles = if (selectedUris.isEmpty()) {
+            emptySet()
+        } else {
+            newFiles.filter { it.uri in selectedUris }.toSet()
+        }
+
+        recomputeVisiblePdfFiles()
+    }
+
+    private fun hasCompleteVisual(pdf: PdfFile): Boolean {
+        val hasThumbnail = !pdf.isLocked &&
+            pdf.thumbnailBitmap != null &&
+            !pdf.thumbnailBitmap.isRecycled
+
+        val hasKnownPages = pdf.pagesCount > 0
+        return pdf.isLocked || (hasThumbnail && hasKnownPages)
+    }
+
+    private fun applyVisualUpdate(updated: PdfFile) {
+        val old = pdfFiles.firstOrNull { it.uri == updated.uri } ?: return
+        if (!isVisualChanged(old, updated)) return
+
+        pdfFiles = pdfFiles.map { item ->
+            if (item.uri == updated.uri) updated else item
+        }
+
+        visiblePdfFiles = visiblePdfFiles.map { item ->
+            if (item.uri == updated.uri) updated else item
+        }
+
+        if (selectedPdfFiles.any { it.uri == updated.uri }) {
+            selectedPdfFiles = selectedPdfFiles
+                .filterNot { it.uri == updated.uri }
+                .toSet() + updated
+        }
+    }
+
+    private fun isVisualChanged(old: PdfFile, new: PdfFile): Boolean {
+        val oldThumb = old.thumbnailBitmap?.takeUnless { it.isRecycled }
+        val newThumb = new.thumbnailBitmap?.takeUnless { it.isRecycled }
+
+        return old.isLocked != new.isLocked ||
+            old.pagesCount != new.pagesCount ||
+            oldThumb !== newThumb
     }
     /* -------------------------------------------------------- */
 
 
 
-    /* -------------------- PERMISSIONS -------------------- */
-    var showPermissionDialog by mutableStateOf(false)
+    /* -------------------- SORTING & SEARCH -------------------- */
+    private var searchMode by mutableStateOf(false)
+    val isSearchMode: Boolean get() = searchMode
+
+    var searchQuery by mutableStateOf("")
         private set
 
-    var permissionDialogBlocking by mutableStateOf(false)
+    var sortType by mutableStateOf(PdfSortType.DATE)
         private set
 
-    fun showPermissionExplanation() {
-        showPermissionDialog = true
-        permissionDialogBlocking = false
-        isLoading = false
-    }
+    var sortOrder by mutableStateOf(PdfSortOrder.DESCENDING)
+        private set
 
-    fun onPermissionDialogCancel() {
-        showPermissionDialog = true
-        permissionDialogBlocking = true
-    }
-    fun onPermissionGranted() {
-        showPermissionDialog = false
-        permissionDialogBlocking = false
-    }
+    private fun recomputeVisiblePdfFiles() {
+        val query = searchQuery.trim()
+        val sorted = when (sortType) {
+            PdfSortType.NAME -> pdfFiles.sortedBy { it.name.lowercase() }
+            PdfSortType.FILE_SIZE -> pdfFiles.sortedBy { it.sizeBytes }
+            PdfSortType.DATE -> pdfFiles.sortedBy { it.lastModifiedEpochSeconds }
+        }
 
-    fun onPermissionDenied() {
-        showPermissionDialog = true
-        permissionDialogBlocking = true
-        isLoading = false
-    }
+        val ordered = when (sortOrder) {
+            PdfSortOrder.ASCENDING -> sorted
+            PdfSortOrder.DESCENDING -> sorted.asReversed()
+        }
 
-    fun requestAllFilesAccess(
-        context: Context,
-        manageAllFilesLauncher: ManagedActivityResultLauncher<Intent, ActivityResult>
-    ) {
-        if (!Environment.isExternalStorageManager()
-        ) {
-            val intent = Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION).apply {
-                data = Uri.parse("package:${context.packageName}")
-            }
-            manageAllFilesLauncher.launch(intent)
+        visiblePdfFiles = if (query.isEmpty()) {
+            ordered
+        } else {
+            ordered.filter { pdf -> pdf.name.contains(query, ignoreCase = true) }
         }
     }
-    /* ------------------------------------------------------------- */
+
+    fun openSearch() {
+        searchMode = true
+        recomputeVisiblePdfFiles()
+    }
+
+    fun closeSearch() {
+        searchMode = false
+        searchQuery = ""
+        recomputeVisiblePdfFiles()
+    }
+
+    fun updateSearchQuery(query: String) {
+        searchQuery = query
+        recomputeVisiblePdfFiles()
+    }
+
+    fun updateSortType(type: PdfSortType) {
+        sortType = type
+        recomputeVisiblePdfFiles()
+    }
+
+    fun updateSortOrder(order: PdfSortOrder) {
+        sortOrder = order
+        recomputeVisiblePdfFiles()
+    }
+    /* ---------------------------------------------------------- */
 
 
 
@@ -211,6 +296,11 @@ class PdfListViewModel : ViewModel() {
         selectionMode = false
     }
 
+    fun enterSelectionMode() {
+        closeSearch()
+        selectionMode = true
+    }
+
     fun mergeSelected() {
         if (!canMergeSelected) return
 
@@ -219,4 +309,15 @@ class PdfListViewModel : ViewModel() {
     fun shareSelected() { /* TODO */ }
     fun deleteSelectedPdfs() { /* TODO */ }
     /* --------------------------------------------------- */
+}
+
+enum class PdfSortType {
+    NAME,
+    FILE_SIZE,
+    DATE
+}
+
+enum class PdfSortOrder {
+    ASCENDING,
+    DESCENDING
 }

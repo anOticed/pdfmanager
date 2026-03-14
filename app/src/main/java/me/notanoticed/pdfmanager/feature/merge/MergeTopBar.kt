@@ -51,8 +51,16 @@ fun MergeTopBar(
         TopAppBar(
             title = {
                 Column {
-                    Text(text = "Merge PDFs", fontSize = 22.sp, fontWeight = FontWeight.ExtraBold)
-                    Text(text = "$total files selected", fontSize = 12.sp, color = Colors.Text.secondary)
+                    Text(
+                        text = "Merge PDFs",
+                        fontSize = 22.sp,
+                        fontWeight = FontWeight.ExtraBold
+                    )
+                    Text(
+                        text = if (total == 0) "No files selected" else "$total files selected",
+                        fontSize = 12.sp,
+                        color = Colors.Text.secondary
+                    )
                 }
             },
             actions = {

@@ -34,7 +34,6 @@ import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ContentCut
-import androidx.compose.material.icons.outlined.Description
 import androidx.compose.material.icons.outlined.FileCopy
 import androidx.compose.material.icons.outlined.FileDownload
 import androidx.compose.material.icons.outlined.Tag
@@ -65,6 +64,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import me.notanoticed.pdfmanager.core.pdf.PdfThumbnail
 import me.notanoticed.pdfmanager.core.toast.BindViewModelToasts
 import me.notanoticed.pdfmanager.feature.preview.LocalPreviewNav
 import me.notanoticed.pdfmanager.ui.theme.Colors
@@ -95,20 +95,16 @@ fun SplitActiveScreen(
                     modifier = Modifier.padding(14.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Box(
-                        contentAlignment = Alignment.Center,
+                    PdfThumbnail(
+                        pdf = selectedSplitPdf,
                         modifier = Modifier
                             .width(48.dp)
-                            .height(64.dp)
-                            .clip(RoundedCornerShape(10.dp))
-                            .background(Colors.Surface.thumbnail)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Outlined.Description,
-                            contentDescription = "",
-                            tint = Colors.Icon.gray,
-                        )
-                    }
+                            .height(64.dp),
+                        cornerRadius = 10.dp,
+                        placeholderBackground = Colors.Surface.thumbnail,
+                        placeholderIconTint = Colors.Icon.gray,
+                        placeholderIconSize = 26.dp
+                    )
 
                     Spacer(modifier = Modifier.width(12.dp))
 

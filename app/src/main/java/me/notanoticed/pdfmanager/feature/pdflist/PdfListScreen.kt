@@ -15,6 +15,7 @@ package me.notanoticed.pdfmanager.feature.pdflist
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -22,17 +23,20 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.MoreVert
+import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults.Indicator
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
@@ -40,7 +44,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import me.notanoticed.pdfmanager.core.pdf.model.PdfFile
 import me.notanoticed.pdfmanager.ui.theme.Colors
 
@@ -53,10 +60,14 @@ fun PdfListScreen(
     val context = LocalContext.current
 
     val isLoading = viewModel.isLoading
-    val pdfFiles = viewModel.pdfFiles
+    val allPdfFiles = viewModel.pdfFiles
+    val pdfFiles = viewModel.visiblePdfFiles
 
-    val hasData = pdfFiles.isNotEmpty()
+    val hasData = allPdfFiles.isNotEmpty()
     val showFullscreenLoader = isLoading && !hasData
+    val showNoSearchResults = viewModel.isSearchMode
+                            && viewModel.searchQuery.trim().isNotEmpty()
+                            && pdfFiles.isEmpty()
 
 
     if (showFullscreenLoader) {
@@ -83,23 +94,67 @@ fun PdfListScreen(
                 )
             }
         ) {
-            LazyColumn(
-                modifier = modifier
-                    .fillMaxSize(),
-                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-                verticalArrangement = Arrangement.spacedBy(14.dp)
-            ) {
-                items(pdfFiles) { pdf ->
-                    DocumentCard(
-                        pdf = pdf,
-                        isSelectionMode = viewModel.isSelectionMode,
-                        isSelected = viewModel.isSelected(pdf),
-                        onClick = { viewModel.onItemClick(pdf) },
-                        onLongPress = { viewModel.onItemLongPress(pdf) },
-                        onMoreClick = { viewModel.openOptions(pdf = pdf) }
-                    )
+            if (showNoSearchResults) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Column(
+                        modifier = modifier.fillMaxSize(),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        Icon(
+                            imageVector = Icons.Outlined.Search,
+                            contentDescription = null,
+                            tint = Colors.Icon.default,
+                            modifier = Modifier.size(60.dp)
+                        )
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        Text(
+                            text = "Nothing matched your search",
+                            color = Colors.Text.secondary,
+                            fontSize = 24.sp,
+                            fontWeight = FontWeight.ExtraBold
+                        )
+
+                        Spacer(modifier = Modifier.height(10.dp))
+
+                        Text(
+                            text = "Check the spelling or try another keyword.",
+                            color = Colors.Text.muted,
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.padding(horizontal = 48.dp)
+                        )
+                    }
                 }
-                item { Spacer(modifier = Modifier.height(24.dp)) }
+            } else {
+                LazyColumn(
+                    modifier = modifier
+                        .fillMaxSize(),
+                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+                    verticalArrangement = Arrangement.spacedBy(14.dp)
+                ) {
+                    items(
+                        items = pdfFiles,
+                        key = { it.uri.toString() }
+                    ) { pdf ->
+                        DocumentCard(
+                            pdf = pdf,
+                            searchQuery = viewModel.searchQuery,
+                            isSelectionMode = viewModel.isSelectionMode,
+                            isSelected = viewModel.isSelected(pdf),
+                            onClick = { viewModel.onItemClick(pdf) },
+                            onLongPress = { viewModel.onItemLongPress(pdf) },
+                            onMoreClick = { viewModel.openOptions(pdf = pdf) }
+                        )
+                    }
+                    item { Spacer(modifier = Modifier.height(24.dp)) }
+                }
             }
         }
     }
@@ -113,6 +168,7 @@ fun PdfListScreen(
 @Composable
 fun DocumentCard(
     pdf: PdfFile,
+    searchQuery: String,
     isSelectionMode: Boolean,
     isSelected: Boolean,
     onClick: () -> Unit,
@@ -137,7 +193,8 @@ fun DocumentCard(
         ) {
             DocumentInfoRow(
                 modifier = Modifier.weight(1f),
-                pdf = pdf
+                pdf = pdf,
+                searchQuery = searchQuery
             )
             if (isSelectionMode) {
                 Checkbox(

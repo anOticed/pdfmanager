@@ -31,12 +31,8 @@ class PreviewNav internal constructor(
     private val openRequest: (PreviewRequest) -> Unit,
     private val setVisible: (Boolean) -> Unit
 ) {
-    fun openSingle(pdf: PdfFile) {
-        openRequest(PreviewRequest.Single(pdf))
-        setVisible(true)
-    }
-    fun openMerge(pdfs: List<PdfFile>) {
-        openRequest(PreviewRequest.Merge(pdfs))
+    fun openSingle(pdf: PdfFile, allowSearch: Boolean = true) {
+        openRequest(PreviewRequest.Single(pdf = pdf, allowSearch = allowSearch))
         setVisible(true)
     }
     fun openSplit(pdf: PdfFile, splitMethodId: Int) {

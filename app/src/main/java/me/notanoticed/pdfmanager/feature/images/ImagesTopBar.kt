@@ -1,7 +1,5 @@
 /**
  * Top bar for the Images tab.
- *
- * Shows selection count and a close action that clears the current image selection.
  */
 
 package me.notanoticed.pdfmanager.feature.images
@@ -11,10 +9,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -49,7 +45,11 @@ fun ImagesTopBar(
     onCloseClick: () -> Unit
 ) {
     val isActive = viewModel.isActive
-    val selectedCount = viewModel.selectedCount
+    val subtitle = when (val selectedCount = viewModel.selectedCount) {
+        0 -> "No images selected"
+        1 -> "1 image selected"
+        else -> "$selectedCount images selected"
+    }
 
     Column {
         TopAppBar(
@@ -57,17 +57,11 @@ fun ImagesTopBar(
                 Column {
                     Text(
                         text = "Images to PDF",
-                        fontSize = 19.sp,
+                        fontSize = 22.sp,
                         fontWeight = FontWeight.ExtraBold,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
-
-                    val subtitle = when (selectedCount) {
-                        1 -> { "1 image selected" }
-                        else -> "$selectedCount images selected"
-                    }
-
                     Text(
                         text = subtitle,
                         fontSize = 12.sp,
@@ -91,9 +85,7 @@ fun ImagesTopBar(
                         contentDescription = "Camera",
                         tint = Colors.Icon.white
                     )
-
                     Spacer(modifier = Modifier.size(6.dp))
-
                     Text(
                         text = "Camera",
                         color = Colors.Text.primary
@@ -115,18 +107,15 @@ fun ImagesTopBar(
                         contentDescription = "Gallery",
                         tint = Colors.Icon.white
                     )
-
                     Spacer(modifier = Modifier.size(6.dp))
-
                     Text(
                         text = "Gallery",
-                        color = Colors.Text.primary,
+                        color = Colors.Text.primary
                     )
                 }
 
-                Spacer(modifier = Modifier.width(8.dp))
-
                 if (isActive) {
+                    Spacer(modifier = Modifier.width(8.dp))
                     FilledIconButton(
                         onClick = onCloseClick,
                         shape = RoundedCornerShape(10.dp),
@@ -137,15 +126,15 @@ fun ImagesTopBar(
                     ) {
                         Icon(
                             imageVector = Icons.Outlined.Close,
-                            contentDescription = "Close Files",
-                            modifier = Modifier.fillMaxSize(0.5f)
+                            contentDescription = "Close images",
+                            modifier = Modifier.size(18.dp)
                         )
                     }
                 }
             },
             colors = TopAppBarDefaults.topAppBarColors(
                 containerColor = Colors.Surface.card,
-                titleContentColor = Colors.Text.primary,
+                titleContentColor = Colors.Text.primary
             )
         )
 
@@ -156,6 +145,5 @@ fun ImagesTopBar(
                 .background(Colors.Border.subtle)
         )
     }
-
 }
 /* ------------------------------------------------- */

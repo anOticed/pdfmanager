@@ -1,8 +1,9 @@
 /**
- * UI dialog for storage permissions.
+ * Universal permission dialog UI.
  *
- * Explains why broad storage access is needed (on newer Android versions) and
- * routes the user to the appropriate system screen when permission is requested.
+ * One visual component used for:
+ * - all-files storage permission
+ * - camera permission
  */
 
 package me.notanoticed.pdfmanager.app
@@ -22,6 +23,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.CameraAlt
 import androidx.compose.material.icons.outlined.Folder
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -33,6 +35,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -42,21 +45,67 @@ import androidx.compose.ui.window.DialogProperties
 import me.notanoticed.pdfmanager.ui.theme.Colors
 import me.notanoticed.pdfmanager.ui.theme.PdfManagerTheme
 
+/* -------------------- MODEL -------------------- */
+data class PermissionDialogTexts(
+    val icon: ImageVector,
+    val title: String,
+    val message: String,
+    val grantButtonText: String
+)
+
+private fun buildPermissionDialogTexts(
+    type: AppPermissionType,
+    isBlocking: Boolean
+): PermissionDialogTexts {
+    return when (type) {
+        AppPermissionType.STORAGE_ALL_FILES -> {
+            PermissionDialogTexts(
+                icon = Icons.Outlined.Folder,
+                title = if (isBlocking) "Storage access is required" else "Permission required",
+                message = if (isBlocking) {
+                    "PDF Manager can't function properly without \"All files access\".\n\n" +
+                        "Please enable it in system settings to continue using the app."
+                } else {
+                    "PDF Manager needs access to your device storage to function properly.\n\n" +
+                        "Your documents stay private and secure."
+                },
+                grantButtonText = "Grant All Files Access"
+            )
+        }
+        AppPermissionType.CAMERA -> {
+            PermissionDialogTexts(
+                icon = Icons.Outlined.CameraAlt,
+                title = if (isBlocking) "Camera access is required" else "Permission required",
+                message = if (isBlocking) {
+                    "PDF Manager can't capture photos without camera access.\n\n" +
+                        "Please grant camera permission to continue."
+                } else {
+                    "PDF Manager needs access to your camera to capture photos."
+                },
+                grantButtonText = "Grant Camera Access"
+            )
+        }
+    }
+}
+/* ----------------------------------------------- */
+
+
 /* -------------------- PERMISSION DIALOG -------------------- */
 @Composable
-fun StoragePermissionDialog(
+fun AppPermissionDialog(
     visible: Boolean,
+    type: AppPermissionType,
     isBlocking: Boolean,
     onGrantClick: () -> Unit,
     onCancel: () -> Unit
 ) {
     if (!visible) return
 
+    val texts = buildPermissionDialogTexts(type = type, isBlocking = isBlocking)
+
     Dialog(
         onDismissRequest = {
-            if (!isBlocking) {
-                onCancel()
-            }
+            if (!isBlocking) onCancel()
         },
         properties = DialogProperties(
             dismissOnBackPress = false,
@@ -102,31 +151,17 @@ fun StoragePermissionDialog(
                             contentAlignment = Alignment.Center
                         ) {
                             Icon(
-                                imageVector = Icons.Outlined.Folder,
+                                imageVector = texts.icon,
                                 contentDescription = null,
-                                tint = Colors.Icon.white,
+                                tint = Colors.Icon.white
                             )
                         }
                     }
 
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    val title = if (isBlocking) {
-                        "Storage access is required"
-                    } else {
-                        "Permission required"
-                    }
-
-                    val message = if (isBlocking) {
-                        "PDF Manager can't function properly without \"All files access\". \n\n" +
-                                "Please enable it in system settings to continue using the app."
-                    } else {
-                        "PDF Manager needs access to your device storage to function properly. \n\n" +
-                                "Your documents stay private and secure."
-                    }
-
                     Text(
-                        text = title,
+                        text = texts.title,
                         fontSize = 20.sp,
                         fontWeight = FontWeight.SemiBold,
                         color = Colors.Text.primary
@@ -135,7 +170,7 @@ fun StoragePermissionDialog(
                     Spacer(modifier = Modifier.height(10.dp))
 
                     Text(
-                        text = message,
+                        text = texts.message,
                         fontSize = 14.sp,
                         color = Colors.Text.secondary
                     )
@@ -143,10 +178,8 @@ fun StoragePermissionDialog(
                     Spacer(modifier = Modifier.height(24.dp))
 
                     if (!isBlocking) {
-                        Row(
-                            horizontalArrangement = Arrangement.spacedBy(12.dp)
-                        ) {
-                            OutlinedButton (
+                        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                            OutlinedButton(
                                 onClick = onCancel,
                                 modifier = Modifier.weight(0.5f),
                                 shape = RoundedCornerShape(50.dp),
@@ -171,25 +204,23 @@ fun StoragePermissionDialog(
                                 )
                             ) {
                                 Text(
-                                    text = "Grant All Files Access",
+                                    text = texts.grantButtonText,
                                     fontSize = 14.sp,
                                     color = Colors.Text.primary
                                 )
                             }
                         }
-                    }
-                    else {
+                    } else {
                         Button(
                             onClick = onGrantClick,
-                            modifier = Modifier
-                                .fillMaxWidth(),
+                            modifier = Modifier.fillMaxWidth(),
                             shape = RoundedCornerShape(50.dp),
                             colors = ButtonDefaults.buttonColors(
                                 containerColor = Colors.Button.blue
                             )
                         ) {
                             Text(
-                                text = "Grant All Files Access",
+                                text = texts.grantButtonText,
                                 fontSize = 14.sp,
                                 color = Colors.Text.primary
                             )
@@ -198,20 +229,18 @@ fun StoragePermissionDialog(
                 }
             }
         }
-
     }
-
 }
 /* ----------------------------------------------------------- */
-
 
 
 @Preview(showBackground = true)
 @Composable
 fun ShowPermissionDialogPreview() {
     PdfManagerTheme {
-        StoragePermissionDialog(
+        AppPermissionDialog(
             visible = true,
+            type = AppPermissionType.CAMERA,
             isBlocking = false,
             onGrantClick = {},
             onCancel = {}

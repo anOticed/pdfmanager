@@ -1,8 +1,7 @@
 /**
  * Images tab "empty" state.
  *
- * Entry screen for the "Images to PDF" workflow. The gallery pick action currently
- * switches to the active screen with placeholder items.
+ * Entry screen for the "Images to PDF" workflow.
  */
 
 package me.notanoticed.pdfmanager.feature.images
@@ -25,6 +24,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import me.notanoticed.pdfmanager.core.toast.BindViewModelToasts
 import me.notanoticed.pdfmanager.ui.theme.Colors
 
 /* -------------------- SCREEN -------------------- */
@@ -33,6 +33,8 @@ fun ImagesScreen(
     modifier: Modifier = Modifier,
     viewModel: ImagesViewModel
 ) {
+    BindViewModelToasts(viewModel)
+
     Column(
         modifier = modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,

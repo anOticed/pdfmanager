@@ -32,6 +32,7 @@ fun AppTopBar(
     imagesViewModel: ImagesViewModel
 ) {
     val pickers = LocalPickers.current
+    val appPermissions = LocalAppPermissions.current
     val context = LocalContext.current
 
     when (currentRoute) {
@@ -51,8 +52,31 @@ fun AppTopBar(
         )
         Screen.Images.route -> ImagesTopBar(
             viewModel = imagesViewModel,
-            onCameraClick = { /* TODO: camera */ },
-            onGalleryClick = { imagesViewModel.pickFromGalleryStub() },
+            onCameraClick = {
+                appPermissions.ensureCameraAccess(
+                    onGranted = {
+                        pickers.takePhoto(
+                            onCaptured = { uri ->
+                                imagesViewModel.addCapturedPhoto(
+                                    context = context,
+                                    uri = uri
+                                )
+                            },
+                            onError = {
+                                imagesViewModel.onCameraLaunchFailed()
+                            }
+                        )
+                    },
+                    onDenied = {
+                        imagesViewModel.onCameraPermissionDenied()
+                    }
+                )
+            },
+            onGalleryClick = {
+                pickers.pickImages { uris ->
+                    imagesViewModel.addFromGallery(context, uris)
+                }
+            },
             onCloseClick = { imagesViewModel.clear() }
         )
         Screen.Settings.route -> SettingsTopBar()

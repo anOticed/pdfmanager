@@ -31,7 +31,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Close
-import androidx.compose.material.icons.outlined.Description
 import androidx.compose.material.icons.outlined.DragHandle
 import androidx.compose.material.icons.outlined.FileDownload
 import androidx.compose.material.icons.outlined.Visibility
@@ -49,10 +48,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import me.notanoticed.pdfmanager.core.pdf.PdfThumbnail
 import me.notanoticed.pdfmanager.core.pdf.model.PdfFile
 import me.notanoticed.pdfmanager.core.toast.BindViewModelToasts
 import me.notanoticed.pdfmanager.feature.preview.LocalPreviewNav
@@ -71,6 +72,7 @@ fun MergeActiveScreen(
     val mergeFiles = viewModel.pdfMergeFiles
     val listState = rememberLazyListState()
     val previewNav = LocalPreviewNav.current
+    val context = LocalContext.current
 
     val reorderableState = rememberReorderableLazyListState(
         lazyListState = listState,
@@ -177,7 +179,18 @@ fun MergeActiveScreen(
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 Button(
-                    onClick = { previewNav.openMerge(pdfs = mergeFiles) },
+                    onClick = {
+                        viewModel.openPreview(
+                            context = context,
+                            onReady = { previewPdf ->
+                                previewNav.openSingle(
+                                    pdf = previewPdf,
+                                    allowSearch = true
+                                )
+                            }
+                        )
+                    },
+                    enabled = mergeFiles.isNotEmpty() && !viewModel.isPreparingPreview,
                     colors = ButtonDefaults.buttonColors(
                         containerColor = Colors.Button.darkSlate
                     ),
@@ -195,7 +208,7 @@ fun MergeActiveScreen(
                     Spacer(modifier = Modifier.width(8.dp))
 
                     Text(
-                        text = "Preview",
+                        text = if (viewModel.isPreparingPreview) "Preparing..." else "Preview",
                         color = Colors.Text.primary,
                         fontSize = 14.sp
                     )
@@ -267,21 +280,16 @@ fun MergeFileCard(
 
             Spacer(modifier = Modifier.width(12.dp))
 
-            Box(
+            PdfThumbnail(
+                pdf = file,
                 modifier = Modifier
                     .width(34.dp)
-                    .height(48.dp)
-                    .clip(RoundedCornerShape(6.dp))
-                    .background(Colors.Icon.darkGray),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = Icons.Outlined.Description,
-                    contentDescription = null,
-                    tint = Colors.Icon.gray,
-                    modifier = Modifier.size(24.dp)
-                )
-            }
+                    .height(48.dp),
+                cornerRadius = 6.dp,
+                placeholderBackground = Colors.Icon.darkGray,
+                placeholderIconTint = Colors.Icon.gray,
+                placeholderIconSize = 24.dp
+            )
 
             Spacer(modifier = Modifier.width(12.dp))
 

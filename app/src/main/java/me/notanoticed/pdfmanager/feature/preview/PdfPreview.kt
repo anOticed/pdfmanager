@@ -1,204 +1,101 @@
 /**
- * PDF page renderer used by the preview overlay.
- *
- * Pages are rendered into Bitmaps and displayed in a vertical list.
- * This implementation renders all pages upfront when the input changes to avoid
- * re-rendering while scrolling (trade-off: higher memory usage for large PDFs).
+ * PDF preview renderer based on AndroidX PDF Viewer Fragment.
  */
 
 package me.notanoticed.pdfmanager.feature.preview
 
-import android.graphics.Bitmap
-import android.graphics.pdf.PdfRenderer
-import android.os.ParcelFileDescriptor
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
+import android.annotation.SuppressLint
+import android.view.View
+import android.view.ViewGroup
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clipToBounds
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+import androidx.compose.ui.viewinterop.AndroidView
+import androidx.fragment.app.FragmentActivity
+import androidx.fragment.app.FragmentContainerView
 import me.notanoticed.pdfmanager.core.pdf.model.PdfFile
 import me.notanoticed.pdfmanager.ui.theme.Colors
-import kotlin.collections.emptyList
 
-/* -------------------- PDF PREVIEW -------------------- */
-private data class PageRef(
-    val pdf: PdfFile,
-    val pageIndex: Int,
-    val key: String
-)
-
-private data class RenderedPage(
-    val key: String,
-    val bitmap: Bitmap
-)
-
+/* -------------------- ENTRY -------------------- */
+@SuppressLint("NewApi")
 @Composable
 fun PdfPreview(
-    pdfs: List<PdfFile>,
-    modifier: Modifier = Modifier
+    pdf: PdfFile,
+    modifier: Modifier = Modifier,
+    searchToggleRequestNonce: Int = 0
 ) {
     val context = LocalContext.current
+    val activity = context as? FragmentActivity
 
-    val pages by remember(pdfs) {
-        derivedStateOf {
-            pdfs.flatMap { pdf ->
-                val count = pdf.pagesCount.coerceAtLeast(0)
-
-                if (count == 0) {
-                    emptyList()
-                }
-                else {
-                    (0 until count).map { pageIndex ->
-                        PageRef(
-                            pdf = pdf,
-                            pageIndex = pageIndex,
-                            key = "${pdf.uri}#$pageIndex"
-                        )
-                    }
-                }
-            }
-        }
-    }
-
-    if (pdfs.isNotEmpty() && pages.isEmpty()) {
+    if (activity == null) {
         Box(
             modifier = modifier.fillMaxSize(),
             contentAlignment = Alignment.Center
         ) {
             Text(
-                text = "No pages to preview",
+                text = "Preview is unavailable in this context",
                 color = Colors.Text.secondary,
                 fontSize = 14.sp
             )
         }
-
         return
     }
 
-    BoxWithConstraints(modifier = modifier.fillMaxSize()) {
-        val density = LocalDensity.current
-        val targetWidthPx = with(density) { maxWidth.toPx().toInt().coerceAtLeast(1) }
+    val fragmentManager = activity.supportFragmentManager
+    val containerId = remember { View.generateViewId() }
+    val fragmentTag = remember(pdf.uri) { "preview_pdf_viewer_${pdf.uri.hashCode()}" }
+    var lastAppliedSearchToggleRequest by remember(fragmentTag) { mutableIntStateOf(0) }
 
-        val rendered = remember { mutableStateListOf<RenderedPage>() }
-        val ready = remember { mutableStateOf(false) }
-
-        DisposableEffect(Unit) {
-            onDispose {
-                rendered.forEach { rp -> runCatching { if (!rp.bitmap.isRecycled) rp.bitmap.recycle() } }
-                rendered.clear()
+    AndroidView(
+        modifier = modifier.fillMaxSize(),
+        factory = { androidContext ->
+            FragmentContainerView(androidContext).apply {
+                id = containerId
+                layoutParams = ViewGroup.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.MATCH_PARENT
+                )
             }
-        }
+        },
+        update = { container ->
+            val fragment = (fragmentManager.findFragmentByTag(fragmentTag) as? AppPdfViewerFragment)
+                ?: run {
+                    if (fragmentManager.isStateSaved) return@AndroidView
 
-        LaunchedEffect(pdfs, targetWidthPx) {
-            // render all pages once and keep bitmaps in memory
-            // this avoids background work during scroll, at the cost of higher RAM usage on large PDFs
-
-            ready.value = false
-
-            rendered.forEach { rp -> runCatching { if (!rp.bitmap.isRecycled) rp.bitmap.recycle() } }
-            rendered.clear()
-
-            withContext(Dispatchers.IO) {
-                for (pdf in pdfs) {
-                    val pfd: ParcelFileDescriptor = context.contentResolver.openFileDescriptor(pdf.uri, "r") ?: continue
-
-                    val renderer = PdfRenderer(pfd)
-                    try {
-                        val pageCount = renderer.pageCount.coerceAtLeast(0)
-
-                        for (pageIndex in 0 until pageCount) {
-                            val page = renderer.openPage(pageIndex)
-                            try {
-                                val scale = targetWidthPx.toFloat() / page.width.toFloat()
-                                val targetHeightPx = (page.height * scale).toInt().coerceAtLeast(1)
-
-                                val bitmap = Bitmap.createBitmap(
-                                    targetWidthPx,
-                                    targetHeightPx,
-                                    Bitmap.Config.ARGB_8888
-                                )
-                                bitmap.eraseColor(Color.White.toArgb())
-                                page.render(bitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
-
-                                val key = "${pdf.uri}#$pageIndex"
-                                withContext(Dispatchers.Main) {
-                                    rendered.add(RenderedPage(key = key, bitmap = bitmap))
-                                }
-                            } catch (_: Exception) {
-                                /* ignore */
-                            } finally {
-                                runCatching { page.close() }
-                            }
-                        }
-                    } catch (_: Exception) {
-                        /* ignore */
-                    } finally {
-                        runCatching { renderer.close() }
-                        runCatching { pfd.close() }
-                    }
+                    val created = AppPdfViewerFragment()
+                    fragmentManager.beginTransaction()
+                        .replace(container.id, created, fragmentTag)
+                        .commitNowAllowingStateLoss()
+                    created
                 }
+
+            fragment.documentUri = pdf.uri
+            if (searchToggleRequestNonce > lastAppliedSearchToggleRequest) {
+                fragment.isTextSearchActive = !fragment.isTextSearchActive
+                lastAppliedSearchToggleRequest = searchToggleRequestNonce
             }
-
-            ready.value = true
         }
+    )
 
-        if (!ready.value) {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                CircularProgressIndicator(color = Colors.Primary.blue)
-            }
-            return@BoxWithConstraints
-        }
-
-        LazyColumn(
-            modifier = Modifier.fillMaxSize(),
-            contentPadding = PaddingValues(0.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            items(items = rendered, key = { it.key }) { rp ->
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clipToBounds()
-                        .background(Colors.Surface.card)
-                ) {
-                    Image(
-                        bitmap = rp.bitmap.asImageBitmap(),
-                        contentDescription = null,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                }
+    DisposableEffect(fragmentTag) {
+        onDispose {
+            val fragment = fragmentManager.findFragmentByTag(fragmentTag) ?: return@onDispose
+            if (!fragmentManager.isStateSaved) {
+                fragmentManager.beginTransaction()
+                    .remove(fragment)
+                    .commitNowAllowingStateLoss()
             }
         }
     }
 }
-/* ----------------------------------------------------- */
+/* ----------------------------------------------- */

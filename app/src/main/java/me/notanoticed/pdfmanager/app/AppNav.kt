@@ -8,10 +8,6 @@
 
 package me.notanoticed.pdfmanager.app
 
-import android.os.Build
-import android.os.Environment
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -56,139 +52,108 @@ fun App() = PdfManagerTheme {
 
     val context = LocalContext.current
 
-    // MANAGE_EXTERNAL_STORAGE launcher (API 30+)
-    val manageAllFilesLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.StartActivityForResult()
-    ) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R &&
-            Environment.isExternalStorageManager()
+    ProvideAppPermissions {
+        val appPermissions = LocalAppPermissions.current
+
+        LaunchedEffect(Unit) {
+            appPermissions.ensureStorageAccess(
+                onGranted = {
+                    pdfListViewModel.loadAll(context)
+                }
+            )
+        }
+
+        PdfListEventHandler(
+            pdfListViewModel = pdfListViewModel,
+            mergeViewModel = mergeViewModel,
+            splitViewModel = splitViewModel,
+            pagerState = pagerState,
+            tabs = appScreens
+        )
+
+        Box(
+            modifier = Modifier.fillMaxSize()
         ) {
-            pdfListViewModel.onPermissionGranted()
-            pdfListViewModel.loadAll(context)
-        } else {
-            pdfListViewModel.onPermissionDenied()
-        }
-    }
-
-    // initial permission check
-    LaunchedEffect(Unit) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            if (Environment.isExternalStorageManager()) {
-                pdfListViewModel.loadAll(context)
-            }
-            else {
-                pdfListViewModel.showPermissionExplanation()
-            }
-        }
-        else {
-            pdfListViewModel.loadAll(context)
-        }
-    }
-
-    PdfListEventHandler(
-        pdfListViewModel = pdfListViewModel,
-        mergeViewModel = mergeViewModel,
-        splitViewModel = splitViewModel,
-        pagerState = pagerState,
-        tabs = appScreens
-    )
-
-    Box(
-        modifier = Modifier.fillMaxSize()
-    ) {
-        Scaffold(
-            topBar = {
-                AppTopBar(
-                    currentRoute = appScreens[pagerState.currentPage],
-                    pdfListViewModel = pdfListViewModel,
-                    splitViewModel = splitViewModel,
-                    mergeViewModel = mergeViewModel,
-                    imagesViewModel = imagesViewModel
-                )
-            },
-            bottomBar = {
-                if (appScreens[pagerState.currentPage] == Screen.PdfList.route && pdfListViewModel.isSelectionMode) {
-                    PdfListSelectionBottomBar(viewModel = pdfListViewModel)
-                }
-                else {
-                    AppBottomBar(
-                        currentRoute = appScreens[pagerState.currentPage]
-                    ) { page ->
-
-                        scope.launch {
-                            pagerState.animateScrollToPage(page = appScreens.indexOf(page))
-                        }
-                    }
-                }
-            },
-            containerColor = Colors.Background.app
-        ) { paddingValues ->
-            HorizontalPager(
-                state = pagerState,
-                key = { appScreens[it] },
-                beyondViewportPageCount = 2,
-                modifier = Modifier.padding(paddingValues)
-            ) { page ->
-                when (appScreens[page]) {
-                    Screen.PdfList.route -> PdfListScreen(viewModel = pdfListViewModel)
-                    Screen.Merge.route -> {
-                        if (mergeViewModel.isActive) {
-                            MergeActiveScreen(viewModel = mergeViewModel)
-                        }
-                        else {
-                            MergeScreen(viewModel = mergeViewModel)
-                        }
-                    }
-                    Screen.Split.route -> {
-                        val selected = splitViewModel.selectedSplitPdf
-                        if (selected != null) {
-                            SplitActiveScreen(viewModel = splitViewModel)
-                        }
-                        else SplitScreen(viewModel = splitViewModel)
-                    }
-                    Screen.Images.route -> {
-                        if (imagesViewModel.isActive) {
-                            ImageActiveScreen(viewModel = imagesViewModel)
-                        }
-                        else {
-                            ImagesScreen(viewModel = imagesViewModel)
-                        }
-                    }
-                    Screen.Settings.route -> SettingsScreen()
-                }
-            }
-        }
-
-        StoragePermissionDialog(
-            visible = pdfListViewModel.showPermissionDialog,
-            isBlocking = pdfListViewModel.permissionDialogBlocking,
-            onGrantClick = {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                    pdfListViewModel.requestAllFilesAccess(
-                        context = context,
-                        manageAllFilesLauncher = manageAllFilesLauncher
+            Scaffold(
+                topBar = {
+                    AppTopBar(
+                        currentRoute = appScreens[pagerState.currentPage],
+                        pdfListViewModel = pdfListViewModel,
+                        splitViewModel = splitViewModel,
+                        mergeViewModel = mergeViewModel,
+                        imagesViewModel = imagesViewModel
                     )
+                },
+                bottomBar = {
+                    if (appScreens[pagerState.currentPage] == Screen.PdfList.route && pdfListViewModel.isSelectionMode) {
+                        PdfListSelectionBottomBar(viewModel = pdfListViewModel)
+                    }
+                    else {
+                        AppBottomBar(
+                            currentRoute = appScreens[pagerState.currentPage]
+                        ) { page ->
+
+                            scope.launch {
+                                pagerState.animateScrollToPage(page = appScreens.indexOf(page))
+                            }
+                        }
+                    }
+                },
+                containerColor = Colors.Background.app
+            ) { paddingValues ->
+                HorizontalPager(
+                    state = pagerState,
+                    key = { appScreens[it] },
+                    beyondViewportPageCount = 2,
+                    modifier = Modifier.padding(paddingValues)
+                ) { page ->
+                    when (appScreens[page]) {
+                        Screen.PdfList.route -> PdfListScreen(viewModel = pdfListViewModel)
+                        Screen.Merge.route -> {
+                            if (mergeViewModel.isActive) {
+                                MergeActiveScreen(viewModel = mergeViewModel)
+                            }
+                            else {
+                                MergeScreen(viewModel = mergeViewModel)
+                            }
+                        }
+                        Screen.Split.route -> {
+                            val selected = splitViewModel.selectedSplitPdf
+                            if (selected != null) {
+                                SplitActiveScreen(viewModel = splitViewModel)
+                            }
+                            else SplitScreen(viewModel = splitViewModel)
+                        }
+                        Screen.Images.route -> {
+                            if (imagesViewModel.isActive) {
+                                ImageActiveScreen(viewModel = imagesViewModel)
+                            }
+                            else {
+                                ImagesScreen(viewModel = imagesViewModel)
+                            }
+                        }
+                        Screen.Settings.route -> SettingsScreen()
+                    }
                 }
-            },
-            onCancel = { pdfListViewModel.onPermissionDialogCancel() }
-        )
-
-        OptionsOverlay(
-            visible = pdfListViewModel.optionsPanelVisible,
-            pdf = pdfListViewModel.optionsPanelPdf,
-            onDismiss = { pdfListViewModel.closeOptions() },
-            onAction = {action ->
-                val pdf = pdfListViewModel.optionsPanelPdf ?: return@OptionsOverlay
-                pdfListViewModel.closeOptions()
-                pdfListViewModel.onFileOptionSelected(action, pdf)
             }
-        )
 
-        PdfDetailsOverlay(
-            visible = pdfListViewModel.detailsPanelVisible,
-            pdf = pdfListViewModel.detailsPanelPdf,
-            onDismiss = { pdfListViewModel.closeDetails() }
-        )
+            OptionsOverlay(
+                visible = pdfListViewModel.optionsPanelVisible,
+                pdf = pdfListViewModel.optionsPanelPdf,
+                onDismiss = { pdfListViewModel.closeOptions() },
+                onAction = {action ->
+                    val pdf = pdfListViewModel.optionsPanelPdf ?: return@OptionsOverlay
+                    pdfListViewModel.closeOptions()
+                    pdfListViewModel.onFileOptionSelected(action, pdf)
+                }
+            )
+
+            PdfDetailsOverlay(
+                visible = pdfListViewModel.detailsPanelVisible,
+                pdf = pdfListViewModel.detailsPanelPdf,
+                onDismiss = { pdfListViewModel.closeDetails() }
+            )
+        }
     }
 
 }

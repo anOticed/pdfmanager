@@ -1,16 +1,19 @@
 /**
  * Images-to-PDF "active" state.
  *
- * Displayed once images are selected.
- * The current implementation is a UI stub:
- * - Shows placeholder items
- * - Uses drag-and-drop reordering
- * - Actions (Preview / Create PDF) are present but not implemented yet
+ * Displays selected images, supports drag-and-drop reorder and remove,
+ * and opens the shared Preview screen via PreviewNav.
  */
 
 package me.notanoticed.pdfmanager.feature.images
 
+import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.net.Uri
+import android.util.Size
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -32,30 +35,41 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.DragHandle
-import androidx.compose.material.icons.outlined.Image
 import androidx.compose.material.icons.outlined.PictureAsPdf
 import androidx.compose.material.icons.outlined.Visibility
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import me.notanoticed.pdfmanager.core.toast.BindViewModelToasts
+import me.notanoticed.pdfmanager.feature.preview.LocalPreviewNav
 import me.notanoticed.pdfmanager.ui.theme.Colors
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
+import java.util.Locale
+import kotlin.math.max
 
 /* -------------------- ACTIVE SCREEN -------------------- */
 @Composable
@@ -63,8 +77,24 @@ fun ImageActiveScreen(
     modifier: Modifier = Modifier,
     viewModel: ImagesViewModel
 ) {
+    BindViewModelToasts(viewModel)
+
     val images = viewModel.selectedImages
     val listState = rememberLazyListState()
+    val context = LocalContext.current
+    val previewNav = LocalPreviewNav.current
+
+    val openPreview = {
+        viewModel.openPreview(
+            context = context,
+            onReady = { previewPdf ->
+                previewNav.openSingle(
+                    pdf = previewPdf,
+                    allowSearch = false
+                )
+            }
+        )
+    }
 
     val reorderableState = rememberReorderableLazyListState(
         lazyListState = listState,
@@ -100,7 +130,7 @@ fun ImageActiveScreen(
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Text(
-                    text = "Drag items to reorder them. Each image becomes one PDF page.",
+                    text = "Drag images to reorder pages. Use Preview to check the final order.",
                     color = Colors.Text.secondary,
                     fontSize = 12.sp
                 )
@@ -167,7 +197,8 @@ fun ImageActiveScreen(
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 Button(
-                    onClick = { /* TODO: preview */ },
+                    onClick = openPreview,
+                    enabled = images.isNotEmpty() && !viewModel.isPreparingPreview,
                     colors = ButtonDefaults.buttonColors(
                         containerColor = Colors.Button.darkSlate
                     ),
@@ -185,7 +216,7 @@ fun ImageActiveScreen(
                     Spacer(modifier = Modifier.width(8.dp))
 
                     Text(
-                        text = "Preview",
+                        text = if (viewModel.isPreparingPreview) "Preparing..." else "Preview",
                         color = Colors.Text.primary,
                         fontSize = 14.sp
                     )
@@ -220,7 +251,6 @@ fun ImageActiveScreen(
     }
 }
 /* ------------------------------------------------------- */
-
 
 
 /* -------------------- ITEM CARD -------------------- */
@@ -260,21 +290,15 @@ private fun ImageItemCard(
 
             Spacer(modifier = Modifier.width(12.dp))
 
-            Box(
+            ThumbnailImage(
+                uri = image.uri,
+                sizePx = 220,
                 modifier = Modifier
-                    .width(34.dp)
-                    .height(48.dp)
+                    .width(44.dp)
+                    .height(56.dp)
                     .clip(RoundedCornerShape(6.dp))
-                    .background(Colors.Icon.darkGray),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = Icons.Outlined.Image,
-                    contentDescription = null,
-                    tint = Colors.Icon.gray,
-                    modifier = Modifier.size(24.dp)
-                )
-            }
+                    .background(Colors.Icon.darkGray)
+            )
 
             Spacer(modifier = Modifier.width(12.dp))
 
@@ -292,9 +316,11 @@ private fun ImageItemCard(
                 )
 
                 Text(
-                    text = "${image.widthPx} × ${image.heightPx}",
+                    text = "${image.widthPx} x ${image.heightPx} | ${formatBytes(image.sizeBytes)}",
                     color = Colors.Text.secondary,
                     fontSize = 11.sp,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
             }
 
@@ -336,3 +362,97 @@ private fun ImageItemCard(
     }
 }
 /* ------------------------------------------------------- */
+
+
+/* -------------------- THUMBNAIL -------------------- */
+@Composable
+private fun ThumbnailImage(
+    uri: Uri,
+    sizePx: Int,
+    modifier: Modifier = Modifier,
+    contentScale: ContentScale = ContentScale.Crop
+) {
+    val context = LocalContext.current
+    val bitmap by produceState<Bitmap?>(initialValue = null, uri, sizePx) {
+        value = withContext(Dispatchers.IO) {
+            runCatching {
+                context.contentResolver.loadThumbnail(uri, Size(sizePx, sizePx), null)
+            }.getOrNull() ?: decodeBitmapFallback(
+                context = context,
+                uri = uri,
+                maxSidePx = sizePx
+            )
+        }
+    }
+
+    Box(
+        modifier = modifier,
+        contentAlignment = Alignment.Center
+    ) {
+        if (bitmap != null) {
+            Image(
+                bitmap = bitmap!!.asImageBitmap(),
+                contentDescription = null,
+                contentScale = contentScale,
+                modifier = Modifier.fillMaxSize()
+            )
+        } else {
+            CircularProgressIndicator(
+                color = Colors.Primary.blue,
+                strokeWidth = 2.dp,
+                modifier = Modifier.size(18.dp)
+            )
+        }
+    }
+}
+
+private fun decodeBitmapFallback(
+    context: Context,
+    uri: Uri,
+    maxSidePx: Int
+): Bitmap? {
+    val bounds = BitmapFactory.Options().apply {
+        inJustDecodeBounds = true
+    }
+
+    context.contentResolver.openInputStream(uri)?.use { stream ->
+        BitmapFactory.decodeStream(stream, null, bounds)
+    }
+
+    val sourceWidth = bounds.outWidth
+    val sourceHeight = bounds.outHeight
+    if (sourceWidth <= 0 || sourceHeight <= 0) return null
+
+    val longEdge = max(sourceWidth, sourceHeight)
+    var sampleSize = 1
+    while (longEdge / sampleSize > maxSidePx) {
+        sampleSize *= 2
+    }
+
+    val options = BitmapFactory.Options().apply {
+        inSampleSize = sampleSize
+        inPreferredConfig = Bitmap.Config.ARGB_8888
+    }
+
+    return context.contentResolver.openInputStream(uri)?.use { stream ->
+        BitmapFactory.decodeStream(stream, null, options)
+    }
+}
+/* --------------------------------------------------- */
+
+
+/* -------------------- UTILS -------------------- */
+private fun formatBytes(bytes: Long): String {
+    val kb = 1000.0
+    val mb = kb * 1000
+    val gb = mb * 1000
+
+    return when {
+        bytes <= 0L -> "Unknown size"
+        bytes < kb -> "$bytes B"
+        bytes < mb -> String.format(Locale.US, "%.1f KB", bytes / kb)
+        bytes < gb -> String.format(Locale.US, "%.1f MB", bytes / mb)
+        else -> String.format(Locale.US, "%.1f GB", bytes / gb)
+    }
+}
+/* ------------------------------------------------ */
