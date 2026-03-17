@@ -26,6 +26,7 @@ import me.notanoticed.pdfmanager.feature.merge.MergeViewModel
 import me.notanoticed.pdfmanager.feature.pdflist.PdfListScreen
 import me.notanoticed.pdfmanager.feature.pdflist.PdfListViewModel
 import me.notanoticed.pdfmanager.feature.settings.SettingsScreen
+import me.notanoticed.pdfmanager.feature.settings.SettingsViewModel
 import me.notanoticed.pdfmanager.feature.split.SplitActiveScreen
 import me.notanoticed.pdfmanager.feature.split.SplitScreen
 import me.notanoticed.pdfmanager.feature.split.SplitViewModel
@@ -41,7 +42,16 @@ import me.notanoticed.pdfmanager.feature.pdflist.PdfListSelectionBottomBar
 
 /* -------------------- APP -------------------- */
 @Composable
-fun App() = PdfManagerTheme {
+fun App() {
+    val settingsViewModel: SettingsViewModel = viewModel()
+
+    PdfManagerTheme(darkTheme = settingsViewModel.isDarkModeEnabled) {
+        AppContent(settingsViewModel = settingsViewModel)
+    }
+}
+
+@Composable
+private fun AppContent(settingsViewModel: SettingsViewModel) {
     val scope = rememberCoroutineScope()
     val pagerState = rememberPagerState(pageCount = { appScreens.size })
 
@@ -132,7 +142,10 @@ fun App() = PdfManagerTheme {
                                 ImagesScreen(viewModel = imagesViewModel)
                             }
                         }
-                        Screen.Settings.route -> SettingsScreen()
+                        Screen.Settings.route -> SettingsScreen(
+                            isDarkModeEnabled = settingsViewModel.isDarkModeEnabled,
+                            onDarkModeChange = settingsViewModel::updateDarkModeEnabled
+                        )
                     }
                 }
             }
@@ -155,7 +168,6 @@ fun App() = PdfManagerTheme {
             )
         }
     }
-
 }
 /* --------------------------------------------- */
 

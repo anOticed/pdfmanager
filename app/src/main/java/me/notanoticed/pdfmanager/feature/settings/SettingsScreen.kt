@@ -54,7 +54,13 @@ import me.notanoticed.pdfmanager.ui.theme.Colors
 
 /* -------------------- SCREEN -------------------- */
 @Composable
-fun SettingsScreen(modifier: Modifier = Modifier) {
+fun SettingsScreen(
+    modifier: Modifier = Modifier,
+    isDarkModeEnabled: Boolean,
+    onDarkModeChange: (Boolean) -> Unit
+) {
+    var notificationsEnabled by remember { mutableStateOf(false) }
+
     LazyColumn(
         modifier = modifier.fillMaxSize(),
         contentPadding = PaddingValues(16.dp),
@@ -66,7 +72,8 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
                     icon = Icons.Outlined.DarkMode,
                     title = "Dark Mode",
                     subtitle = "Use dark theme throughout the app",
-                    checked = true
+                    checked = isDarkModeEnabled,
+                    onCheckedChange = onDarkModeChange
                 )
 
             }
@@ -77,7 +84,9 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
                 SwitchRow(
                     icon = Icons.Outlined.Notifications,
                     title = "Notifications",
-                    subtitle = "Receive notifications from the app"
+                    subtitle = "Receive notifications from the app",
+                    checked = notificationsEnabled,
+                    onCheckedChange = { notificationsEnabled = it }
                 )
             }
         }
@@ -178,11 +187,13 @@ fun CardBlock(text: String, content: @Composable ColumnScope.() -> Unit = {}) {
 }
 
 @Composable
-fun SwitchRow(icon: ImageVector, title: String, subtitle: String, checked: Boolean = false) {
-    var checked by remember {
-        mutableStateOf(checked) // TODO: get from settings
-    }
-
+fun SwitchRow(
+    icon: ImageVector,
+    title: String,
+    subtitle: String,
+    checked: Boolean = false,
+    onCheckedChange: (Boolean) -> Unit = {}
+) {
     ListItem(
         leadingContent = {
             Box(
@@ -210,7 +221,7 @@ fun SwitchRow(icon: ImageVector, title: String, subtitle: String, checked: Boole
         trailingContent = {
             Switch(
                 checked = checked,
-                onCheckedChange = { checked = it  /* TODO: save to settings */ },
+                onCheckedChange = onCheckedChange,
                 colors = SwitchDefaults.colors(
                     checkedThumbColor = Colors.Primary.white,
                     checkedTrackColor = Colors.Primary.blue,
