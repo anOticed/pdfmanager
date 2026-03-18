@@ -180,19 +180,19 @@ private val LightPalette = AppColorPalette(
         lightGray = Color(0xFF5A6C84),
         gray = Color(0xFF74859C),
         slateGray = Color(0xFFC4D0E0),
-        darkSlate = Color(0xFFE7EDF6),
+        darkSlate = Color(0xFFDCE5F0),
         nearBlack = Color(0xFF0F172A),
         charcoal = Color(0xFF1B2434)
     ),
     background = AppBackgroundColors(
-        app = Color(0xFFF4F7FB),
+        app = Color(0xFFF2F5FA),
         surface = Color(0xFFFFFFFF)
     ),
     surface = AppSurfaceColors(
         card = Color(0xFFFFFFFF),
-        selectedCard = Color(0xFFE7F0FF),
-        thumbnail = Color(0xFFEAF0F7),
-        charcoalSlate = Color(0xFFF3F7FC)
+        selectedCard = Color(0xFFE0EAFF),
+        thumbnail = Color(0xFFE1E9F3),
+        charcoalSlate = Color(0xFFE7EEF7)
     ),
     text = AppTextColors(
         primary = Color(0xFF172235),
@@ -203,11 +203,11 @@ private val LightPalette = AppColorPalette(
     border = AppBorderColors(
         default = Color(0xFFCBD6E3),
         blue = Color(0xFF1F6BFF),
-        darkBlue = Color(0xFFBAC8DA),
+        darkBlue = Color(0xFFBFCCDD),
         lightBlue = Color(0xFF5A95FF),
         gray = Color(0xFF95A5BA),
         darkGray = Color(0xFFD1DAE6),
-        subtle = Color(0x160F172A)
+        subtle = Color(0x240F172A)
     ),
     button = AppButtonColors(
         blue = Color(0xFF1F6BFF),
@@ -218,8 +218,8 @@ private val LightPalette = AppColorPalette(
         outline = Color(0x180F172A),
         green = Color(0xFF20B874),
         red = Color(0xFFD94B4B),
-        iconBackground = Color(0xFFE7EDF5),
-        iconBackgroundDisabled = Color(0xFFEEF2F7)
+        iconBackground = Color(0xFFDEE7F1),
+        iconBackgroundDisabled = Color(0xFFE9EFF6)
     ),
     icon = AppIconColors(
         default = Color(0xFF5A6C84),
@@ -230,12 +230,12 @@ private val LightPalette = AppColorPalette(
         yellow = Color(0xFFE49B34),
         gray = Color(0xFF74859C),
         disabledGray = Color(0xFF9EACBF),
-        darkGray = Color(0xFFC9D5E3),
+        darkGray = Color(0xFFBCC9D9),
         pdf = Color(0xFF5A6C84),
         merge = Color(0xFF20B874),
         lock = Color(0xFFE49B34),
         delete = Color(0xFFD94B4B),
-        thumbnailBackground = Color(0xFFC9D5E3)
+        thumbnailBackground = Color(0xFFBCC9D9)
     )
 )
 
