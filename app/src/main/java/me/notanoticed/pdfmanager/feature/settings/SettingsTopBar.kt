@@ -34,7 +34,7 @@ fun SettingsTopBar() {
             },
             colors = TopAppBarDefaults.topAppBarColors(
                 containerColor = Colors.Surface.card,
-                titleContentColor = Colors.Primary.white,
+                titleContentColor = Colors.Text.primary,
             )
         )
 

@@ -6,6 +6,10 @@
 
 package me.notanoticed.pdfmanager.ui.theme
 
+import android.app.Activity
+import android.content.Context
+import android.content.ContextWrapper
+import android.graphics.Color as AndroidColor
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Shapes
@@ -13,6 +17,8 @@ import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
+import androidx.compose.ui.platform.LocalView
+import androidx.core.view.WindowCompat
 
 
 
@@ -63,9 +69,19 @@ fun PdfManagerTheme(
     content: @Composable () -> Unit
 ) {
     val colorScheme = createColorScheme(darkTheme)
+    val view = LocalView.current
 
     SideEffect {
         updateActivePalette(darkTheme)
+
+        val activity = view.context.findActivity() ?: return@SideEffect
+        activity.window.statusBarColor = AndroidColor.TRANSPARENT
+        activity.window.navigationBarColor = AndroidColor.TRANSPARENT
+
+        WindowCompat.getInsetsController(activity.window, view).apply {
+            isAppearanceLightStatusBars = !darkTheme
+            isAppearanceLightNavigationBars = !darkTheme
+        }
     }
 
     MaterialTheme(
@@ -76,3 +92,11 @@ fun PdfManagerTheme(
     )
 }
 /* ------------------------------------------------------- */
+
+private tailrec fun Context.findActivity(): Activity? {
+    return when (this) {
+        is Activity -> this
+        is ContextWrapper -> baseContext.findActivity()
+        else -> null
+    }
+}

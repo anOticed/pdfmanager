@@ -209,7 +209,7 @@ fun MergeActiveScreen(
 
                     Text(
                         text = if (viewModel.isPreparingPreview) "Preparing..." else "Preview",
-                        color = Colors.Text.primary,
+                        color = Colors.Primary.white,
                         fontSize = 14.sp
                     )
                 }
@@ -234,7 +234,7 @@ fun MergeActiveScreen(
 
                     Text(
                         text = "Merge PDFs",
-                        color = Colors.Text.primary,
+                        color = Colors.Primary.white,
                         fontSize = 14.sp
                     )
                 }
@@ -272,7 +272,7 @@ fun MergeFileCard(
             ) {
                 Text(
                     text = index.toString(),
-                    color = Colors.Text.primary,
+                    color = Colors.Primary.white,
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Bold
                 )
@@ -324,7 +324,7 @@ fun MergeFileCard(
                 Icon(
                     Icons.Outlined.DragHandle,
                     contentDescription = "Reorder",
-                    tint = Colors.Icon.white,
+                    tint = Colors.Icon.default,
                     modifier = Modifier.size(16.dp)
                 )
             }

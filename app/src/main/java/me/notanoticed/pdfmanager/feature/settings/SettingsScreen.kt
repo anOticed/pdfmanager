@@ -205,7 +205,7 @@ fun SwitchRow(
                 Icon(
                     imageVector = icon,
                     contentDescription = null,
-                    tint = Colors.Icon.white,
+                    tint = Colors.Icon.default,
                     modifier = Modifier
                         .fillMaxSize(0.65f)
                         .align(Alignment.Center)
@@ -253,7 +253,7 @@ fun ArrowRow(icon: ImageVector, title: String, subtitle: String) {
                 Icon(
                     imageVector = icon,
                     contentDescription = null,
-                    tint = Colors.Icon.white,
+                    tint = Colors.Icon.default,
                     modifier = Modifier
                         .fillMaxSize(0.65f)
                         .align(Alignment.Center)

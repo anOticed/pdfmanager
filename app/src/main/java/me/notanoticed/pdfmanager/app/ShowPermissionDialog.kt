@@ -206,7 +206,7 @@ fun AppPermissionDialog(
                                 Text(
                                     text = texts.grantButtonText,
                                     fontSize = 14.sp,
-                                    color = Colors.Text.primary
+                                    color = Colors.Primary.white
                                 )
                             }
                         }
@@ -222,7 +222,7 @@ fun AppPermissionDialog(
                             Text(
                                 text = texts.grantButtonText,
                                 fontSize = 14.sp,
-                                color = Colors.Text.primary
+                                color = Colors.Primary.white
                             )
                         }
                     }

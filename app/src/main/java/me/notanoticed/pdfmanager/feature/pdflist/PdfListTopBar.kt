@@ -190,7 +190,7 @@ fun PdfListTopBar(
                             IconButton(
                                 onClick = { viewModel.openSearch() },
                                 colors = IconButtonDefaults.iconButtonColors(
-                                    contentColor = Colors.Icon.white
+                                    contentColor = Colors.Icon.default
                                 )
                             ) {
                                 Icon(
@@ -210,7 +210,9 @@ fun PdfListTopBar(
             },
             colors = TopAppBarDefaults.topAppBarColors(
                 containerColor = Colors.Surface.card,
-                titleContentColor = Colors.Primary.white,
+                titleContentColor = Colors.Text.primary,
+                navigationIconContentColor = Colors.Icon.default,
+                actionIconContentColor = Colors.Icon.default
             )
         )
 
@@ -237,7 +239,7 @@ private fun PdfListMoreMenu(
     IconButton(
         onClick = { onExpandedChange(true) },
         colors = IconButtonDefaults.iconButtonColors(
-            contentColor = Colors.Icon.white
+            contentColor = Colors.Icon.default
         )
     ) {
         Icon(
@@ -286,7 +288,7 @@ private fun PdfListMoreMenu(
                     Icon(
                         imageVector = Icons.Outlined.Check,
                         contentDescription = null,
-                        tint = Colors.Icon.white
+                        tint = Colors.Icon.blue
                     )
                 }
             }
@@ -310,7 +312,7 @@ private fun PdfListMoreMenu(
                     Icon(
                         imageVector = Icons.Outlined.Check,
                         contentDescription = null,
-                        tint = Colors.Icon.white
+                        tint = Colors.Icon.blue
                     )
                 }
             }
@@ -334,7 +336,7 @@ private fun PdfListMoreMenu(
                     Icon(
                         imageVector = Icons.Outlined.Check,
                         contentDescription = null,
-                        tint = Colors.Icon.white
+                        tint = Colors.Icon.blue
                     )
                 }
             }
@@ -360,7 +362,7 @@ private fun PdfListMoreMenu(
                     Icon(
                         imageVector = Icons.Outlined.Check,
                         contentDescription = null,
-                        tint = Colors.Icon.white
+                        tint = Colors.Icon.blue
                     )
                 }
             }
@@ -384,7 +386,7 @@ private fun PdfListMoreMenu(
                     Icon(
                         imageVector = Icons.Outlined.Check,
                         contentDescription = null,
-                        tint = Colors.Icon.white
+                        tint = Colors.Icon.blue
                     )
                 }
             }

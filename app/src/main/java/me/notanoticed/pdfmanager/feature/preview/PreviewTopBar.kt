@@ -48,7 +48,7 @@ fun PreviewTopBar(
                     onClick = onBack,
                     colors = IconButtonDefaults.iconButtonColors(
                         containerColor = Colors.Surface.card,
-                        contentColor = Colors.Icon.white
+                        contentColor = Colors.Icon.default
                     )
                 ) {
                     Icon(
@@ -74,7 +74,7 @@ fun PreviewTopBar(
                         onClick = onSearchClick,
                         colors = IconButtonDefaults.iconButtonColors(
                             containerColor = Colors.Surface.card,
-                            contentColor = Colors.Icon.white
+                            contentColor = Colors.Icon.default
                         )
                     ) {
                         Icon(
@@ -88,9 +88,9 @@ fun PreviewTopBar(
             },
             colors = TopAppBarDefaults.topAppBarColors(
                 containerColor = Colors.Surface.card,
-                titleContentColor = Colors.Primary.white,
-                navigationIconContentColor = Colors.Icon.white,
-                actionIconContentColor = Colors.Icon.white
+                titleContentColor = Colors.Text.primary,
+                navigationIconContentColor = Colors.Icon.default,
+                actionIconContentColor = Colors.Icon.default
             )
         )
 

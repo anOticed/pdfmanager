@@ -88,7 +88,7 @@ fun ImagesTopBar(
                     Spacer(modifier = Modifier.size(6.dp))
                     Text(
                         text = "Camera",
-                        color = Colors.Text.primary
+                        color = Colors.Primary.white
                     )
                 }
 
@@ -110,7 +110,7 @@ fun ImagesTopBar(
                     Spacer(modifier = Modifier.size(6.dp))
                     Text(
                         text = "Gallery",
-                        color = Colors.Text.primary
+                        color = Colors.Primary.white
                     )
                 }
 
@@ -121,7 +121,7 @@ fun ImagesTopBar(
                         shape = RoundedCornerShape(10.dp),
                         colors = IconButtonDefaults.filledIconButtonColors(
                             containerColor = Colors.Button.iconBackground,
-                            contentColor = Colors.Icon.white
+                            contentColor = Colors.Icon.default
                         )
                     ) {
                         Icon(
@@ -134,7 +134,8 @@ fun ImagesTopBar(
             },
             colors = TopAppBarDefaults.topAppBarColors(
                 containerColor = Colors.Surface.card,
-                titleContentColor = Colors.Text.primary
+                titleContentColor = Colors.Text.primary,
+                actionIconContentColor = Colors.Icon.default
             )
         )
 

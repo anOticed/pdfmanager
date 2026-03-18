@@ -177,7 +177,7 @@ fun SplitActiveScreen(
 
                         Text(
                             text = "Preview",
-                            color = Colors.Text.primary,
+                            color = Colors.Primary.white,
                             fontSize = 14.sp
                         )
                     }
@@ -202,7 +202,7 @@ fun SplitActiveScreen(
 
                         Text(
                             text = "Split PDF",
-                            color = Colors.Text.primary,
+                            color = Colors.Primary.white,
                             fontSize = 14.sp
                         )
                     }
@@ -325,7 +325,7 @@ fun RadioButtonSingleSelection(
                                 color = Colors.Text.primary,
                                 textAlign = TextAlign.Start
                             ),
-                            cursorBrush = SolidColor(Colors.Primary.white),
+                            cursorBrush = SolidColor(Colors.Primary.blue),
                             modifier = Modifier
                                 .width(220.dp)
                                 .height(40.dp)
@@ -374,7 +374,7 @@ fun RadioButtonSingleSelection(
                                 color = Colors.Text.primary,
                                 textAlign = TextAlign.Start
                             ),
-                            cursorBrush = SolidColor(Colors.Primary.white),
+                            cursorBrush = SolidColor(Colors.Primary.blue),
                             modifier = Modifier
                                 .width(80.dp)
                                 .height(40.dp)
@@ -430,6 +430,7 @@ fun MethodCard(
     val surfaceColor = if (method.id == selectedOptionId) Colors.Surface.selectedCard else Colors.Surface.card
     val borderColor = if (method.id == selectedOptionId) Colors.Border.lightBlue else Colors.Border.darkGray
     val iconBGColor = if (method.id == selectedOptionId) Colors.Icon.blue else Colors.Icon.darkGray
+    val iconTint = if (method.id == selectedOptionId) Colors.Icon.white else Colors.Icon.default
 
     Card(
         onClick = { viewModel.selectSplitMethod(method.id) },
@@ -457,7 +458,7 @@ fun MethodCard(
                     Icon(
                         imageVector = method.icon,
                         contentDescription = null,
-                        tint = Colors.Icon.white,
+                        tint = iconTint,
                         modifier = Modifier
                             .fillMaxSize(0.65f)
                             .align(Alignment.Center)

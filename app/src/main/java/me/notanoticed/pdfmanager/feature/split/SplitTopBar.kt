@@ -81,7 +81,7 @@ fun SplitTopBar(
 
                     Text(
                         text = if (isActive) "Change" else "Select PDF",
-                        color = Colors.Text.primary
+                        color = Colors.Primary.white
                     )
                 }
 
@@ -93,7 +93,7 @@ fun SplitTopBar(
                         shape = RoundedCornerShape(10.dp),
                         colors = IconButtonDefaults.filledIconButtonColors(
                             containerColor = Colors.Button.iconBackground,
-                            contentColor = Colors.Icon.white
+                            contentColor = Colors.Icon.default
                         )
                     ) {
                         Icon(
@@ -107,6 +107,7 @@ fun SplitTopBar(
             colors = TopAppBarDefaults.topAppBarColors(
                 containerColor = Colors.Surface.card,
                 titleContentColor = Colors.Text.primary,
+                actionIconContentColor = Colors.Icon.default
             )
         )
 

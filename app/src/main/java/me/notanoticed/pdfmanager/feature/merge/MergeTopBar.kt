@@ -74,7 +74,7 @@ fun MergeTopBar(
                 ) {
                     Icon(imageVector = Icons.Outlined.Add, contentDescription = "Add PDFs", tint = Colors.Icon.white)
                     Spacer(modifier = Modifier.size(6.dp))
-                    Text(text = "Add PDFs", color = Colors.Text.primary)
+                    Text(text = "Add PDFs", color = Colors.Primary.white)
                 }
 
                 Spacer(modifier = Modifier.width(8.dp))
@@ -85,7 +85,7 @@ fun MergeTopBar(
                         shape = RoundedCornerShape(10.dp),
                         colors = IconButtonDefaults.filledIconButtonColors(
                             containerColor = Colors.Button.iconBackground,
-                            contentColor = Colors.Icon.white
+                            contentColor = Colors.Icon.default
                         )
                     ) {
                         Icon(
@@ -98,7 +98,8 @@ fun MergeTopBar(
             },
             colors = TopAppBarDefaults.topAppBarColors(
                 containerColor = Colors.Surface.card,
-                titleContentColor = Colors.Primary.white,
+                titleContentColor = Colors.Text.primary,
+                actionIconContentColor = Colors.Icon.default
             )
         )
 

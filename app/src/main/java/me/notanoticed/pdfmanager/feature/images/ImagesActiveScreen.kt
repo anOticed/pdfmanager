@@ -217,7 +217,7 @@ fun ImageActiveScreen(
 
                     Text(
                         text = if (viewModel.isPreparingPreview) "Preparing..." else "Preview",
-                        color = Colors.Text.primary,
+                        color = Colors.Primary.white,
                         fontSize = 14.sp
                     )
                 }
@@ -242,7 +242,7 @@ fun ImageActiveScreen(
 
                     Text(
                         text = "Create PDF",
-                        color = Colors.Text.primary,
+                        color = Colors.Primary.white,
                         fontSize = 14.sp
                     )
                 }
@@ -282,7 +282,7 @@ private fun ImageItemCard(
             ) {
                 Text(
                     text = index.toString(),
-                    color = Colors.Text.primary,
+                    color = Colors.Primary.white,
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Bold
                 )
@@ -336,7 +336,7 @@ private fun ImageItemCard(
                 Icon(
                     imageVector = Icons.Outlined.DragHandle,
                     contentDescription = "Reorder",
-                    tint = Colors.Icon.white,
+                    tint = Colors.Icon.default,
                     modifier = Modifier.size(16.dp)
                 )
             }
