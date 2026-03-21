@@ -8,6 +8,8 @@
 package me.notanoticed.pdfmanager.feature.preview
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
@@ -19,6 +21,7 @@ import androidx.compose.ui.Modifier
 import me.notanoticed.pdfmanager.ui.theme.Colors
 
 /* -------------------- ACTIVITY -------------------- */
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun PreviewActivity(
     request: PreviewRequest,
@@ -46,6 +49,7 @@ fun PreviewActivity(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
+                .consumeWindowInsets(paddingValues)
                 .imePadding(),
             request = request,
             searchToggleRequestNonce = searchToggleRequestNonce.intValue

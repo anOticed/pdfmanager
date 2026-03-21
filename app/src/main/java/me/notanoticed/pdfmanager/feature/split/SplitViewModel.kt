@@ -1,8 +1,7 @@
 /**
  * ViewModel for the Split tab.
  *
- * Holds the selected PDF and the chosen split method. The Split tab switches between
- * SplitScreen (no PDF selected) and SplitActiveScreen (PDF selected).
+ * Holds the selected PDF and the current split configuration.
  */
 
 package me.notanoticed.pdfmanager.feature.split
@@ -19,19 +18,23 @@ import me.notanoticed.pdfmanager.core.pickers.Pickers
 import kotlinx.coroutines.launch
 import me.notanoticed.pdfmanager.core.toast.ToastBindable
 
-const val SPLIT_METHOD_RANGES = 0
-const val SPLIT_METHOD_ONE_PAGE_PER_FILE = 1
-const val SPLIT_METHOD_EVERY_N_PAGES = 2
-
 class SplitViewModel : ViewModel(), ToastBindable {
     var selectedSplitPdf: PdfFile? by mutableStateOf(null)
         private set
 
     val isActive: Boolean get() = selectedSplitPdf != null
 
-    var selectedSplitMethodId by mutableStateOf(SPLIT_METHOD_RANGES) // 0: ranges, 1: one page per file, 2: every N pages
-    var splitRangesText by mutableStateOf("")
-    var splitPagesPerFileText by mutableStateOf("")
+    var splitConfiguration by mutableStateOf(SplitConfiguration())
+        private set
+
+    val selectedSplitMethod: SplitMethodType
+        get() = splitConfiguration.method
+
+    val splitRangesText: String
+        get() = splitConfiguration.pageRanges
+
+    val splitPagesPerFileText: String
+        get() = splitConfiguration.pagesPerFile
 
     private var toast: ((String) -> Unit)? = null
 
@@ -54,23 +57,24 @@ class SplitViewModel : ViewModel(), ToastBindable {
         }
 
         selectedSplitPdf = pdfFile
+        resetSplitConfiguration()
     }
 
     fun closeSelectedSplitPdf() {
         selectedSplitPdf = null
-        selectSplitMethod(SPLIT_METHOD_RANGES)
+        resetSplitConfiguration()
     }
 
-    fun selectSplitMethod(method: Int) {
-        selectedSplitMethodId = method
+    fun selectSplitMethod(method: SplitMethodType) {
+        splitConfiguration = splitConfiguration.copy(method = method)
     }
 
     fun updateSplitRangesText(text: String) {
-        splitRangesText = text
+        splitConfiguration = splitConfiguration.copy(pageRanges = text)
     }
 
     fun updateSplitPagesPerFileText(text: String) {
-        splitPagesPerFileText = text
+        splitConfiguration = splitConfiguration.copy(pagesPerFile = text)
     }
 
     fun splitPdf(context: Context) {
@@ -84,5 +88,9 @@ class SplitViewModel : ViewModel(), ToastBindable {
                 updateSelectedSplitPdf(selectedPdf)
             }
         }
+    }
+
+    private fun resetSplitConfiguration() {
+        splitConfiguration = SplitConfiguration()
     }
 }

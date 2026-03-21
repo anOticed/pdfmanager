@@ -9,6 +9,7 @@
 package me.notanoticed.pdfmanager.app
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
@@ -115,7 +116,9 @@ private fun AppContent(settingsViewModel: SettingsViewModel) {
                     state = pagerState,
                     key = { appScreens[it] },
                     beyondViewportPageCount = 2,
-                    modifier = Modifier.padding(paddingValues)
+                    modifier = Modifier
+                        .padding(paddingValues)
+                        .consumeWindowInsets(paddingValues)
                 ) { page ->
                     when (appScreens[page]) {
                         Screen.PdfList.route -> PdfListScreen(viewModel = pdfListViewModel)

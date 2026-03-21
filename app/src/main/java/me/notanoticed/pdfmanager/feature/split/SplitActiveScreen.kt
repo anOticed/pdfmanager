@@ -11,27 +11,33 @@
 package me.notanoticed.pdfmanager.feature.split
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.windowInsetsBottomHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.foundation.text.input.TextFieldLineLimits
-import androidx.compose.foundation.text.input.rememberTextFieldState
+import androidx.compose.foundation.relocation.BringIntoViewRequester
+import androidx.compose.foundation.relocation.bringIntoViewRequester
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ContentCut
 import androidx.compose.material.icons.outlined.FileCopy
@@ -53,23 +59,29 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import me.notanoticed.pdfmanager.core.pdf.PdfThumbnail
 import me.notanoticed.pdfmanager.core.toast.BindViewModelToasts
 import me.notanoticed.pdfmanager.feature.preview.LocalPreviewNav
 import me.notanoticed.pdfmanager.ui.theme.Colors
 
 /* -------------------- ACTIVE SCREEN -------------------- */
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun SplitActiveScreen(
     modifier: Modifier = Modifier,
@@ -77,11 +89,13 @@ fun SplitActiveScreen(
 ) {
     BindViewModelToasts(viewModel)
     val selectedSplitPdf = viewModel.selectedSplitPdf ?: return
-    val selectedSplitMethodId = viewModel.selectedSplitMethodId
+    val splitConfiguration = viewModel.splitConfiguration
     val previewNav = LocalPreviewNav.current
 
     LazyColumn(
-        modifier = modifier.fillMaxSize(),
+        modifier = modifier
+            .fillMaxSize()
+            .imePadding(),
         contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(18.dp)
     ) {
@@ -158,7 +172,12 @@ fun SplitActiveScreen(
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     Button(
-                        onClick = { previewNav.openSplit(pdf = selectedSplitPdf, splitMethodId = selectedSplitMethodId) },
+                        onClick = {
+                            previewNav.openSplit(
+                                pdf = selectedSplitPdf,
+                                configuration = splitConfiguration
+                            )
+                        },
                         colors = ButtonDefaults.buttonColors(
                             containerColor = Colors.Button.darkSlate
                         ),
@@ -210,13 +229,17 @@ fun SplitActiveScreen(
             }
         }
 
+        item {
+            Spacer(modifier = Modifier.windowInsetsBottomHeight(WindowInsets.systemBars))
+        }
+
     }
 
 }
 
 
 data class SplitMethod(
-    val id: Int,
+    val type: SplitMethodType,
     val title: String,
     val description: String,
     val icon: ImageVector
@@ -224,7 +247,7 @@ data class SplitMethod(
 
 
 data class MethodView(
-    val id: Int,
+    val type: SplitMethodType,
     val title: String,
     val description: String
 )
@@ -234,24 +257,24 @@ data class MethodView(
 fun RadioButtonSingleSelection(
     viewModel: SplitViewModel
 ) {
-    val selectedSplitPDF = viewModel.selectedSplitPdf ?: return
-    val selectedOptionId = viewModel.selectedSplitMethodId
+    val selectedSplitPdf = viewModel.selectedSplitPdf ?: return
+    val selectedMethod = viewModel.selectedSplitMethod
 
     val radioOptions = listOf(
         SplitMethod(
-            id = 0,
+            type = SplitMethodType.PAGE_RANGES,
             title = "By Page Ranges",
             description = "Split into specific ranges (e.g., 1-5, 10-15)",
             icon = Icons.Outlined.ContentCut
         ),
         SplitMethod(
-            id = 1,
+            type = SplitMethodType.SINGLE_PAGE_PER_FILE,
             title = "One Page Per File",
             description = "Create a separate file for each page",
             icon = Icons.Outlined.FileCopy
         ),
         SplitMethod(
-            id = 2,
+            type = SplitMethodType.EVERY_N_PAGES,
             title = "Every N Pages",
             description = "Split into files with N pages each",
             icon = Icons.Outlined.Tag
@@ -260,17 +283,17 @@ fun RadioButtonSingleSelection(
 
     val methodView = listOf(
         MethodView(
-            id = 0,
+            type = SplitMethodType.PAGE_RANGES,
             title = "Page Ranges",
             description = "Enter page ranges separated by commas (e.g., 1-5, 10-15, 20)"
         ),
         MethodView(
-            id = 1,
+            type = SplitMethodType.SINGLE_PAGE_PER_FILE,
             title = "Single Page Files",
-            description = "This will create ${selectedSplitPDF.pagesCount} separate PDF files, one for each page."
+            description = "This will create ${selectedSplitPdf.pagesCount} separate PDF files, one for each page."
         ),
         MethodView(
-            id = 2,
+            type = SplitMethodType.EVERY_N_PAGES,
             title = "Pages Per File",
             description = "Enter how many pages should each file contain"
         )
@@ -292,8 +315,12 @@ fun RadioButtonSingleSelection(
         Surface(
             shape = RoundedCornerShape(10.dp),
             color = Colors.Surface.charcoalSlate,
-            modifier = Modifier.fillMaxWidth().padding(top = 24.dp)
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 24.dp)
         ) {
+            val selectedMethodView = methodView.first { it.type == selectedMethod }
+
             Row(
                 modifier = Modifier.padding(horizontal = 14.dp, vertical = 10.dp),
                 verticalAlignment = Alignment.CenterVertically
@@ -303,114 +330,31 @@ fun RadioButtonSingleSelection(
                     modifier = Modifier.padding(vertical = 8.dp)
                 ) {
                     Text(
-                        text = methodView[selectedOptionId].title,
+                        text = selectedMethodView.title,
                         color = Colors.Text.blue,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.SemiBold,
                     )
 
                     Text(
-                        text = methodView[selectedOptionId].description,
+                        text = selectedMethodView.description,
                         color = Colors.Text.secondary,
                         fontSize = 12.sp
                     )
 
-                    if (selectedOptionId == SPLIT_METHOD_RANGES) {
-                        val textFieldState = rememberTextFieldState()
-
-                        BasicTextField(
-                            state = textFieldState,
-                            lineLimits = TextFieldLineLimits.SingleLine,
-                            textStyle = LocalTextStyle.current.copy(
-                                color = Colors.Text.primary,
-                                textAlign = TextAlign.Start
-                            ),
-                            cursorBrush = SolidColor(Colors.Primary.blue),
-                            modifier = Modifier
-                                .width(220.dp)
-                                .height(40.dp)
-                                .clip(RoundedCornerShape(10.dp))
-                                .background(Colors.Primary.darkSlate)
-                                .padding(horizontal = 10.dp),
-                            decorator = { innerTextField ->
-
-                                TextFieldDefaults.DecorationBox(
-                                    value = textFieldState.text.toString(),
-                                    visualTransformation = VisualTransformation.None,
-                                    innerTextField = innerTextField,
-                                    placeholder = {
-                                        Text(
-                                            text = "1-5, 10-15, 20",
-                                            color = Colors.Text.secondary,
-                                            fontSize = 13.sp,
-                                            textAlign = TextAlign.Start,
-                                            modifier = Modifier.fillMaxWidth()
-                                        )
-                                    },
-                                    singleLine = true,
-                                    enabled = true,
-                                    interactionSource = remember { MutableInteractionSource() },
-                                    contentPadding = PaddingValues(0.dp),
-                                    colors = TextFieldDefaults.colors(
-                                        focusedContainerColor = Colors.Primary.darkSlate,
-                                        unfocusedContainerColor = Colors.Primary.darkSlate,
-                                        disabledContainerColor = Colors.Primary.darkSlate,
-                                        focusedIndicatorColor = Color.Transparent,
-                                        unfocusedIndicatorColor = Color.Transparent,
-                                        disabledIndicatorColor = Color.Transparent,
-                                        errorIndicatorColor = Color.Transparent
-                                    )
-                                )
-                            }
+                    if (selectedMethod == SplitMethodType.PAGE_RANGES) {
+                        SplitInputField(
+                            value = viewModel.splitRangesText,
+                            onValueChange = viewModel::updateSplitRangesText,
+                            placeholder = "1-5, 10-15, 20",
+                            width = 220.dp
                         )
-                    }
-                    else if (selectedOptionId == SPLIT_METHOD_EVERY_N_PAGES) {
-                        val textFieldState = rememberTextFieldState()
-
-                        BasicTextField(
-                            state = textFieldState,
-                            lineLimits = TextFieldLineLimits.SingleLine,
-                            textStyle = LocalTextStyle.current.copy(
-                                color = Colors.Text.primary,
-                                textAlign = TextAlign.Start
-                            ),
-                            cursorBrush = SolidColor(Colors.Primary.blue),
-                            modifier = Modifier
-                                .width(80.dp)
-                                .height(40.dp)
-                                .clip(RoundedCornerShape(10.dp))
-                                .background(Colors.Primary.darkSlate)
-                                .padding(horizontal = 10.dp),
-                            decorator = { innerTextField ->
-
-                                TextFieldDefaults.DecorationBox(
-                                    value = textFieldState.text.toString(),
-                                    visualTransformation = VisualTransformation.None,
-                                    innerTextField = innerTextField,
-                                    placeholder = {
-                                        Text(
-                                            text = "5",
-                                            color = Colors.Text.secondary,
-                                            fontSize = 13.sp,
-                                            textAlign = TextAlign.Start,
-                                            modifier = Modifier.fillMaxWidth()
-                                        )
-                                    },
-                                    singleLine = true,
-                                    enabled = true,
-                                    interactionSource = remember { MutableInteractionSource() },
-                                    contentPadding = PaddingValues(0.dp),
-                                    colors = TextFieldDefaults.colors(
-                                        focusedContainerColor = Colors.Primary.darkSlate,
-                                        unfocusedContainerColor = Colors.Primary.darkSlate,
-                                        disabledContainerColor = Colors.Primary.darkSlate,
-                                        focusedIndicatorColor = Color.Transparent,
-                                        unfocusedIndicatorColor = Color.Transparent,
-                                        disabledIndicatorColor = Color.Transparent,
-                                        errorIndicatorColor = Color.Transparent
-                                    )
-                                )
-                            }
+                    } else if (selectedMethod == SplitMethodType.EVERY_N_PAGES) {
+                        SplitInputField(
+                            value = viewModel.splitPagesPerFileText,
+                            onValueChange = viewModel::updateSplitPagesPerFileText,
+                            placeholder = "5",
+                            width = 80.dp
                         )
                     }
                 }
@@ -425,15 +369,16 @@ fun MethodCard(
     method: SplitMethod,
     viewModel: SplitViewModel,
 ) {
-    val selectedOptionId = viewModel.selectedSplitMethodId
+    val selectedMethod = viewModel.selectedSplitMethod
 
-    val surfaceColor = if (method.id == selectedOptionId) Colors.Surface.selectedCard else Colors.Surface.card
-    val borderColor = if (method.id == selectedOptionId) Colors.Border.lightBlue else Colors.Border.darkGray
-    val iconBGColor = if (method.id == selectedOptionId) Colors.Icon.blue else Colors.Icon.darkGray
-    val iconTint = if (method.id == selectedOptionId) Colors.Icon.white else Colors.Icon.default
+    val isSelected = method.type == selectedMethod
+    val surfaceColor = if (isSelected) Colors.Surface.selectedCard else Colors.Surface.card
+    val borderColor = if (isSelected) Colors.Border.lightBlue else Colors.Border.darkGray
+    val iconBGColor = if (isSelected) Colors.Icon.blue else Colors.Icon.darkGray
+    val iconTint = if (isSelected) Colors.Icon.white else Colors.Icon.default
 
     Card(
-        onClick = { viewModel.selectSplitMethod(method.id) },
+        onClick = { viewModel.selectSplitMethod(method.type) },
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
             containerColor = surfaceColor
@@ -481,7 +426,7 @@ fun MethodCard(
             },
             trailingContent = {
                 RadioButton(
-                    selected = (method.id == selectedOptionId),
+                    selected = isSelected,
                     onClick = null,
                     colors = RadioButtonDefaults.colors(
                         selectedColor = Colors.Button.skyBlue
@@ -499,3 +444,70 @@ fun MethodCard(
     }
 }
 /* ------------------------------------------------------- */
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+private fun SplitInputField(
+    value: String,
+    onValueChange: (String) -> Unit,
+    placeholder: String,
+    width: Dp
+) {
+    val bringIntoViewRequester = remember { BringIntoViewRequester() }
+    val coroutineScope = rememberCoroutineScope()
+
+    BasicTextField(
+        value = value,
+        onValueChange = onValueChange,
+        singleLine = true,
+        textStyle = LocalTextStyle.current.copy(
+            color = Colors.Text.primary,
+            textAlign = TextAlign.Start
+        ),
+        cursorBrush = SolidColor(Colors.Primary.blue),
+        modifier = Modifier
+            .width(width)
+            .height(40.dp)
+            .bringIntoViewRequester(bringIntoViewRequester)
+            .onFocusChanged { focusState ->
+                if (focusState.isFocused) {
+                    coroutineScope.launch {
+                        delay(250)
+                        bringIntoViewRequester.bringIntoView()
+                    }
+                }
+            }
+            .clip(RoundedCornerShape(10.dp))
+            .background(Colors.Primary.darkSlate)
+            .padding(horizontal = 10.dp),
+        decorationBox = { innerTextField ->
+            TextFieldDefaults.DecorationBox(
+                value = value,
+                visualTransformation = VisualTransformation.None,
+                innerTextField = innerTextField,
+                placeholder = {
+                    Text(
+                        text = placeholder,
+                        color = Colors.Text.secondary,
+                        fontSize = 13.sp,
+                        textAlign = TextAlign.Start,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                },
+                singleLine = true,
+                enabled = true,
+                interactionSource = remember { MutableInteractionSource() },
+                contentPadding = PaddingValues(0.dp),
+                colors = TextFieldDefaults.colors(
+                    focusedContainerColor = Colors.Primary.darkSlate,
+                    unfocusedContainerColor = Colors.Primary.darkSlate,
+                    disabledContainerColor = Colors.Primary.darkSlate,
+                    focusedIndicatorColor = Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent,
+                    disabledIndicatorColor = Color.Transparent,
+                    errorIndicatorColor = Color.Transparent
+                )
+            )
+        }
+    )
+}
