@@ -88,9 +88,8 @@ fun SplitActiveScreen(
     viewModel: SplitViewModel
 ) {
     BindViewModelToasts(viewModel)
-    val selectedSplitPdf = viewModel.selectedSplitPdf ?: return
-    val splitConfiguration = viewModel.splitConfiguration
     val previewNav = LocalPreviewNav.current
+    val selectedSplitPdf = viewModel.selectedSplitPdf ?: return
 
     LazyColumn(
         modifier = modifier
@@ -173,10 +172,12 @@ fun SplitActiveScreen(
                 ) {
                     Button(
                         onClick = {
-                            previewNav.openSplit(
-                                pdf = selectedSplitPdf,
-                                configuration = splitConfiguration
-                            )
+                            viewModel.openPreview { pdf, configuration ->
+                                previewNav.openSplit(
+                                    pdf = pdf,
+                                    configuration = configuration
+                                )
+                            }
                         },
                         colors = ButtonDefaults.buttonColors(
                             containerColor = Colors.Button.darkSlate

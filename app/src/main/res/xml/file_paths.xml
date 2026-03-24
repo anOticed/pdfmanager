@@ -9,6 +9,9 @@
     <cache-path
         name="merge_preview_pdfs"
         path="merge_preview_pdf/" />
+    <cache-path
+        name="split_preview_pdfs"
+        path="split_preview_pdf/" />
     <external-files-path
         name="external_pictures"
         path="Pictures/" />

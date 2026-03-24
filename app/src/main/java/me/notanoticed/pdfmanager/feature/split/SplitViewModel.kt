@@ -77,6 +77,21 @@ class SplitViewModel : ViewModel(), ToastBindable {
         splitConfiguration = splitConfiguration.copy(pagesPerFile = text)
     }
 
+    fun openPreview(onValid: (PdfFile, SplitConfiguration) -> Unit) {
+        val pdf = selectedSplitPdf ?: return
+        val validationError = validateSplitConfiguration(
+            totalPages = pdf.pagesCount,
+            configuration = splitConfiguration
+        )
+
+        if (validationError != null) {
+            showToast(validationError)
+            return
+        }
+
+        onValid(pdf, splitConfiguration)
+    }
+
     fun splitPdf(context: Context) {
         /* TODO: implement splitPdf() */
     }

@@ -28,7 +28,10 @@ fun PreviewActivity(
     onBack: () -> Unit
 ) {
     BackHandler(onBack = onBack)
-    val canShowSearch = (request as? PreviewRequest.Single)?.allowSearch == true
+    val canShowSearch = when (request) {
+        is PreviewRequest.Single -> request.allowSearch
+        is PreviewRequest.Split -> true
+    }
     val searchToggleRequestNonce = remember(request) { mutableIntStateOf(0) }
 
     Scaffold(
