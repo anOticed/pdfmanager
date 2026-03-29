@@ -69,14 +69,14 @@ private fun SplitPreviewContent(
     val state by produceState<SplitPreviewState>(
         initialValue = SplitPreviewState.Loading,
         key1 = request.pdf.uri,
-        key2 = request.configuration
+        key2 = request.plan
     ) {
         value = withContext(Dispatchers.IO) {
             runCatching {
                 prepareSplitPreviewPdf(
                     context = context,
                     sourcePdf = request.pdf,
-                    configuration = request.configuration
+                    plan = request.plan
                 )
             }.fold(
                 onSuccess = SplitPreviewState::Ready,

@@ -36,6 +36,14 @@ class SplitViewModel : ViewModel(), ToastBindable {
     val splitPagesPerFileText: String
         get() = splitConfiguration.pagesPerFile
 
+    val splitPlanResult: SplitPlanResult?
+        get() = selectedSplitPdf?.let { pdf ->
+            buildSplitPlan(
+                totalPages = pdf.pagesCount,
+                configuration = splitConfiguration
+            )
+        }
+
     private var toast: ((String) -> Unit)? = null
 
     override fun bindToast(toast: (String) -> Unit) {
@@ -77,19 +85,13 @@ class SplitViewModel : ViewModel(), ToastBindable {
         splitConfiguration = splitConfiguration.copy(pagesPerFile = text)
     }
 
-    fun openPreview(onValid: (PdfFile, SplitConfiguration) -> Unit) {
+    fun openPreview(onValid: (PdfFile, SplitPlan) -> Unit) {
         val pdf = selectedSplitPdf ?: return
-        val validationError = validateSplitConfiguration(
-            totalPages = pdf.pagesCount,
-            configuration = splitConfiguration
-        )
-
-        if (validationError != null) {
-            showToast(validationError)
-            return
+        when (val planResult = splitPlanResult) {
+            is SplitPlanResult.Ready -> onValid(pdf, planResult.plan)
+            is SplitPlanResult.Error -> showToast(planResult.message)
+            null -> Unit
         }
-
-        onValid(pdf, splitConfiguration)
     }
 
     fun splitPdf(context: Context) {

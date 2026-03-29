@@ -8,7 +8,7 @@
 package me.notanoticed.pdfmanager.feature.preview
 
 import me.notanoticed.pdfmanager.core.pdf.model.PdfFile
-import me.notanoticed.pdfmanager.feature.split.SplitConfiguration
+import me.notanoticed.pdfmanager.feature.split.SplitPlan
 
 /* -------------------- PREVIEW REQUEST -------------------- */
 sealed interface PreviewRequest {
@@ -23,7 +23,7 @@ sealed interface PreviewRequest {
 
     data class Split(
         val pdf: PdfFile,
-        val configuration: SplitConfiguration
+        val plan: SplitPlan
     ): PreviewRequest {
         override val topBarTitle: String = "Split Preview"
     }

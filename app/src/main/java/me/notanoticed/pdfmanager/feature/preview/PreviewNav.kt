@@ -25,7 +25,7 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import me.notanoticed.pdfmanager.core.pdf.model.PdfFile
-import me.notanoticed.pdfmanager.feature.split.SplitConfiguration
+import me.notanoticed.pdfmanager.feature.split.SplitPlan
 
 /* -------------------- PREVIEW NAVIGATION -------------------- */
 class PreviewNav internal constructor(
@@ -36,8 +36,8 @@ class PreviewNav internal constructor(
         openRequest(PreviewRequest.Single(pdf = pdf, allowSearch = allowSearch))
         setVisible(true)
     }
-    fun openSplit(pdf: PdfFile, configuration: SplitConfiguration) {
-        openRequest(PreviewRequest.Split(pdf = pdf, configuration = configuration))
+    fun openSplit(pdf: PdfFile, plan: SplitPlan) {
+        openRequest(PreviewRequest.Split(pdf = pdf, plan = plan))
         setVisible(true)
     }
 

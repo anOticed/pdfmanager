@@ -90,6 +90,7 @@ fun SplitActiveScreen(
     BindViewModelToasts(viewModel)
     val previewNav = LocalPreviewNav.current
     val selectedSplitPdf = viewModel.selectedSplitPdf ?: return
+    val splitPlanResult = viewModel.splitPlanResult
 
     LazyColumn(
         modifier = modifier
@@ -155,6 +156,10 @@ fun SplitActiveScreen(
         }
 
         item {
+            SplitPlanSummaryCard(splitPlanResult = splitPlanResult)
+        }
+
+        item {
             Surface(
                 shape = RoundedCornerShape(10.dp),
                 color = Colors.Surface.charcoalSlate,
@@ -172,13 +177,14 @@ fun SplitActiveScreen(
                 ) {
                     Button(
                         onClick = {
-                            viewModel.openPreview { pdf, configuration ->
+                            viewModel.openPreview { pdf, plan ->
                                 previewNav.openSplit(
                                     pdf = pdf,
-                                    configuration = configuration
+                                    plan = plan
                                 )
                             }
                         },
+                        enabled = splitPlanResult is SplitPlanResult.Ready,
                         colors = ButtonDefaults.buttonColors(
                             containerColor = Colors.Button.darkSlate
                         ),
@@ -204,6 +210,7 @@ fun SplitActiveScreen(
 
                     Button(
                         onClick = { /* TODO: split */ },
+                        enabled = splitPlanResult is SplitPlanResult.Ready,
                         colors = ButtonDefaults.buttonColors(
                             containerColor = Colors.Button.red
                         ),
@@ -445,6 +452,122 @@ fun MethodCard(
     }
 }
 /* ------------------------------------------------------- */
+
+@Composable
+private fun SplitPlanSummaryCard(
+    splitPlanResult: SplitPlanResult?
+) {
+    Surface(
+        shape = RoundedCornerShape(10.dp),
+        color = Colors.Surface.charcoalSlate,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Column(
+            modifier = Modifier.padding(14.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
+            Text(
+                text = "Output Summary",
+                color = Colors.Text.blue,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.SemiBold
+            )
+
+            when (splitPlanResult) {
+                is SplitPlanResult.Ready -> {
+                    Text(
+                        text = buildString {
+                            append("${splitPlanResult.plan.outputFileCount} output ")
+                            append(if (splitPlanResult.plan.outputFileCount == 1) "file" else "files")
+                            append(" will be created")
+                        },
+                        color = Colors.Text.primary,
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.Medium
+                    )
+
+                    Text(
+                        text = "${splitPlanResult.plan.totalPagesCovered} pages will be included in total",
+                        color = Colors.Text.secondary,
+                        fontSize = 12.sp
+                    )
+
+                    splitPlanResult.plan.chunks
+                        .take(5)
+                        .forEachIndexed { index, chunk ->
+                            SplitChunkSummaryRow(
+                                fileIndex = index + 1,
+                                chunk = chunk
+                            )
+                        }
+
+                    val remainingCount = splitPlanResult.plan.outputFileCount - 5
+                    if (remainingCount > 0) {
+                        Text(
+                            text = "...and $remainingCount more output files",
+                            color = Colors.Text.secondary,
+                            fontSize = 12.sp
+                        )
+                    }
+                }
+
+                is SplitPlanResult.Error -> {
+                    Text(
+                        text = splitPlanResult.message,
+                        color = Colors.Button.red,
+                        fontSize = 12.sp
+                    )
+                }
+
+                null -> {
+                    Text(
+                        text = "Select a PDF to see the split summary.",
+                        color = Colors.Text.secondary,
+                        fontSize = 12.sp
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun SplitChunkSummaryRow(
+    fileIndex: Int,
+    chunk: SplitChunk
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Column(
+            modifier = Modifier.weight(1f),
+            verticalArrangement = Arrangement.spacedBy(2.dp)
+        ) {
+            Text(
+                text = "File $fileIndex",
+                color = Colors.Text.primary,
+                fontSize = 12.sp,
+                fontWeight = FontWeight.Medium
+            )
+
+            Text(
+                text = chunk.title,
+                color = Colors.Text.secondary,
+                fontSize = 11.sp
+            )
+        }
+
+        Spacer(modifier = Modifier.width(12.dp))
+
+        Text(
+            text = chunk.summaryLine,
+            color = Colors.Text.secondary,
+            fontSize = 11.sp
+        )
+    }
+}
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
