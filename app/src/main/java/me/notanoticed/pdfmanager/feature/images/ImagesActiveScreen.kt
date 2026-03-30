@@ -30,7 +30,9 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Close
@@ -65,6 +67,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import me.notanoticed.pdfmanager.core.toast.BindViewModelToasts
 import me.notanoticed.pdfmanager.feature.preview.LocalPreviewNav
+import me.notanoticed.pdfmanager.ui.components.ExpandablePagesPerSheetSection
 import me.notanoticed.pdfmanager.ui.theme.Colors
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
@@ -134,6 +137,13 @@ fun ImageActiveScreen(
                     color = Colors.Text.secondary,
                     fontSize = 12.sp
                 )
+
+                Spacer(modifier = Modifier.height(14.dp))
+
+                ExpandablePagesPerSheetSection(
+                    selectedOption = viewModel.pagesPerSheetOption,
+                    onOptionSelected = viewModel::updatePagesPerSheet
+                )
             }
         }
 
@@ -150,7 +160,7 @@ fun ImageActiveScreen(
         ) {
             LazyColumn(
                 state = listState,
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxSize(),
                 contentPadding = PaddingValues(horizontal = 16.dp, vertical = 16.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {

@@ -7,6 +7,7 @@
 
 package me.notanoticed.pdfmanager.feature.preview
 
+import me.notanoticed.pdfmanager.core.pdf.PagesPerSheetOption
 import me.notanoticed.pdfmanager.core.pdf.model.PdfFile
 import me.notanoticed.pdfmanager.feature.split.SplitPlan
 
@@ -23,7 +24,8 @@ sealed interface PreviewRequest {
 
     data class Split(
         val pdf: PdfFile,
-        val plan: SplitPlan
+        val plan: SplitPlan,
+        val pagesPerSheet: PagesPerSheetOption
     ): PreviewRequest {
         override val topBarTitle: String = "Split Preview"
     }

@@ -12,6 +12,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import me.notanoticed.pdfmanager.core.pdf.PagesPerSheetOption
 import me.notanoticed.pdfmanager.core.pdf.PdfRepository
 import me.notanoticed.pdfmanager.core.pdf.model.PdfFile
 import me.notanoticed.pdfmanager.core.pickers.Pickers
@@ -25,6 +26,8 @@ class SplitViewModel : ViewModel(), ToastBindable {
     val isActive: Boolean get() = selectedSplitPdf != null
 
     var splitConfiguration by mutableStateOf(SplitConfiguration())
+        private set
+    var pagesPerSheetOption by mutableStateOf(PagesPerSheetOption.ONE)
         private set
 
     val selectedSplitMethod: SplitMethodType
@@ -85,10 +88,14 @@ class SplitViewModel : ViewModel(), ToastBindable {
         splitConfiguration = splitConfiguration.copy(pagesPerFile = text)
     }
 
-    fun openPreview(onValid: (PdfFile, SplitPlan) -> Unit) {
+    fun updatePagesPerSheet(option: PagesPerSheetOption) {
+        pagesPerSheetOption = option
+    }
+
+    fun openPreview(onValid: (PdfFile, SplitPlan, PagesPerSheetOption) -> Unit) {
         val pdf = selectedSplitPdf ?: return
         when (val planResult = splitPlanResult) {
-            is SplitPlanResult.Ready -> onValid(pdf, planResult.plan)
+            is SplitPlanResult.Ready -> onValid(pdf, planResult.plan, pagesPerSheetOption)
             is SplitPlanResult.Error -> showToast(planResult.message)
             null -> Unit
         }

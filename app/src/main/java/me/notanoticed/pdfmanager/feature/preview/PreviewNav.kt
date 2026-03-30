@@ -24,6 +24,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import me.notanoticed.pdfmanager.core.pdf.PagesPerSheetOption
 import me.notanoticed.pdfmanager.core.pdf.model.PdfFile
 import me.notanoticed.pdfmanager.feature.split.SplitPlan
 
@@ -36,8 +37,18 @@ class PreviewNav internal constructor(
         openRequest(PreviewRequest.Single(pdf = pdf, allowSearch = allowSearch))
         setVisible(true)
     }
-    fun openSplit(pdf: PdfFile, plan: SplitPlan) {
-        openRequest(PreviewRequest.Split(pdf = pdf, plan = plan))
+    fun openSplit(
+        pdf: PdfFile,
+        plan: SplitPlan,
+        pagesPerSheet: PagesPerSheetOption
+    ) {
+        openRequest(
+            PreviewRequest.Split(
+                pdf = pdf,
+                plan = plan,
+                pagesPerSheet = pagesPerSheet
+            )
+        )
         setVisible(true)
     }
 

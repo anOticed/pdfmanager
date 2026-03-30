@@ -21,6 +21,7 @@ import com.tom_roush.pdfbox.pdmodel.PDDocument
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import me.notanoticed.pdfmanager.core.pdf.PagesPerSheetOption
 import me.notanoticed.pdfmanager.core.pdf.PdfRepository
 import me.notanoticed.pdfmanager.core.pdf.model.PdfFile
 import me.notanoticed.pdfmanager.core.pickers.Pickers
@@ -32,6 +33,8 @@ class MergeViewModel : ViewModel(), ToastBindable {
     var pdfMergeFiles by mutableStateOf<List<PdfFile>>(emptyList())
     val isActive: Boolean get() = pdfMergeFiles.isNotEmpty()
     val total: Int get() = pdfMergeFiles.size
+    var pagesPerSheetOption by mutableStateOf(PagesPerSheetOption.ONE)
+        private set
 
     var isPreparingPreview by mutableStateOf(false)
         private set
@@ -99,6 +102,10 @@ class MergeViewModel : ViewModel(), ToastBindable {
         pdfMergeFiles = list
     }
 
+    fun updatePagesPerSheet(option: PagesPerSheetOption) {
+        pagesPerSheetOption = option
+    }
+
     fun openPreview(
         context: Context,
         onReady: (PdfFile) -> Unit
@@ -110,12 +117,19 @@ class MergeViewModel : ViewModel(), ToastBindable {
         if (isPreparingPreview) return
 
         val snapshot = pdfMergeFiles
+        val pagesPerSheetSnapshot = pagesPerSheetOption
 
         viewModelScope.launch {
             isPreparingPreview = true
 
             val previewResult = withContext(Dispatchers.IO) {
-                runCatching { buildMergedPreviewPdf(context, snapshot) }
+                runCatching {
+                    buildMergedPreviewPdf(
+                        context = context,
+                        pdfs = snapshot,
+                        pagesPerSheet = pagesPerSheetSnapshot
+                    )
+                }
             }
 
             val preview = previewResult.getOrNull()
@@ -165,7 +179,8 @@ private data class PreviewPdfResult(
 
 private fun buildMergedPreviewPdf(
     context: Context,
-    pdfs: List<PdfFile>
+    pdfs: List<PdfFile>,
+    pagesPerSheet: PagesPerSheetOption
 ): PreviewPdfResult {
     require(pdfs.isNotEmpty()) { "No source PDFs selected" }
 
@@ -177,7 +192,7 @@ private fun buildMergedPreviewPdf(
     }
     cleanupOldPreviewFiles(previewDir, keepCount = 6)
 
-    val fileName = "merge_preview_${System.currentTimeMillis()}.pdf"
+    val fileName = "merge_preview_${pagesPerSheet.pagesPerSheet}_pages_${System.currentTimeMillis()}.pdf"
     val outputFile = File(previewDir, fileName)
     var createdPages = 0
     val openedSourceDocuments = mutableListOf<PDDocument>()

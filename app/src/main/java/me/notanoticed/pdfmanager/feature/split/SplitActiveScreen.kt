@@ -78,6 +78,7 @@ import kotlinx.coroutines.launch
 import me.notanoticed.pdfmanager.core.pdf.PdfThumbnail
 import me.notanoticed.pdfmanager.core.toast.BindViewModelToasts
 import me.notanoticed.pdfmanager.feature.preview.LocalPreviewNav
+import me.notanoticed.pdfmanager.ui.components.ExpandablePagesPerSheetSection
 import me.notanoticed.pdfmanager.ui.theme.Colors
 
 /* -------------------- ACTIVE SCREEN -------------------- */
@@ -156,6 +157,20 @@ fun SplitActiveScreen(
         }
 
         item {
+            Surface(
+                shape = RoundedCornerShape(10.dp),
+                color = Colors.Surface.charcoalSlate,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                ExpandablePagesPerSheetSection(
+                    selectedOption = viewModel.pagesPerSheetOption,
+                    onOptionSelected = viewModel::updatePagesPerSheet,
+                    modifier = Modifier.padding(14.dp)
+                )
+            }
+        }
+
+        item {
             SplitPlanSummaryCard(splitPlanResult = splitPlanResult)
         }
 
@@ -177,10 +192,11 @@ fun SplitActiveScreen(
                 ) {
                     Button(
                         onClick = {
-                            viewModel.openPreview { pdf, plan ->
+                            viewModel.openPreview { pdf, plan, pagesPerSheet ->
                                 previewNav.openSplit(
                                     pdf = pdf,
-                                    plan = plan
+                                    plan = plan,
+                                    pagesPerSheet = pagesPerSheet
                                 )
                             }
                         },

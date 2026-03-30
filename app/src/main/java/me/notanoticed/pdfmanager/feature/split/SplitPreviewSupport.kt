@@ -8,6 +8,7 @@ import android.content.Context
 import androidx.core.content.FileProvider
 import com.tom_roush.pdfbox.android.PDFBoxResourceLoader
 import com.tom_roush.pdfbox.pdmodel.PDDocument
+import me.notanoticed.pdfmanager.core.pdf.PagesPerSheetOption
 import me.notanoticed.pdfmanager.core.pdf.model.PdfFile
 import java.io.File
 import java.util.concurrent.atomic.AtomicBoolean
@@ -16,14 +17,16 @@ import java.util.concurrent.atomic.AtomicBoolean
 internal fun prepareSplitPreviewPdf(
     context: Context,
     sourcePdf: PdfFile,
-    plan: SplitPlan
+    plan: SplitPlan,
+    pagesPerSheet: PagesPerSheetOption
 ): PdfFile {
     return when (plan.method) {
         SplitMethodType.PAGE_RANGES -> {
             buildPageRangesPreviewPdf(
                 context = context,
                 sourcePdf = sourcePdf,
-                plan = plan
+                plan = plan,
+                pagesPerSheet = pagesPerSheet
             )
         }
 
@@ -35,7 +38,8 @@ internal fun prepareSplitPreviewPdf(
 private fun buildPageRangesPreviewPdf(
     context: Context,
     sourcePdf: PdfFile,
-    plan: SplitPlan
+    plan: SplitPlan,
+    pagesPerSheet: PagesPerSheetOption
 ): PdfFile {
     ensurePdfBoxInitialized(context)
 
@@ -45,7 +49,7 @@ private fun buildPageRangesPreviewPdf(
     }
     cleanupOldPreviewFiles(previewDir, keepCount = 6)
 
-    val fileName = "split_preview_${System.currentTimeMillis()}.pdf"
+    val fileName = "split_preview_${pagesPerSheet.pagesPerSheet}_pages_${System.currentTimeMillis()}.pdf"
     val outputFile = File(previewDir, fileName)
 
     try {

@@ -28,6 +28,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import me.notanoticed.pdfmanager.core.pdf.PagesPerSheetOption
 import me.notanoticed.pdfmanager.core.pdf.PdfRepository
 import me.notanoticed.pdfmanager.core.pdf.model.PdfFile
 import me.notanoticed.pdfmanager.core.toast.ToastBindable
@@ -56,6 +57,8 @@ class ImagesViewModel : ViewModel(), ToastBindable {
 
     val isActive: Boolean get() = selectedImages.isNotEmpty()
     val selectedCount: Int get() = selectedImages.size
+    var pagesPerSheetOption by mutableStateOf(PagesPerSheetOption.ONE)
+        private set
 
     var isPreparingPreview by mutableStateOf(false)
         private set
@@ -141,6 +144,10 @@ class ImagesViewModel : ViewModel(), ToastBindable {
         selectedImages = list
     }
 
+    fun updatePagesPerSheet(option: PagesPerSheetOption) {
+        pagesPerSheetOption = option
+    }
+
     fun openPreview(
         context: Context,
         onReady: (PdfFile) -> Unit
@@ -152,12 +159,17 @@ class ImagesViewModel : ViewModel(), ToastBindable {
         if (isPreparingPreview) return
 
         val snapshot = selectedImages
+        val pagesPerSheetSnapshot = pagesPerSheetOption
 
         viewModelScope.launch {
             isPreparingPreview = true
 
             val preview = withContext(Dispatchers.IO) {
-                buildPreviewPdf(context, snapshot)
+                buildPreviewPdf(
+                    context = context,
+                    images = snapshot,
+                    pagesPerSheet = pagesPerSheetSnapshot
+                )
             }
 
             if (preview == null) {
@@ -267,14 +279,15 @@ private fun readImageBounds(
 
 private fun buildPreviewPdf(
     context: Context,
-    images: List<ImageItem>
+    images: List<ImageItem>,
+    pagesPerSheet: PagesPerSheetOption
 ): PreviewPdfResult? {
     if (images.isEmpty()) return null
 
     val previewDir = File(context.cacheDir, "images_preview_pdf").apply { mkdirs() }
     cleanupOldPreviewFiles(previewDir, keepCount = 6)
 
-    val fileName = "images_preview_${System.currentTimeMillis()}.pdf"
+    val fileName = "images_preview_${pagesPerSheet.pagesPerSheet}_pages_${System.currentTimeMillis()}.pdf"
     val outputFile = File(previewDir, fileName)
     val pdf = PdfDocument()
 
