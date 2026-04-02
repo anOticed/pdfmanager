@@ -21,8 +21,10 @@ import com.tom_roush.pdfbox.pdmodel.PDDocument
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import me.notanoticed.pdfmanager.core.pdf.PdfPageSource
 import me.notanoticed.pdfmanager.core.pdf.PagesPerSheetOption
 import me.notanoticed.pdfmanager.core.pdf.PdfRepository
+import me.notanoticed.pdfmanager.core.pdf.buildPdfFromPageGroups
 import me.notanoticed.pdfmanager.core.pdf.model.PdfFile
 import me.notanoticed.pdfmanager.core.pickers.Pickers
 import me.notanoticed.pdfmanager.core.toast.ToastBindable
@@ -194,11 +196,10 @@ private fun buildMergedPreviewPdf(
 
     val fileName = "merge_preview_${pagesPerSheet.pagesPerSheet}_pages_${System.currentTimeMillis()}.pdf"
     val outputFile = File(previewDir, fileName)
-    var createdPages = 0
     val openedSourceDocuments = mutableListOf<PDDocument>()
 
     try {
-        PDDocument().use { outputDocument ->
+        val pageGroup = buildList {
             pdfs.forEach { inputPdf ->
                 val inputStream = context.contentResolver.openInputStream(inputPdf.uri)
                     ?: throw IllegalStateException("Failed to open source PDF: ${inputPdf.uri}")
@@ -209,16 +210,38 @@ private fun buildMergedPreviewPdf(
                 openedSourceDocuments += sourceDocument
 
                 for (pageIndex in 0 until sourceDocument.numberOfPages) {
-                    outputDocument.importPage(sourceDocument.getPage(pageIndex))
-                    createdPages++
+                    add(
+                        PdfPageSource(
+                            document = sourceDocument,
+                            pageIndex = pageIndex
+                        )
+                    )
                 }
             }
-
-            if (createdPages == 0) {
-                error("Selected PDFs contain no pages")
-            }
-            outputDocument.save(outputFile)
         }
+
+        if (pageGroup.isEmpty()) {
+            error("Selected PDFs contain no pages")
+        }
+
+        val outputPages = buildPdfFromPageGroups(
+            outputFile = outputFile,
+            pageGroups = listOf(pageGroup),
+            pagesPerSheet = pagesPerSheet
+        )
+
+        val previewUri = FileProvider.getUriForFile(
+            context,
+            "${context.packageName}.fileprovider",
+            outputFile
+        )
+
+        return PreviewPdfResult(
+            uri = previewUri,
+            name = fileName,
+            sizeBytes = outputFile.length().coerceAtLeast(0L),
+            pagesCount = outputPages
+        )
     } catch (error: Throwable) {
         Log.e("MergePreview", "Failed to build merged preview PDF", error)
         runCatching { outputFile.delete() }
@@ -228,19 +251,6 @@ private fun buildMergedPreviewPdf(
             runCatching { source.close() }
         }
     }
-
-    val previewUri = FileProvider.getUriForFile(
-        context,
-        "${context.packageName}.fileprovider",
-        outputFile
-    )
-
-    return PreviewPdfResult(
-        uri = previewUri,
-        name = fileName,
-        sizeBytes = outputFile.length().coerceAtLeast(0L),
-        pagesCount = createdPages
-    )
 }
 
 private val isPdfBoxInitialized = AtomicBoolean(false)

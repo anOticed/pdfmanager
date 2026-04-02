@@ -13,7 +13,6 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Color
-import android.graphics.Rect
 import android.graphics.pdf.PdfDocument
 import android.net.Uri
 import android.provider.OpenableColumns
@@ -28,18 +27,19 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import me.notanoticed.pdfmanager.core.pdf.fitRectIntoSlot
+import me.notanoticed.pdfmanager.core.pdf.pageCountForSheets
 import me.notanoticed.pdfmanager.core.pdf.PagesPerSheetOption
+import me.notanoticed.pdfmanager.core.pdf.PREVIEW_A4_HEIGHT_PX
+import me.notanoticed.pdfmanager.core.pdf.PREVIEW_A4_WIDTH_PX
 import me.notanoticed.pdfmanager.core.pdf.PdfRepository
+import me.notanoticed.pdfmanager.core.pdf.buildSheetLayoutSlots
 import me.notanoticed.pdfmanager.core.pdf.model.PdfFile
 import me.notanoticed.pdfmanager.core.toast.ToastBindable
 import java.io.File
 import java.io.FileOutputStream
 import kotlin.math.max
-import kotlin.math.min
 import kotlin.math.roundToInt
-
-private const val PREVIEW_A4_WIDTH_PX = 1240
-private const val PREVIEW_A4_HEIGHT_PX = 1754
 
 /* -------------------- VIEW MODEL -------------------- */
 data class ImageItem(
@@ -292,10 +292,15 @@ private fun buildPreviewPdf(
     val pdf = PdfDocument()
 
     val success = runCatching {
-        images.forEachIndexed { index, image ->
-            val pageWidth = PREVIEW_A4_WIDTH_PX
-            val pageHeight = PREVIEW_A4_HEIGHT_PX
+        val pageWidth = PREVIEW_A4_WIDTH_PX
+        val pageHeight = PREVIEW_A4_HEIGHT_PX
+        val sheetSlots = buildSheetLayoutSlots(
+            sheetWidth = pageWidth.toFloat(),
+            sheetHeight = pageHeight.toFloat(),
+            pagesPerSheet = pagesPerSheet
+        )
 
+        images.chunked(pagesPerSheet.pagesPerSheet).forEachIndexed { index, sheetImages ->
             val page = pdf.startPage(
                 PdfDocument.PageInfo.Builder(pageWidth, pageHeight, index + 1).create()
             )
@@ -303,22 +308,24 @@ private fun buildPreviewPdf(
             try {
                 page.canvas.drawColor(Color.WHITE)
 
-                val bitmap = decodeBitmapForPdfPage(
-                    context = context,
-                    uri = image.uri,
-                    targetWidth = pageWidth,
-                    targetHeight = pageHeight
-                )
-
-                if (bitmap != null) {
-                    val dstRect = fitInsideRect(
-                        srcWidth = bitmap.width,
-                        srcHeight = bitmap.height,
-                        dstWidth = pageWidth,
-                        dstHeight = pageHeight
+                sheetImages.forEachIndexed { slotIndex, image ->
+                    val slot = sheetSlots[slotIndex]
+                    val bitmap = decodeBitmapForPdfPage(
+                        context = context,
+                        uri = image.uri,
+                        targetWidth = slot.width.roundToInt(),
+                        targetHeight = slot.height.roundToInt()
                     )
-                    page.canvas.drawBitmap(bitmap, null, dstRect, null)
-                    bitmap.recycle()
+
+                    if (bitmap != null) {
+                        val dstRect = fitRectIntoSlot(
+                            slot = slot,
+                            srcWidth = bitmap.width,
+                            srcHeight = bitmap.height
+                        )
+                        page.canvas.drawBitmap(bitmap, null, dstRect, null)
+                        bitmap.recycle()
+                    }
                 }
             } finally {
                 pdf.finishPage(page)
@@ -350,7 +357,7 @@ private fun buildPreviewPdf(
         uri = uri,
         name = fileName,
         sizeBytes = outputFile.length().coerceAtLeast(0L),
-        pagesCount = images.size
+        pagesCount = pageCountForSheets(images.size, pagesPerSheet)
     )
 }
 
@@ -387,29 +394,6 @@ private fun decodeBitmapForPdfPage(
     return context.contentResolver.openInputStream(uri)?.use { stream ->
         BitmapFactory.decodeStream(stream, null, options)
     }
-}
-
-private fun fitInsideRect(
-    srcWidth: Int,
-    srcHeight: Int,
-    dstWidth: Int,
-    dstHeight: Int
-): Rect {
-    if (srcWidth <= 0 || srcHeight <= 0 || dstWidth <= 0 || dstHeight <= 0) {
-        return Rect(0, 0, dstWidth.coerceAtLeast(1), dstHeight.coerceAtLeast(1))
-    }
-
-    val scale = min(
-        dstWidth.toFloat() / srcWidth.toFloat(),
-        dstHeight.toFloat() / srcHeight.toFloat()
-    )
-
-    val outWidth = (srcWidth * scale).roundToInt().coerceAtLeast(1)
-    val outHeight = (srcHeight * scale).roundToInt().coerceAtLeast(1)
-    val left = ((dstWidth - outWidth) / 2).coerceAtLeast(0)
-    val top = ((dstHeight - outHeight) / 2).coerceAtLeast(0)
-
-    return Rect(left, top, left + outWidth, top + outHeight)
 }
 
 private fun cleanupOldPreviewFiles(

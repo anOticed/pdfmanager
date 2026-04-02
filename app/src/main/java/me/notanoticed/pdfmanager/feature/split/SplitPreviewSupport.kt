@@ -8,34 +8,15 @@ import android.content.Context
 import androidx.core.content.FileProvider
 import com.tom_roush.pdfbox.android.PDFBoxResourceLoader
 import com.tom_roush.pdfbox.pdmodel.PDDocument
+import me.notanoticed.pdfmanager.core.pdf.PdfPageSource
 import me.notanoticed.pdfmanager.core.pdf.PagesPerSheetOption
+import me.notanoticed.pdfmanager.core.pdf.buildPdfFromPageGroups
 import me.notanoticed.pdfmanager.core.pdf.model.PdfFile
 import java.io.File
 import java.util.concurrent.atomic.AtomicBoolean
 
 /* -------------------- PREVIEW -------------------- */
 internal fun prepareSplitPreviewPdf(
-    context: Context,
-    sourcePdf: PdfFile,
-    plan: SplitPlan,
-    pagesPerSheet: PagesPerSheetOption
-): PdfFile {
-    return when (plan.method) {
-        SplitMethodType.PAGE_RANGES -> {
-            buildPageRangesPreviewPdf(
-                context = context,
-                sourcePdf = sourcePdf,
-                plan = plan,
-                pagesPerSheet = pagesPerSheet
-            )
-        }
-
-        SplitMethodType.SINGLE_PAGE_PER_FILE,
-        SplitMethodType.EVERY_N_PAGES -> sourcePdf
-    }
-}
-
-private fun buildPageRangesPreviewPdf(
     context: Context,
     sourcePdf: PdfFile,
     plan: SplitPlan,
@@ -58,43 +39,44 @@ private fun buildPageRangesPreviewPdf(
 
         inputStream.use { stream ->
             PDDocument.load(stream).use { sourceDocument ->
-                PDDocument().use { outputDocument ->
-                    plan.chunks
-                        .flatMap { it.pages }
-                        .forEach { pageNumber ->
-                            outputDocument.importPage(sourceDocument.getPage(pageNumber - 1))
-                        }
-
-                    if (outputDocument.numberOfPages <= 0) {
-                        error("No pages were selected for preview")
+                val pageGroups = plan.chunks.map { chunk ->
+                    chunk.pages.map { pageNumber ->
+                        PdfPageSource(
+                            document = sourceDocument,
+                            pageIndex = pageNumber - 1
+                        )
                     }
-
-                    outputDocument.save(outputFile)
                 }
+
+                val outputPages = buildPdfFromPageGroups(
+                    outputFile = outputFile,
+                    pageGroups = pageGroups,
+                    pagesPerSheet = pagesPerSheet
+                )
+
+                val previewUri = FileProvider.getUriForFile(
+                    context,
+                    "${context.packageName}.fileprovider",
+                    outputFile
+                )
+
+                val now = System.currentTimeMillis() / 1000L
+                return PdfFile(
+                    uri = previewUri,
+                    name = fileName,
+                    sizeBytes = outputFile.length().coerceAtLeast(0L),
+                    pagesCount = outputPages,
+                    storagePath = previewUri.toString(),
+                    lastModifiedEpochSeconds = now,
+                    createdEpochSeconds = now,
+                    isLocked = false
+                )
             }
         }
     } catch (error: Throwable) {
         runCatching { outputFile.delete() }
         throw error
     }
-
-    val previewUri = FileProvider.getUriForFile(
-        context,
-        "${context.packageName}.fileprovider",
-        outputFile
-    )
-
-    val now = System.currentTimeMillis() / 1000L
-    return PdfFile(
-        uri = previewUri,
-        name = fileName,
-        sizeBytes = outputFile.length().coerceAtLeast(0L),
-        pagesCount = plan.totalPagesCovered,
-        storagePath = previewUri.toString(),
-        lastModifiedEpochSeconds = now,
-        createdEpochSeconds = now,
-        isLocked = false
-    )
 }
 /* ------------------------------------------------ */
 
