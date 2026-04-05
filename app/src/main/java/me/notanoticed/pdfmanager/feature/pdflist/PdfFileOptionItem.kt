@@ -48,7 +48,8 @@ val pdfFileOptionItems: List<PdfFileOptionItem> = listOf(
     PdfFileOptionItem(
         action = PdfFileOptionAction.RENAME,
         title = "Rename",
-        icon = Icons.Outlined.Edit
+        icon = Icons.Outlined.Edit,
+        tint = Colors.Icon.rename
     ),
     PdfFileOptionItem(
         action = PdfFileOptionAction.MERGE,
@@ -59,7 +60,8 @@ val pdfFileOptionItems: List<PdfFileOptionItem> = listOf(
     PdfFileOptionItem(
         action = PdfFileOptionAction.SPLIT,
         title = "Split",
-        icon = Icons.Outlined.CallSplit
+        icon = Icons.Outlined.CallSplit,
+        tint = Colors.Icon.split
     ),
     PdfFileOptionItem(
         action = PdfFileOptionAction.COMPRESS,
@@ -86,12 +88,14 @@ val pdfFileOptionItems: List<PdfFileOptionItem> = listOf(
     PdfFileOptionItem(
         action = PdfFileOptionAction.PRINT,
         title = "Print",
-        icon = Icons.Outlined.Print
+        icon = Icons.Outlined.Print,
+        tint = Colors.Icon.print
     ),
     PdfFileOptionItem(
         action = PdfFileOptionAction.SHARE,
         title = "Share",
-        icon = Icons.Outlined.Share
+        icon = Icons.Outlined.Share,
+        tint = Colors.Icon.share
     ),
     PdfFileOptionItem(
         action = PdfFileOptionAction.DETAILS,

@@ -37,9 +37,11 @@ import kotlinx.coroutines.launch
 import me.notanoticed.pdfmanager.feature.images.ImageActiveScreen
 import me.notanoticed.pdfmanager.feature.images.ImagesScreen
 import me.notanoticed.pdfmanager.feature.images.ImagesViewModel
+import me.notanoticed.pdfmanager.feature.pdflist.DeletePdfDialog
 import me.notanoticed.pdfmanager.feature.pdflist.OptionsOverlay
 import me.notanoticed.pdfmanager.feature.pdflist.PdfDetailsOverlay
 import me.notanoticed.pdfmanager.feature.pdflist.PdfListSelectionBottomBar
+import me.notanoticed.pdfmanager.feature.pdflist.RenamePdfDialog
 
 /* -------------------- APP -------------------- */
 @Composable
@@ -168,6 +170,24 @@ private fun AppContent(settingsViewModel: SettingsViewModel) {
                 visible = pdfListViewModel.detailsPanelVisible,
                 pdf = pdfListViewModel.detailsPanelPdf,
                 onDismiss = { pdfListViewModel.closeDetails() }
+            )
+
+            RenamePdfDialog(
+                visible = pdfListViewModel.renameDialogVisible,
+                currentName = pdfListViewModel.renameDialogPdf?.name.orEmpty(),
+                inputValue = pdfListViewModel.renameInput,
+                isProcessing = pdfListViewModel.isFileActionInProgress,
+                onValueChange = pdfListViewModel::updateRenameInput,
+                onDismiss = { pdfListViewModel.closeRenameDialog() },
+                onConfirm = { pdfListViewModel.confirmRename(context) }
+            )
+
+            DeletePdfDialog(
+                visible = pdfListViewModel.deleteDialogVisible,
+                fileName = pdfListViewModel.deleteDialogPdf?.name.orEmpty(),
+                isProcessing = pdfListViewModel.isFileActionInProgress,
+                onDismiss = { pdfListViewModel.closeDeleteDialog() },
+                onConfirm = { pdfListViewModel.confirmDelete(context) }
             )
         }
     }

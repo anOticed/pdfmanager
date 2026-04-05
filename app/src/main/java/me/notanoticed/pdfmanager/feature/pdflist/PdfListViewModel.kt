@@ -13,14 +13,29 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Dispatchers
 import me.notanoticed.pdfmanager.core.pdf.PdfRepository
+import me.notanoticed.pdfmanager.core.pdf.PdfDocumentActions
 import me.notanoticed.pdfmanager.core.pdf.model.PdfFile
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import me.notanoticed.pdfmanager.core.toast.ToastBindable
 
+class PdfListViewModel : ViewModel(), ToastBindable {
+    private var toast: ((String) -> Unit)? = null
 
+    override fun bindToast(toast: (String) -> Unit) {
+        this.toast = toast
+    }
 
-class PdfListViewModel : ViewModel() {
+    override fun unbindToast() {
+        toast = null
+    }
+
+    private fun showToast(message: String) {
+        toast?.invoke(message)
+    }
 
     /* -------------------- LOADING / DATA -------------------- */
     var isLoading by mutableStateOf(false)
@@ -205,14 +220,127 @@ class PdfListViewModel : ViewModel() {
     }
 
     fun onFileOptionSelected(action: PdfFileOptionAction, pdf: PdfFile) {
-        when(action) {
-            PdfFileOptionAction.MERGE -> pendingEvent = PdfListEvent.OpenMerge(listOf(pdf))
-            PdfFileOptionAction.SPLIT -> pendingEvent = PdfListEvent.OpenSplit(pdf)
-            PdfFileOptionAction.DETAILS -> pendingEvent = PdfListEvent.OpenDetails(pdf)
-            else -> Unit
+        pendingEvent = when (action) {
+            PdfFileOptionAction.RENAME -> PdfListEvent.OpenRenameDialog(pdf)
+            PdfFileOptionAction.MERGE -> PdfListEvent.OpenMerge(listOf(pdf))
+            PdfFileOptionAction.SPLIT -> PdfListEvent.OpenSplit(pdf)
+            PdfFileOptionAction.PRINT -> PdfListEvent.PrintPdf(pdf)
+            PdfFileOptionAction.SHARE -> PdfListEvent.SharePdf(pdf)
+            PdfFileOptionAction.DETAILS -> PdfListEvent.OpenDetails(pdf)
+            PdfFileOptionAction.DELETE -> PdfListEvent.OpenDeleteDialog(pdf)
+            else -> null
         }
     }
     /* ------------------------------------------------------- */
+
+
+
+    /* -------------------- FILE ACTION DIALOGS -------------------- */
+    var renameDialogVisible by mutableStateOf(false)
+        private set
+
+    var renameDialogPdf: PdfFile? by mutableStateOf(null)
+        private set
+
+    var renameInput by mutableStateOf("")
+        private set
+
+    var deleteDialogVisible by mutableStateOf(false)
+        private set
+
+    var deleteDialogPdf: PdfFile? by mutableStateOf(null)
+        private set
+
+    var isFileActionInProgress by mutableStateOf(false)
+        private set
+
+    fun showRenameDialog(pdf: PdfFile) {
+        renameDialogPdf = pdf
+        renameInput = pdf.name
+        renameDialogVisible = true
+    }
+
+    fun closeRenameDialog() {
+        renameDialogVisible = false
+        renameDialogPdf = null
+        renameInput = ""
+    }
+
+    fun updateRenameInput(value: String) {
+        renameInput = value
+    }
+
+    fun confirmRename(context: Context) {
+        val pdf = renameDialogPdf ?: return
+        if (isFileActionInProgress) return
+
+        val targetName = PdfDocumentActions.normalizeDisplayName(
+            rawName = renameInput,
+            fallbackName = pdf.name
+        )
+
+        if (targetName == pdf.name) {
+            closeRenameDialog()
+            return
+        }
+
+        viewModelScope.launch {
+            isFileActionInProgress = true
+
+            val renamed = withContext(Dispatchers.IO) {
+                PdfDocumentActions.renamePdf(context, pdf, targetName)
+            }
+
+            isFileActionInProgress = false
+
+            if (!renamed) {
+                showToast("Failed to rename PDF")
+                return@launch
+            }
+
+            closeRenameDialog()
+            showToast("PDF renamed successfully")
+            loadAll(context)
+        }
+    }
+
+    fun showDeleteDialog(pdf: PdfFile) {
+        deleteDialogPdf = pdf
+        deleteDialogVisible = true
+    }
+
+    fun closeDeleteDialog() {
+        deleteDialogVisible = false
+        deleteDialogPdf = null
+    }
+
+    fun confirmDelete(context: Context) {
+        val pdf = deleteDialogPdf ?: return
+        if (isFileActionInProgress) return
+
+        viewModelScope.launch {
+            isFileActionInProgress = true
+
+            val deleted = withContext(Dispatchers.IO) {
+                PdfDocumentActions.deletePdf(context, pdf)
+            }
+
+            isFileActionInProgress = false
+
+            if (!deleted) {
+                showToast("Failed to delete PDF")
+                return@launch
+            }
+
+            closeDeleteDialog()
+            if (detailsPanelPdf?.uri == pdf.uri) {
+                closeDetails()
+            }
+            showToast("PDF deleted successfully")
+            loadAll(context)
+        }
+    }
+    /* ------------------------------------------------------------ */
 
 
 

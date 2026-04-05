@@ -77,6 +77,10 @@ internal data class AppIconColors(
     val green: Color,
     val red: Color,
     val yellow: Color,
+    val rename: Color,
+    val split: Color,
+    val share: Color,
+    val print: Color,
     val gray: Color,
     val disabledGray: Color,
     val darkGray: Color,
@@ -157,6 +161,10 @@ private val DarkPalette = AppColorPalette(
         green = Color(0xFF059568),
         red = Color(0xFFE82D2C),
         yellow = Color(0xFFFFB74D),
+        rename = Color(0xFFB38CFF),
+        split = Color(0xFFFFA24C),
+        share = Color(0xFF5ED0FF),
+        print = Color(0xFF9FB0C7),
         gray = Color(0xFF7D8592),
         disabledGray = Color(0xFF696C6F),
         darkGray = Color(0xFF2A2F37),
@@ -228,6 +236,10 @@ private val LightPalette = AppColorPalette(
         green = Color(0xFF20B874),
         red = Color(0xFFD94B4B),
         yellow = Color(0xFFE49B34),
+        rename = Color(0xFF7A52E8),
+        split = Color(0xFFE97818),
+        share = Color(0xFF007FB8),
+        print = Color(0xFF5F7088),
         gray = Color(0xFF74859C),
         disabledGray = Color(0xFF9EACBF),
         darkGray = Color(0xFFBCC9D9),
@@ -316,6 +328,10 @@ object Colors {
         val green: Color get() = activePalette.icon.green
         val red: Color get() = activePalette.icon.red
         val yellow: Color get() = activePalette.icon.yellow
+        val rename: Color get() = activePalette.icon.rename
+        val split: Color get() = activePalette.icon.split
+        val share: Color get() = activePalette.icon.share
+        val print: Color get() = activePalette.icon.print
         val gray: Color get() = activePalette.icon.gray
         val disabledGray: Color get() = activePalette.icon.disabledGray
         val darkGray: Color get() = activePalette.icon.darkGray

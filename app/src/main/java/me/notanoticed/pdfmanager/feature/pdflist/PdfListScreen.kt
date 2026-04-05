@@ -49,6 +49,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import me.notanoticed.pdfmanager.core.pdf.model.PdfFile
+import me.notanoticed.pdfmanager.core.toast.BindViewModelToasts
 import me.notanoticed.pdfmanager.ui.theme.Colors
 
 /* -------------------- SCREEN -------------------- */
@@ -57,6 +58,8 @@ fun PdfListScreen(
     modifier: Modifier = Modifier,
     viewModel: PdfListViewModel,
 ) {
+    BindViewModelToasts(viewModel)
+
     val context = LocalContext.current
 
     val isLoading = viewModel.isLoading
