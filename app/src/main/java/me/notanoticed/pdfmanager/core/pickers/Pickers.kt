@@ -31,6 +31,11 @@ interface Pickers {
     fun pickPdf(onPicked: (Uri) -> Unit)
     fun pickPdfs(onPicked: (List<Uri>) -> Unit)
     fun pickImages(onPicked: (List<Uri>) -> Unit)
+    fun createPdfDocument(
+        suggestedName: String,
+        onPicked: (Uri) -> Unit
+    )
+    fun pickFolder(onPicked: (Uri) -> Unit)
     fun takePhoto(
         onCaptured: (Uri) -> Unit,
         onError: (Throwable) -> Unit = {}
@@ -46,6 +51,8 @@ fun ProvidePickers(content: @Composable () -> Unit) {
     var onPdfPicked by remember { mutableStateOf<(Uri) -> Unit>({}) }
     var onPdfsPicked by remember { mutableStateOf<(List<Uri>) -> Unit>({}) }
     var onImagesPicked by remember { mutableStateOf<(List<Uri>) -> Unit>({}) }
+    var onPdfDocumentCreated by remember { mutableStateOf<(Uri) -> Unit>({}) }
+    var onFolderPicked by remember { mutableStateOf<(Uri) -> Unit>({}) }
     var onPhotoCaptured by remember { mutableStateOf<(Uri) -> Unit>({}) }
     var pendingPhotoUri by remember { mutableStateOf<Uri?>(null) }
 
@@ -98,6 +105,38 @@ fun ProvidePickers(content: @Composable () -> Unit) {
         }
     }
 
+    val createPdfDocumentLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.CreateDocument("application/pdf")
+    ) { uri ->
+        if (uri != null) {
+            try {
+                context.contentResolver.takePersistableUriPermission(
+                    uri,
+                    Intent.FLAG_GRANT_READ_URI_PERMISSION or
+                        Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+                )
+            } catch (_: Exception) { /* ignore */ }
+
+            onPdfDocumentCreated(uri)
+        }
+    }
+
+    val folderLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.OpenDocumentTree()
+    ) { uri ->
+        if (uri != null) {
+            try {
+                context.contentResolver.takePersistableUriPermission(
+                    uri,
+                    Intent.FLAG_GRANT_READ_URI_PERMISSION or
+                        Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+                )
+            } catch (_: Exception) { /* ignore */ }
+
+            onFolderPicked(uri)
+        }
+    }
+
     val takePhotoLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.TakePicture()
     ) { isSuccess ->
@@ -126,6 +165,19 @@ fun ProvidePickers(content: @Composable () -> Unit) {
                 imagesLauncher.launch(
                     PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
                 )
+            }
+
+            override fun createPdfDocument(
+                suggestedName: String,
+                onPicked: (Uri) -> Unit
+            ) {
+                onPdfDocumentCreated = onPicked
+                createPdfDocumentLauncher.launch(suggestedName)
+            }
+
+            override fun pickFolder(onPicked: (Uri) -> Unit) {
+                onFolderPicked = onPicked
+                folderLauncher.launch(null)
             }
 
             override fun takePhoto(

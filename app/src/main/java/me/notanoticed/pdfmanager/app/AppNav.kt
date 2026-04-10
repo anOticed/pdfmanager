@@ -37,6 +37,7 @@ import kotlinx.coroutines.launch
 import me.notanoticed.pdfmanager.feature.images.ImageActiveScreen
 import me.notanoticed.pdfmanager.feature.images.ImagesScreen
 import me.notanoticed.pdfmanager.feature.images.ImagesViewModel
+import me.notanoticed.pdfmanager.feature.export.ProvidePdfOutputFlow
 import me.notanoticed.pdfmanager.feature.pdflist.DeletePdfDialog
 import me.notanoticed.pdfmanager.feature.pdflist.OptionsOverlay
 import me.notanoticed.pdfmanager.feature.pdflist.PdfDetailsOverlay
@@ -84,111 +85,115 @@ private fun AppContent(settingsViewModel: SettingsViewModel) {
             tabs = appScreens
         )
 
-        Box(
-            modifier = Modifier.fillMaxSize()
+        ProvidePdfOutputFlow(
+            onExportFinished = { pdfListViewModel.loadAll(context) }
         ) {
-            Scaffold(
-                topBar = {
-                    AppTopBar(
-                        currentRoute = appScreens[pagerState.currentPage],
-                        pdfListViewModel = pdfListViewModel,
-                        splitViewModel = splitViewModel,
-                        mergeViewModel = mergeViewModel,
-                        imagesViewModel = imagesViewModel
-                    )
-                },
-                bottomBar = {
-                    if (appScreens[pagerState.currentPage] == Screen.PdfList.route && pdfListViewModel.isSelectionMode) {
-                        PdfListSelectionBottomBar(viewModel = pdfListViewModel)
-                    }
-                    else {
-                        AppBottomBar(
-                            currentRoute = appScreens[pagerState.currentPage]
-                        ) { page ->
-
-                            scope.launch {
-                                pagerState.animateScrollToPage(page = appScreens.indexOf(page))
-                            }
-                        }
-                    }
-                },
-                containerColor = Colors.Background.app
-            ) { paddingValues ->
-                HorizontalPager(
-                    state = pagerState,
-                    key = { appScreens[it] },
-                    beyondViewportPageCount = 2,
-                    modifier = Modifier
-                        .padding(paddingValues)
-                        .consumeWindowInsets(paddingValues)
-                ) { page ->
-                    when (appScreens[page]) {
-                        Screen.PdfList.route -> PdfListScreen(viewModel = pdfListViewModel)
-                        Screen.Merge.route -> {
-                            if (mergeViewModel.isActive) {
-                                MergeActiveScreen(viewModel = mergeViewModel)
-                            }
-                            else {
-                                MergeScreen(viewModel = mergeViewModel)
-                            }
-                        }
-                        Screen.Split.route -> {
-                            val selected = splitViewModel.selectedSplitPdf
-                            if (selected != null) {
-                                SplitActiveScreen(viewModel = splitViewModel)
-                            }
-                            else SplitScreen(viewModel = splitViewModel)
-                        }
-                        Screen.Images.route -> {
-                            if (imagesViewModel.isActive) {
-                                ImageActiveScreen(viewModel = imagesViewModel)
-                            }
-                            else {
-                                ImagesScreen(viewModel = imagesViewModel)
-                            }
-                        }
-                        Screen.Settings.route -> SettingsScreen(
-                            isDarkModeEnabled = settingsViewModel.isDarkModeEnabled,
-                            onDarkModeChange = settingsViewModel::updateDarkModeEnabled
+            Box(
+                modifier = Modifier.fillMaxSize()
+            ) {
+                Scaffold(
+                    topBar = {
+                        AppTopBar(
+                            currentRoute = appScreens[pagerState.currentPage],
+                            pdfListViewModel = pdfListViewModel,
+                            splitViewModel = splitViewModel,
+                            mergeViewModel = mergeViewModel,
+                            imagesViewModel = imagesViewModel
                         )
+                    },
+                    bottomBar = {
+                        if (appScreens[pagerState.currentPage] == Screen.PdfList.route && pdfListViewModel.isSelectionMode) {
+                            PdfListSelectionBottomBar(viewModel = pdfListViewModel)
+                        }
+                        else {
+                            AppBottomBar(
+                                currentRoute = appScreens[pagerState.currentPage]
+                            ) { page ->
+
+                                scope.launch {
+                                    pagerState.animateScrollToPage(page = appScreens.indexOf(page))
+                                }
+                            }
+                        }
+                    },
+                    containerColor = Colors.Background.app
+                ) { paddingValues ->
+                    HorizontalPager(
+                        state = pagerState,
+                        key = { appScreens[it] },
+                        beyondViewportPageCount = 2,
+                        modifier = Modifier
+                            .padding(paddingValues)
+                            .consumeWindowInsets(paddingValues)
+                    ) { page ->
+                        when (appScreens[page]) {
+                            Screen.PdfList.route -> PdfListScreen(viewModel = pdfListViewModel)
+                            Screen.Merge.route -> {
+                                if (mergeViewModel.isActive) {
+                                    MergeActiveScreen(viewModel = mergeViewModel)
+                                }
+                                else {
+                                    MergeScreen(viewModel = mergeViewModel)
+                                }
+                            }
+                            Screen.Split.route -> {
+                                val selected = splitViewModel.selectedSplitPdf
+                                if (selected != null) {
+                                    SplitActiveScreen(viewModel = splitViewModel)
+                                }
+                                else SplitScreen(viewModel = splitViewModel)
+                            }
+                            Screen.Images.route -> {
+                                if (imagesViewModel.isActive) {
+                                    ImageActiveScreen(viewModel = imagesViewModel)
+                                }
+                                else {
+                                    ImagesScreen(viewModel = imagesViewModel)
+                                }
+                            }
+                            Screen.Settings.route -> SettingsScreen(
+                                isDarkModeEnabled = settingsViewModel.isDarkModeEnabled,
+                                onDarkModeChange = settingsViewModel::updateDarkModeEnabled
+                            )
+                        }
                     }
                 }
+
+                OptionsOverlay(
+                    visible = pdfListViewModel.optionsPanelVisible,
+                    pdf = pdfListViewModel.optionsPanelPdf,
+                    onDismiss = { pdfListViewModel.closeOptions() },
+                    onAction = {action ->
+                        val pdf = pdfListViewModel.optionsPanelPdf ?: return@OptionsOverlay
+                        pdfListViewModel.closeOptions()
+                        pdfListViewModel.onFileOptionSelected(action, pdf)
+                    }
+                )
+
+                PdfDetailsOverlay(
+                    visible = pdfListViewModel.detailsPanelVisible,
+                    pdf = pdfListViewModel.detailsPanelPdf,
+                    onDismiss = { pdfListViewModel.closeDetails() }
+                )
+
+                RenamePdfDialog(
+                    visible = pdfListViewModel.renameDialogVisible,
+                    currentName = pdfListViewModel.renameDialogPdf?.name.orEmpty(),
+                    inputValue = pdfListViewModel.renameInput,
+                    isProcessing = pdfListViewModel.isFileActionInProgress,
+                    onValueChange = pdfListViewModel::updateRenameInput,
+                    onDismiss = { pdfListViewModel.closeRenameDialog() },
+                    onConfirm = { pdfListViewModel.confirmRename(context) }
+                )
+
+                DeletePdfDialog(
+                    visible = pdfListViewModel.deleteDialogVisible,
+                    fileName = pdfListViewModel.deleteDialogPdf?.name.orEmpty(),
+                    isProcessing = pdfListViewModel.isFileActionInProgress,
+                    onDismiss = { pdfListViewModel.closeDeleteDialog() },
+                    onConfirm = { pdfListViewModel.confirmDelete(context) }
+                )
             }
-
-            OptionsOverlay(
-                visible = pdfListViewModel.optionsPanelVisible,
-                pdf = pdfListViewModel.optionsPanelPdf,
-                onDismiss = { pdfListViewModel.closeOptions() },
-                onAction = {action ->
-                    val pdf = pdfListViewModel.optionsPanelPdf ?: return@OptionsOverlay
-                    pdfListViewModel.closeOptions()
-                    pdfListViewModel.onFileOptionSelected(action, pdf)
-                }
-            )
-
-            PdfDetailsOverlay(
-                visible = pdfListViewModel.detailsPanelVisible,
-                pdf = pdfListViewModel.detailsPanelPdf,
-                onDismiss = { pdfListViewModel.closeDetails() }
-            )
-
-            RenamePdfDialog(
-                visible = pdfListViewModel.renameDialogVisible,
-                currentName = pdfListViewModel.renameDialogPdf?.name.orEmpty(),
-                inputValue = pdfListViewModel.renameInput,
-                isProcessing = pdfListViewModel.isFileActionInProgress,
-                onValueChange = pdfListViewModel::updateRenameInput,
-                onDismiss = { pdfListViewModel.closeRenameDialog() },
-                onConfirm = { pdfListViewModel.confirmRename(context) }
-            )
-
-            DeletePdfDialog(
-                visible = pdfListViewModel.deleteDialogVisible,
-                fileName = pdfListViewModel.deleteDialogPdf?.name.orEmpty(),
-                isProcessing = pdfListViewModel.isFileActionInProgress,
-                onDismiss = { pdfListViewModel.closeDeleteDialog() },
-                onConfirm = { pdfListViewModel.confirmDelete(context) }
-            )
         }
     }
 }

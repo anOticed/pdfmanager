@@ -7,7 +7,6 @@
 
 package me.notanoticed.pdfmanager.feature.pdflist
 
-import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box

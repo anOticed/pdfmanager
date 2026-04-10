@@ -34,8 +34,12 @@ import me.notanoticed.pdfmanager.core.pdf.PREVIEW_A4_HEIGHT_PX
 import me.notanoticed.pdfmanager.core.pdf.PREVIEW_A4_WIDTH_PX
 import me.notanoticed.pdfmanager.core.pdf.PdfRepository
 import me.notanoticed.pdfmanager.core.pdf.buildSheetLayoutSlots
+import me.notanoticed.pdfmanager.core.pdf.copyFileToUri
+import me.notanoticed.pdfmanager.core.pdf.createTempPdfFile
+import me.notanoticed.pdfmanager.core.pdf.prepareGeneratedPdfFile
 import me.notanoticed.pdfmanager.core.pdf.model.PdfFile
 import me.notanoticed.pdfmanager.core.toast.ToastBindable
+import me.notanoticed.pdfmanager.feature.export.PdfOutputRequest
 import java.io.File
 import java.io.FileOutputStream
 import kotlin.math.max
@@ -200,6 +204,38 @@ class ImagesViewModel : ViewModel(), ToastBindable {
             onReady(pdf)
         }
     }
+
+    fun requestCreatePdfExport(
+        onRequest: (PdfOutputRequest) -> Unit
+    ) {
+        if (selectedImages.isEmpty()) {
+            showToast("Add at least one image first")
+            return
+        }
+
+        val snapshot = selectedImages
+        val pagesPerSheetSnapshot = pagesPerSheetOption
+        val suggestedName = buildSuggestedImagesFileName(snapshot)
+
+        onRequest(
+            PdfOutputRequest.SaveFile(
+                dialogTitle = "Save PDF from images",
+                inputLabel = "File name",
+                inputHint = "Choose the final PDF name. You'll pick the save location in the next step.",
+                confirmLabel = "Choose Location",
+                suggestedName = suggestedName,
+                processingMessage = "Processing your file, please wait..."
+            ) { context, destinationUri, _ ->
+                exportImagesPdf(
+                    context = context,
+                    images = snapshot,
+                    pagesPerSheet = pagesPerSheetSnapshot,
+                    destinationUri = destinationUri
+                )
+                "PDF created successfully"
+            }
+        )
+    }
 }
 /* ---------------------------------------------------- */
 
@@ -284,14 +320,83 @@ private fun buildPreviewPdf(
 ): PreviewPdfResult? {
     if (images.isEmpty()) return null
 
-    val previewDir = File(context.cacheDir, "images_preview_pdf").apply { mkdirs() }
-    cleanupOldPreviewFiles(previewDir, keepCount = 6)
-
     val fileName = "images_preview_${pagesPerSheet.pagesPerSheet}_pages_${System.currentTimeMillis()}.pdf"
-    val outputFile = File(previewDir, fileName)
-    val pdf = PdfDocument()
+    val outputFile = prepareGeneratedPdfFile(
+        context = context,
+        directoryName = "images_preview_pdf",
+        fileName = fileName,
+        cleanupPrefix = "images_preview_"
+    )
 
     val success = runCatching {
+        writeImagesPdfToFile(
+            context = context,
+            images = images,
+            pagesPerSheet = pagesPerSheet,
+            outputFile = outputFile
+        )
+        true
+    }.getOrElse { false }
+
+    if (!success) {
+        runCatching { outputFile.delete() }
+        return null
+    }
+
+    val uri = runCatching {
+        FileProvider.getUriForFile(
+            context,
+            "${context.packageName}.fileprovider",
+            outputFile
+        )
+    }.getOrNull() ?: return null
+
+    return PreviewPdfResult(
+        uri = uri,
+        name = fileName,
+        sizeBytes = outputFile.length().coerceAtLeast(0L),
+        pagesCount = pageCountForSheets(images.size, pagesPerSheet)
+    )
+}
+
+private fun exportImagesPdf(
+    context: Context,
+    images: List<ImageItem>,
+    pagesPerSheet: PagesPerSheetOption,
+    destinationUri: Uri
+) {
+    val tempFile = createTempPdfFile(
+        context = context,
+        directoryName = "images_output_pdf",
+        filePrefix = "images_export_"
+    )
+
+    try {
+        writeImagesPdfToFile(
+            context = context,
+            images = images,
+            pagesPerSheet = pagesPerSheet,
+            outputFile = tempFile
+        )
+        copyFileToUri(
+            context = context,
+            sourceFile = tempFile,
+            destinationUri = destinationUri
+        )
+    } finally {
+        runCatching { tempFile.delete() }
+    }
+}
+
+private fun writeImagesPdfToFile(
+    context: Context,
+    images: List<ImageItem>,
+    pagesPerSheet: PagesPerSheetOption,
+    outputFile: File
+) {
+    val pdf = PdfDocument()
+
+    try {
         val pageWidth = PREVIEW_A4_WIDTH_PX
         val pageHeight = PREVIEW_A4_HEIGHT_PX
         val sheetSlots = buildSheetLayoutSlots(
@@ -335,30 +440,23 @@ private fun buildPreviewPdf(
         FileOutputStream(outputFile).use { stream ->
             pdf.writeTo(stream)
         }
-        true
-    }.getOrElse { false }
-
-    runCatching { pdf.close() }
-
-    if (!success) {
-        runCatching { outputFile.delete() }
-        return null
+    } finally {
+        runCatching { pdf.close() }
     }
+}
 
-    val uri = runCatching {
-        FileProvider.getUriForFile(
-            context,
-            "${context.packageName}.fileprovider",
-            outputFile
-        )
-    }.getOrNull() ?: return null
+private fun buildSuggestedImagesFileName(
+    images: List<ImageItem>
+): String {
+    val firstName = images.firstOrNull()?.name
+        ?.substringBeforeLast('.')
+        .orEmpty()
 
-    return PreviewPdfResult(
-        uri = uri,
-        name = fileName,
-        sizeBytes = outputFile.length().coerceAtLeast(0L),
-        pagesCount = pageCountForSheets(images.size, pagesPerSheet)
-    )
+    return if (images.size == 1 && firstName.isNotBlank()) {
+        "${firstName}.pdf"
+    } else {
+        "images_${System.currentTimeMillis()}.pdf"
+    }
 }
 
 private fun decodeBitmapForPdfPage(
@@ -396,20 +494,4 @@ private fun decodeBitmapForPdfPage(
     }
 }
 
-private fun cleanupOldPreviewFiles(
-    dir: File,
-    keepCount: Int
-) {
-    if (!dir.exists() || !dir.isDirectory) return
-
-    val stale = dir.listFiles()
-        ?.filter { it.isFile && it.name.startsWith("images_preview_") && it.name.endsWith(".pdf") }
-        ?.sortedByDescending { it.lastModified() }
-        ?.drop(keepCount)
-        ?: return
-
-    stale.forEach { file ->
-        runCatching { file.delete() }
-    }
-}
 /* ------------------------------------------------- */

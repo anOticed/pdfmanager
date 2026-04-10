@@ -30,9 +30,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Close
@@ -65,13 +63,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import me.notanoticed.pdfmanager.core.pdf.formatFileSize
 import me.notanoticed.pdfmanager.core.toast.BindViewModelToasts
+import me.notanoticed.pdfmanager.feature.export.LocalPdfOutputFlow
 import me.notanoticed.pdfmanager.feature.preview.LocalPreviewNav
 import me.notanoticed.pdfmanager.ui.components.ExpandablePagesPerSheetSection
 import me.notanoticed.pdfmanager.ui.theme.Colors
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
-import java.util.Locale
 import kotlin.math.max
 
 /* -------------------- ACTIVE SCREEN -------------------- */
@@ -85,6 +84,7 @@ fun ImageActiveScreen(
     val images = viewModel.selectedImages
     val listState = rememberLazyListState()
     val context = LocalContext.current
+    val pdfOutputFlow = LocalPdfOutputFlow.current
     val previewNav = LocalPreviewNav.current
 
     val openPreview = {
@@ -233,7 +233,9 @@ fun ImageActiveScreen(
                 }
 
                 Button(
-                    onClick = { /* TODO: create pdf */ },
+                    onClick = {
+                        viewModel.requestCreatePdfExport(pdfOutputFlow::start)
+                    },
                     colors = ButtonDefaults.buttonColors(
                         containerColor = Colors.Button.green
                     ),
@@ -326,7 +328,7 @@ private fun ImageItemCard(
                 )
 
                 Text(
-                    text = "${image.widthPx} x ${image.heightPx} | ${formatBytes(image.sizeBytes)}",
+                    text = "${image.widthPx} x ${image.heightPx} | ${formatFileSize(image.sizeBytes, unknownWhenNonPositive = true)}",
                     color = Colors.Text.secondary,
                     fontSize = 11.sp,
                     maxLines = 1,
@@ -449,20 +451,3 @@ private fun decodeBitmapFallback(
     }
 }
 /* --------------------------------------------------- */
-
-
-/* -------------------- UTILS -------------------- */
-private fun formatBytes(bytes: Long): String {
-    val kb = 1000.0
-    val mb = kb * 1000
-    val gb = mb * 1000
-
-    return when {
-        bytes <= 0L -> "Unknown size"
-        bytes < kb -> "$bytes B"
-        bytes < mb -> String.format(Locale.US, "%.1f KB", bytes / kb)
-        bytes < gb -> String.format(Locale.US, "%.1f MB", bytes / mb)
-        else -> String.format(Locale.US, "%.1f GB", bytes / gb)
-    }
-}
-/* ------------------------------------------------ */

@@ -27,9 +27,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Close
@@ -58,6 +56,7 @@ import androidx.compose.ui.unit.sp
 import me.notanoticed.pdfmanager.core.pdf.PdfThumbnail
 import me.notanoticed.pdfmanager.core.pdf.model.PdfFile
 import me.notanoticed.pdfmanager.core.toast.BindViewModelToasts
+import me.notanoticed.pdfmanager.feature.export.LocalPdfOutputFlow
 import me.notanoticed.pdfmanager.feature.preview.LocalPreviewNav
 import me.notanoticed.pdfmanager.ui.components.ExpandablePagesPerSheetSection
 import me.notanoticed.pdfmanager.ui.theme.Colors
@@ -75,6 +74,7 @@ fun MergeActiveScreen(
     val mergeFiles = viewModel.pdfMergeFiles
     val listState = rememberLazyListState()
     val previewNav = LocalPreviewNav.current
+    val pdfOutputFlow = LocalPdfOutputFlow.current
     val context = LocalContext.current
 
     val reorderableState = rememberReorderableLazyListState(
@@ -223,7 +223,9 @@ fun MergeActiveScreen(
                 }
 
                 Button(
-                    onClick = { /* TODO: merge */ },
+                    onClick = {
+                        viewModel.requestMergeExport(pdfOutputFlow::start)
+                    },
                     colors = ButtonDefaults.buttonColors(
                         containerColor = Colors.Button.green
                     ),

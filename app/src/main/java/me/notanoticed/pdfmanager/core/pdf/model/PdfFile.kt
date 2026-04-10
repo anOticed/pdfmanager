@@ -9,6 +9,7 @@ package me.notanoticed.pdfmanager.core.pdf.model
 
 import android.graphics.Bitmap
 import android.net.Uri
+import me.notanoticed.pdfmanager.core.pdf.formatFileSize
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -40,20 +41,7 @@ data class PdfFile(
 
     fun lastModifiedDate(): String = formatDate(lastModifiedEpochSeconds)
 
-    fun size(): String = formatBytes(sizeBytes)
-
-    private fun formatBytes(bytes: Long): String {
-        val kb = 1000.0
-        val mb = kb * 1000
-        val gb = mb * 1000
-
-        return when {
-            bytes < kb -> "$bytes B"
-            bytes < mb -> String.format(Locale.US, "%.1f KB", bytes / kb)
-            bytes < gb -> String.format(Locale.US, "%.1f MB", bytes / mb)
-            else -> String.format(Locale.US, "%.1f GB", bytes / gb)
-        }
-    }
+    fun size(): String = formatFileSize(sizeBytes)
 
     private fun formatDate(epochSeconds: Long): String {
         val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.US)

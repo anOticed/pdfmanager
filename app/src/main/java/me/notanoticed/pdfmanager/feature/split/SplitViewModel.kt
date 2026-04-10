@@ -12,10 +12,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import me.notanoticed.pdfmanager.core.pdf.PdfDocumentActions
 import me.notanoticed.pdfmanager.core.pdf.PagesPerSheetOption
 import me.notanoticed.pdfmanager.core.pdf.PdfRepository
 import me.notanoticed.pdfmanager.core.pdf.model.PdfFile
 import me.notanoticed.pdfmanager.core.pickers.Pickers
+import me.notanoticed.pdfmanager.feature.export.PdfOutputRequest
 import kotlinx.coroutines.launch
 import me.notanoticed.pdfmanager.core.toast.ToastBindable
 
@@ -101,8 +103,49 @@ class SplitViewModel : ViewModel(), ToastBindable {
         }
     }
 
-    fun splitPdf(context: Context) {
-        /* TODO: implement splitPdf() */
+    fun requestSplitExport(
+        onRequest: (PdfOutputRequest) -> Unit
+    ) {
+        val pdf = selectedSplitPdf ?: return
+        val plan = when (val result = splitPlanResult) {
+            is SplitPlanResult.Ready -> result.plan
+            is SplitPlanResult.Error -> {
+                showToast(result.message)
+                return
+            }
+            null -> return
+        }
+
+        val pagesPerSheetSnapshot = pagesPerSheetOption
+        val suggestedBaseName = PdfDocumentActions.normalizeBaseName(
+            rawName = pdf.name,
+            fallbackName = "split_output"
+        )
+
+        onRequest(
+            PdfOutputRequest.SaveFolder(
+                dialogTitle = "Save split PDFs",
+                inputLabel = "Base file name",
+                inputHint = "Choose the base file name. You'll pick the destination folder in the next step.",
+                confirmLabel = "Choose Folder",
+                suggestedName = suggestedBaseName,
+                processingMessage = "Processing your files, please wait..."
+            ) { context, destinationUri, baseName ->
+                val createdCount = exportSplitPlanToFolder(
+                    context = context,
+                    sourcePdf = pdf,
+                    plan = plan,
+                    pagesPerSheet = pagesPerSheetSnapshot,
+                    folderUri = destinationUri,
+                    baseName = baseName
+                )
+
+                buildString {
+                    append(createdCount)
+                    append(if (createdCount == 1) " PDF file saved successfully" else " PDF files saved successfully")
+                }
+            }
+        )
     }
 
     fun pickSplitPdf(context: Context, pickers: Pickers) {

@@ -65,7 +65,7 @@ fun MergeTopBar(
             },
             actions = {
                 Button(
-                    onClick = onAddClick  /* TODO: SAF picker */ ,
+                    onClick = onAddClick,
                     colors = ButtonDefaults.buttonColors(
                         containerColor = Colors.Button.blue
                     ),

@@ -9,6 +9,7 @@
 package me.notanoticed.pdfmanager.core.pdf
 
 import android.content.ContentUris
+import android.content.ContentResolver
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -175,10 +176,20 @@ object PdfRepository {
                         else -> uri.toString()
                     }
 
+                    val resolvedSize = if (size > 0L) {
+                        size
+                    } else {
+                        resolvePdfSize(
+                            contentResolver = contentResolver,
+                            uri = uri,
+                            storagePath = dataPath ?: storagePath
+                        )
+                    }
+
                     val descriptor = PdfDescriptor(
                         uri = uri,
                         name = name,
-                        sizeBytes = size,
+                        sizeBytes = resolvedSize,
                         storagePath = storagePath,
                         createdEpochSeconds = createdEpoch,
                         lastModifiedEpochSeconds = if (lastModifiedEpoch > 0L) lastModifiedEpoch else createdEpoch
@@ -381,6 +392,14 @@ private suspend fun queryPdfDescriptor(
             }
         }
 
+        if (size <= 0L) {
+            size = resolvePdfSize(
+                contentResolver = contentResolver,
+                uri = uri,
+                storagePath = null
+            )
+        }
+
         val now = System.currentTimeMillis() / 1000L
         if (createdEpochSeconds == 0L) {
             createdEpochSeconds = if (lastModifiedEpochSeconds != 0L) lastModifiedEpochSeconds else now
@@ -398,6 +417,42 @@ private suspend fun queryPdfDescriptor(
             lastModifiedEpochSeconds = lastModifiedEpochSeconds
         )
     }
+
+private fun resolvePdfSize(
+    contentResolver: ContentResolver,
+    uri: Uri,
+    storagePath: String?
+): Long {
+    val assetDescriptorSize = runCatching {
+        contentResolver.openAssetFileDescriptor(uri, "r")?.use { descriptor ->
+            descriptor.length.coerceAtLeast(0L)
+        } ?: 0L
+    }.getOrDefault(0L)
+
+    if (assetDescriptorSize > 0L) return assetDescriptorSize
+
+    val fileDescriptorSize = runCatching {
+        contentResolver.openFileDescriptor(uri, "r")?.use { descriptor ->
+            descriptor.statSize.coerceAtLeast(0L)
+        } ?: 0L
+    }.getOrDefault(0L)
+
+    if (fileDescriptorSize > 0L) return fileDescriptorSize
+
+    if (!storagePath.isNullOrBlank()) {
+        val fileSize = runCatching {
+            File(storagePath)
+                .takeIf { it.exists() && it.isFile }
+                ?.length()
+                ?.coerceAtLeast(0L)
+                ?: 0L
+        }.getOrDefault(0L)
+
+        if (fileSize > 0L) return fileSize
+    }
+
+    return 0L
+}
 
 private suspend fun readPdfVisualData(
     context: Context,

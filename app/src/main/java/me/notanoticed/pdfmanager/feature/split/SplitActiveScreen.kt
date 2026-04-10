@@ -17,7 +17,6 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -77,18 +76,19 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import me.notanoticed.pdfmanager.core.pdf.PdfThumbnail
 import me.notanoticed.pdfmanager.core.toast.BindViewModelToasts
+import me.notanoticed.pdfmanager.feature.export.LocalPdfOutputFlow
 import me.notanoticed.pdfmanager.feature.preview.LocalPreviewNav
 import me.notanoticed.pdfmanager.ui.components.ExpandablePagesPerSheetSection
 import me.notanoticed.pdfmanager.ui.theme.Colors
 
 /* -------------------- ACTIVE SCREEN -------------------- */
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun SplitActiveScreen(
     modifier: Modifier = Modifier,
     viewModel: SplitViewModel
 ) {
     BindViewModelToasts(viewModel)
+    val pdfOutputFlow = LocalPdfOutputFlow.current
     val previewNav = LocalPreviewNav.current
     val selectedSplitPdf = viewModel.selectedSplitPdf ?: return
     val splitPlanResult = viewModel.splitPlanResult
@@ -225,7 +225,9 @@ fun SplitActiveScreen(
                     }
 
                     Button(
-                        onClick = { /* TODO: split */ },
+                        onClick = {
+                            viewModel.requestSplitExport(pdfOutputFlow::start)
+                        },
                         enabled = splitPlanResult is SplitPlanResult.Ready,
                         colors = ButtonDefaults.buttonColors(
                             containerColor = Colors.Button.red

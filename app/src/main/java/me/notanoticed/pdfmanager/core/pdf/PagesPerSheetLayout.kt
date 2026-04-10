@@ -117,74 +117,91 @@ fun buildPdfFromPageGroups(
     require(pageGroups.any { it.isNotEmpty() }) { "No source pages selected" }
 
     PDDocument().use { outputDocument ->
-        val sheetSize = PDRectangle.A4
-        val slots = buildSheetLayoutSlots(
-            sheetWidth = sheetSize.width,
-            sheetHeight = sheetSize.height,
-            pagesPerSheet = pagesPerSheet
-        )
         val layerUtility = LayerUtility(outputDocument)
 
         pageGroups.forEach { pageGroup ->
             if (pageGroup.isEmpty()) return@forEach
 
             pageGroup.chunked(pagesPerSheet.pagesPerSheet).forEach { sheetPages ->
-                val outputPage = PDPage(sheetSize)
-                outputDocument.addPage(outputPage)
-
-                PDPageContentStream(
-                    outputDocument,
-                    outputPage,
-                    PDPageContentStream.AppendMode.OVERWRITE,
-                    false,
-                    true
-                ).use { contentStream ->
-                    sheetPages.forEachIndexed { slotIndex, source ->
-                        val sourcePage = source.document.getPage(source.pageIndex)
-                        val form = layerUtility.importPageAsForm(source.document, sourcePage)
-                        val sourceBounds = form.getBBox()
-                            ?: sourcePage.getCropBox()
-                            ?: sourcePage.getMediaBox()
-
-                        val sourceWidth = sourceBounds.width.coerceAtLeast(1f)
-                        val sourceHeight = sourceBounds.height.coerceAtLeast(1f)
-                        val slot = slots[slotIndex]
-
-                        val scale = min(
-                            slot.width / sourceWidth,
-                            slot.height / sourceHeight
-                        )
-
-                        val drawnWidth = sourceWidth * scale
-                        val drawnHeight = sourceHeight * scale
-                        val slotBottom = sheetSize.height - slot.top - slot.height
-                        val translateX = slot.left +
-                            (slot.width - drawnWidth) / 2f -
-                            sourceBounds.lowerLeftX * scale
-                        val translateY = slotBottom +
-                            (slot.height - drawnHeight) / 2f -
-                            sourceBounds.lowerLeftY * scale
-
-                        contentStream.saveGraphicsState()
-                        contentStream.transform(
-                            Matrix(
-                                scale,
-                                0f,
-                                0f,
-                                scale,
-                                translateX,
-                                translateY
-                            )
-                        )
-                        contentStream.drawForm(form)
-                        contentStream.restoreGraphicsState()
-                    }
-                }
+                appendPdfSheet(
+                    outputDocument = outputDocument,
+                    layerUtility = layerUtility,
+                    sheetPages = sheetPages,
+                    pagesPerSheet = pagesPerSheet
+                )
             }
         }
 
         outputDocument.save(outputFile)
         return outputDocument.numberOfPages
+    }
+}
+
+fun appendPdfSheet(
+    outputDocument: PDDocument,
+    layerUtility: LayerUtility,
+    sheetPages: List<PdfPageSource>,
+    pagesPerSheet: PagesPerSheetOption
+) {
+    if (sheetPages.isEmpty()) return
+
+    val sheetSize = PDRectangle.A4
+    val slots = buildSheetLayoutSlots(
+        sheetWidth = sheetSize.width,
+        sheetHeight = sheetSize.height,
+        pagesPerSheet = pagesPerSheet
+    )
+
+    val outputPage = PDPage(sheetSize)
+    outputDocument.addPage(outputPage)
+
+    PDPageContentStream(
+        outputDocument,
+        outputPage,
+        PDPageContentStream.AppendMode.OVERWRITE,
+        false,
+        true
+    ).use { contentStream ->
+        sheetPages.forEachIndexed { slotIndex, source ->
+            val sourcePage = source.document.getPage(source.pageIndex)
+            val form = layerUtility.importPageAsForm(source.document, sourcePage)
+            val sourceBounds = form.getBBox()
+                ?: sourcePage.getCropBox()
+                ?: sourcePage.getMediaBox()
+
+            val sourceWidth = sourceBounds.width.coerceAtLeast(1f)
+            val sourceHeight = sourceBounds.height.coerceAtLeast(1f)
+            val slot = slots[slotIndex]
+
+            val scale = min(
+                slot.width / sourceWidth,
+                slot.height / sourceHeight
+            )
+
+            val drawnWidth = sourceWidth * scale
+            val drawnHeight = sourceHeight * scale
+            val slotBottom = sheetSize.height - slot.top - slot.height
+            val translateX = slot.left +
+                (slot.width - drawnWidth) / 2f -
+                sourceBounds.lowerLeftX * scale
+            val translateY = slotBottom +
+                (slot.height - drawnHeight) / 2f -
+                sourceBounds.lowerLeftY * scale
+
+            contentStream.saveGraphicsState()
+            contentStream.transform(
+                Matrix(
+                    scale,
+                    0f,
+                    0f,
+                    scale,
+                    translateX,
+                    translateY
+                )
+            )
+            contentStream.drawForm(form)
+            contentStream.restoreGraphicsState()
+        }
     }
 }
 

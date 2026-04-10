@@ -6,7 +6,6 @@
 
 package me.notanoticed.pdfmanager.feature.pdflist
 
-import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -32,11 +31,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import androidx.lifecycle.viewmodel.compose.viewModel
 import me.notanoticed.pdfmanager.core.pdf.model.PdfFile
 import me.notanoticed.pdfmanager.ui.theme.Colors
 import me.notanoticed.pdfmanager.ui.theme.PdfManagerTheme
-import androidx.core.net.toUri
 
 /* -------------------- OPTIONS PANEL -------------------- */
 @OptIn(ExperimentalMaterial3Api::class)
