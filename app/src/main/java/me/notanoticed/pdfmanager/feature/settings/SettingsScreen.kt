@@ -1,17 +1,19 @@
 /**
  * Settings tab UI.
  *
- * Currently a minimal placeholder screen used to reserve the tab and demonstrate layout.
+ * Contains persistent app preferences and compact app information.
  */
 
 package me.notanoticed.pdfmanager.feature.settings
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -25,18 +27,22 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ChevronRight
 import androidx.compose.material.icons.outlined.DarkMode
 import androidx.compose.material.icons.outlined.Description
-import androidx.compose.material.icons.outlined.Info
-import androidx.compose.material.icons.outlined.Notifications
+import androidx.compose.material.icons.outlined.Language
+import androidx.compose.material.icons.outlined.LocalOffer
+import androidx.compose.material.icons.outlined.OpenInNew
 import androidx.compose.material.icons.outlined.Share
-import androidx.compose.material.icons.outlined.StarOutline
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
+import androidx.compose.material3.RadioButton
+import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -56,10 +62,9 @@ import me.notanoticed.pdfmanager.ui.theme.Colors
 @Composable
 fun SettingsScreen(
     modifier: Modifier = Modifier,
-    isDarkModeEnabled: Boolean,
-    onDarkModeChange: (Boolean) -> Unit
+    viewModel: SettingsViewModel
 ) {
-    var notificationsEnabled by remember { mutableStateOf(false) }
+    var languageDialogVisible by remember { mutableStateOf(false) }
 
     LazyColumn(
         modifier = modifier.fillMaxSize(),
@@ -72,152 +77,107 @@ fun SettingsScreen(
                     icon = Icons.Outlined.DarkMode,
                     title = "Dark Mode",
                     subtitle = "Use dark theme throughout the app",
-                    checked = isDarkModeEnabled,
-                    onCheckedChange = onDarkModeChange
+                    checked = viewModel.isDarkModeEnabled,
+                    onCheckedChange = viewModel::updateDarkModeEnabled
                 )
-
-            }
-        }
-
-        item {
-            CardBlock(text = "SECURITY & PRIVACY") {
-                SwitchRow(
-                    icon = Icons.Outlined.Notifications,
-                    title = "Notifications",
-                    subtitle = "Receive notifications from the app",
-                    checked = notificationsEnabled,
-                    onCheckedChange = { notificationsEnabled = it }
+                SettingsDivider()
+                LanguageRow(
+                    selectedLanguage = viewModel.selectedLanguage,
+                    onClick = { languageDialogVisible = true }
                 )
             }
         }
 
         item {
-            CardBlock(text = "SUPPORT & FEEDBACK") {
-                ArrowRow(
-                    icon = Icons.Outlined.StarOutline,
-                    title = "Rate App",
-                    subtitle = "Rate PDF Manager on the Google Play"
-                    // TODO: add rate logic
+            CardBlock(text = "MORE") {
+                ActionRow(
+                    icon = Icons.Outlined.LocalOffer,
+                    title = "License",
+                    subtitle = "GNU GPL v3",
+                    onClick = viewModel::openLicense
                 )
-                HorizontalDivider(
-                    color = Colors.Border.default,
-                    thickness = 0.5.dp,
-                    modifier = Modifier.fillMaxWidth()
+                SettingsDivider()
+                ActionRow(
+                    icon = Icons.Outlined.OpenInNew,
+                    title = "GitHub",
+                    subtitle = PROJECT_REPOSITORY_URL,
+                    onClick = viewModel::openRepository
                 )
-                ArrowRow(
+                SettingsDivider()
+                ActionRow(
                     icon = Icons.Outlined.Share,
                     title = "Share App",
-                    subtitle = "Tell others about PDF Manager"
-                    // TODO: add share logic
-                )
-                HorizontalDivider(
-                    color = Colors.Border.default,
-                    thickness = 0.5.dp,
-                    modifier = Modifier.fillMaxWidth()
-                )
-                ArrowRow(
-                    icon = Icons.Outlined.Info,
-                    title = "About",
-                    subtitle = "Version info and app details",
-                    // TODO: add about logic
+                    subtitle = "Tell others about PDF Manager",
+                    onClick = viewModel::shareApp
                 )
             }
         }
 
         item {
-            Surface(
-                modifier = Modifier.fillMaxWidth(),
-                color = Colors.Surface.card,
-                shape = RoundedCornerShape(16.dp)
-            ) {
-                Column(
-                    modifier = Modifier.padding(20.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Box (
-                        modifier = Modifier
-                            .size(54.dp)
-                            .clip(CircleShape)
-                            .background(Colors.Primary.blue),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Icon(
-                            imageVector = Icons.Outlined.Description,
-                            contentDescription = null,
-                            tint = Colors.Icon.white,
-                            modifier = Modifier.fillMaxSize(0.5f)
-                        )
-                    }
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(text = "PDF Manager", color = Colors.Text.primary, fontWeight = FontWeight.SemiBold)
-                    Text(text = "Version ${BuildConfig.VERSION_NAME}", color = Colors.Text.secondary, fontSize = 12.sp)
-                    Text(text = "Your complete PDF toolkit", color = Colors.Text.secondary, fontSize = 12.sp)
-                }
-            }
+            AppInfoCard()
         }
     }
+
+    LanguageDialog(
+        visible = languageDialogVisible,
+        selectedLanguage = viewModel.selectedLanguage,
+        onDismiss = { languageDialogVisible = false },
+        onLanguageClick = { language ->
+            viewModel.updateLanguage(language)
+            languageDialogVisible = false
+        }
+    )
 }
 
 @Composable
-fun SectionHeader(text: String) {
+private fun SectionHeader(text: String) {
     Text(
         text = text,
         color = Colors.Text.secondary,
         fontSize = 12.sp,
         fontWeight = FontWeight.SemiBold,
-        modifier = Modifier
-            .padding(start = 16.dp)
-
+        modifier = Modifier.padding(start = 16.dp)
     )
 }
 
 @Composable
-fun CardBlock(text: String, content: @Composable ColumnScope.() -> Unit = {}) {
+private fun CardBlock(
+    text: String,
+    content: @Composable ColumnScope.() -> Unit
+) {
     SectionHeader(text = text)
     Surface(
         color = Colors.Surface.card,
         shape = RoundedCornerShape(16.dp)
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth(),
             content = content
         )
     }
 }
 
 @Composable
-fun SwitchRow(
+private fun SettingsDivider() {
+    HorizontalDivider(
+        color = Colors.Border.default,
+        thickness = 0.5.dp,
+        modifier = Modifier.fillMaxWidth()
+    )
+}
+
+@Composable
+private fun SwitchRow(
     icon: ImageVector,
     title: String,
     subtitle: String,
-    checked: Boolean = false,
-    onCheckedChange: (Boolean) -> Unit = {}
+    checked: Boolean,
+    onCheckedChange: (Boolean) -> Unit
 ) {
-    ListItem(
-        leadingContent = {
-            Box(
-                modifier = Modifier
-                    .size(36.dp)
-                    .clip(CircleShape)
-                    .background(Colors.Surface.thumbnail)
-            ) {
-                Icon(
-                    imageVector = icon,
-                    contentDescription = null,
-                    tint = Colors.Icon.default,
-                    modifier = Modifier
-                        .fillMaxSize(0.65f)
-                        .align(Alignment.Center)
-                )
-            }
-        },
-        headlineContent = {
-            Text(text = title, color = Colors.Text.primary, fontWeight = FontWeight.SemiBold) }
-        ,
-        supportingContent = {
-            Text(text = subtitle, color = Colors.Text.secondary, fontSize = 12.sp)
-        },
+    BaseSettingsRow(
+        icon = icon,
+        title = title,
+        subtitle = subtitle,
         trailingContent = {
             Switch(
                 checked = checked,
@@ -228,57 +188,243 @@ fun SwitchRow(
                     uncheckedThumbColor = Colors.Primary.white,
                     uncheckedTrackColor = Colors.Primary.slateGray,
                     uncheckedBorderColor = Colors.Border.gray
-                ),
+                )
             )
-        },
-        colors = ListItemDefaults.colors(
-            containerColor = Colors.Surface.card
-        ),
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 4.dp)
+        }
     )
 }
 
 @Composable
-fun ArrowRow(icon: ImageVector, title: String, subtitle: String) {
-    ListItem(
-        leadingContent = {
-            Box(
-                modifier = Modifier
-                    .size(36.dp)
-                    .clip(CircleShape)
-                    .background(Colors.Surface.thumbnail)
+private fun LanguageRow(
+    selectedLanguage: AppLanguage,
+    onClick: () -> Unit
+) {
+    BaseSettingsRow(
+        icon = Icons.Outlined.Language,
+        title = "Language",
+        subtitle = "Choose application language",
+        clickable = true,
+        onClick = onClick,
+        trailingContent = {
+            Row(
+                verticalAlignment = Alignment.CenterVertically
             ) {
+                Text(
+                    text = selectedLanguage.displayName,
+                    color = Colors.Text.blue,
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.SemiBold
+                )
                 Icon(
-                    imageVector = icon,
+                    imageVector = Icons.Outlined.ChevronRight,
                     contentDescription = null,
-                    tint = Colors.Icon.default,
-                    modifier = Modifier
-                        .fillMaxSize(0.65f)
-                        .align(Alignment.Center)
+                    tint = Colors.Text.secondary
                 )
             }
+        }
+    )
+}
+
+@Composable
+private fun AppInfoCard() {
+    Surface(
+        modifier = Modifier.fillMaxWidth(),
+        color = Colors.Surface.card,
+        shape = RoundedCornerShape(16.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(20.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(54.dp)
+                    .clip(CircleShape)
+                    .background(Colors.Primary.blue),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = Icons.Outlined.Description,
+                    contentDescription = null,
+                    tint = Colors.Icon.white,
+                    modifier = Modifier.fillMaxSize(0.5f)
+                )
+            }
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = "PDF Manager",
+                color = Colors.Text.primary,
+                fontWeight = FontWeight.SemiBold
+            )
+            Text(
+                text = "Version ${BuildConfig.VERSION_NAME}",
+                color = Colors.Text.secondary,
+                fontSize = 12.sp
+            )
+            Text(
+                text = "Your complete PDF toolkit",
+                color = Colors.Text.secondary,
+                fontSize = 12.sp
+            )
+        }
+    }
+}
+
+@Composable
+private fun LanguageDialog(
+    visible: Boolean,
+    selectedLanguage: AppLanguage,
+    onDismiss: () -> Unit,
+    onLanguageClick: (AppLanguage) -> Unit
+) {
+    if (!visible) return
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        containerColor = Colors.Surface.card,
+        title = {
+            Text(
+                text = "Language",
+                color = Colors.Text.primary,
+                fontWeight = FontWeight.SemiBold
+            )
         },
-        headlineContent = {
-            Text(text = title, color = Colors.Text.primary, fontWeight = FontWeight.SemiBold) }
-        ,
-        supportingContent = {
-            Text(text = subtitle, color = Colors.Text.secondary, fontSize = 12.sp)
+        text = {
+            Column {
+                AppLanguage.options.forEach { language ->
+                    LanguageOptionRow(
+                        language = language,
+                        selected = language == selectedLanguage,
+                        onClick = { onLanguageClick(language) }
+                    )
+                }
+            }
         },
+        confirmButton = {
+            TextButton(onClick = onDismiss) {
+                Text(
+                    text = "Cancel",
+                    color = Colors.Primary.blue
+                )
+            }
+        }
+    )
+}
+
+@Composable
+private fun LanguageOptionRow(
+    language: AppLanguage,
+    selected: Boolean,
+    onClick: () -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick)
+            .padding(vertical = 10.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        RadioButton(
+            selected = selected,
+            onClick = onClick,
+            colors = RadioButtonDefaults.colors(
+                selectedColor = Colors.Primary.blue,
+                unselectedColor = Colors.Icon.default
+            )
+        )
+        Text(
+            text = language.displayName,
+            color = Colors.Text.primary,
+            fontWeight = FontWeight.Medium
+        )
+    }
+}
+
+@Composable
+private fun ActionRow(
+    icon: ImageVector,
+    title: String,
+    subtitle: String,
+    onClick: () -> Unit
+) {
+    BaseSettingsRow(
+        icon = icon,
+        title = title,
+        subtitle = subtitle,
+        clickable = true,
+        onClick = onClick,
         trailingContent = {
             Icon(
                 imageVector = Icons.Outlined.ChevronRight,
                 contentDescription = null,
                 tint = Colors.Text.secondary
             )
+        }
+    )
+}
+
+@Composable
+private fun BaseSettingsRow(
+    icon: ImageVector,
+    title: String,
+    subtitle: String,
+    clickable: Boolean = false,
+    onClick: () -> Unit = {},
+    trailingContent: @Composable (() -> Unit)? = null
+) {
+    val rowModifier = if (clickable) {
+        Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick)
+            .padding(vertical = 4.dp)
+    } else {
+        Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp)
+    }
+
+    ListItem(
+        leadingContent = {
+            SettingsIcon(icon = icon)
         },
+        headlineContent = {
+            Text(
+                text = title,
+                color = Colors.Text.primary,
+                fontWeight = FontWeight.SemiBold
+            )
+        },
+        supportingContent = {
+            Text(
+                text = subtitle,
+                color = Colors.Text.secondary,
+                fontSize = 12.sp
+            )
+        },
+        trailingContent = trailingContent,
         colors = ListItemDefaults.colors(
             containerColor = Colors.Surface.card
         ),
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 4.dp)
+        modifier = rowModifier
     )
+}
+
+@Composable
+private fun SettingsIcon(icon: ImageVector) {
+    Box(
+        modifier = Modifier
+            .size(36.dp)
+            .clip(CircleShape)
+            .background(Colors.Surface.thumbnail)
+    ) {
+        Icon(
+            imageVector = icon,
+            contentDescription = null,
+            tint = Colors.Icon.default,
+            modifier = Modifier
+                .fillMaxSize(0.65f)
+                .align(Alignment.Center)
+        )
+    }
 }
 /* ------------------------------------------------ */

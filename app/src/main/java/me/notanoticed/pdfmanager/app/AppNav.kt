@@ -21,11 +21,21 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
+import kotlinx.coroutines.launch
+import me.notanoticed.pdfmanager.feature.export.ProvidePdfOutputFlow
+import me.notanoticed.pdfmanager.feature.images.ImageActiveScreen
+import me.notanoticed.pdfmanager.feature.images.ImagesScreen
+import me.notanoticed.pdfmanager.feature.images.ImagesViewModel
 import me.notanoticed.pdfmanager.feature.merge.MergeActiveScreen
 import me.notanoticed.pdfmanager.feature.merge.MergeScreen
 import me.notanoticed.pdfmanager.feature.merge.MergeViewModel
+import me.notanoticed.pdfmanager.feature.pdflist.DeletePdfDialog
+import me.notanoticed.pdfmanager.feature.pdflist.OptionsOverlay
+import me.notanoticed.pdfmanager.feature.pdflist.PdfDetailsOverlay
 import me.notanoticed.pdfmanager.feature.pdflist.PdfListScreen
+import me.notanoticed.pdfmanager.feature.pdflist.PdfListSelectionBottomBar
 import me.notanoticed.pdfmanager.feature.pdflist.PdfListViewModel
+import me.notanoticed.pdfmanager.feature.pdflist.RenamePdfDialog
 import me.notanoticed.pdfmanager.feature.settings.SettingsScreen
 import me.notanoticed.pdfmanager.feature.settings.SettingsViewModel
 import me.notanoticed.pdfmanager.feature.split.SplitActiveScreen
@@ -33,16 +43,6 @@ import me.notanoticed.pdfmanager.feature.split.SplitScreen
 import me.notanoticed.pdfmanager.feature.split.SplitViewModel
 import me.notanoticed.pdfmanager.ui.theme.Colors
 import me.notanoticed.pdfmanager.ui.theme.PdfManagerTheme
-import kotlinx.coroutines.launch
-import me.notanoticed.pdfmanager.feature.images.ImageActiveScreen
-import me.notanoticed.pdfmanager.feature.images.ImagesScreen
-import me.notanoticed.pdfmanager.feature.images.ImagesViewModel
-import me.notanoticed.pdfmanager.feature.export.ProvidePdfOutputFlow
-import me.notanoticed.pdfmanager.feature.pdflist.DeletePdfDialog
-import me.notanoticed.pdfmanager.feature.pdflist.OptionsOverlay
-import me.notanoticed.pdfmanager.feature.pdflist.PdfDetailsOverlay
-import me.notanoticed.pdfmanager.feature.pdflist.PdfListSelectionBottomBar
-import me.notanoticed.pdfmanager.feature.pdflist.RenamePdfDialog
 
 /* -------------------- APP -------------------- */
 @Composable
@@ -151,10 +151,7 @@ private fun AppContent(settingsViewModel: SettingsViewModel) {
                                     ImagesScreen(viewModel = imagesViewModel)
                                 }
                             }
-                            Screen.Settings.route -> SettingsScreen(
-                                isDarkModeEnabled = settingsViewModel.isDarkModeEnabled,
-                                onDarkModeChange = settingsViewModel::updateDarkModeEnabled
-                            )
+                            Screen.Settings.route -> SettingsScreen(viewModel = settingsViewModel)
                         }
                     }
                 }
