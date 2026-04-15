@@ -8,12 +8,15 @@
 
 package me.notanoticed.pdfmanager.app
 
+import android.content.ClipData
+import android.content.Context
 import android.content.Intent
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.platform.LocalContext
 import me.notanoticed.pdfmanager.core.pdf.PdfDocumentActions
+import me.notanoticed.pdfmanager.core.pdf.model.PdfFile
 import me.notanoticed.pdfmanager.core.toast.rememberToast
 import me.notanoticed.pdfmanager.feature.merge.MergeViewModel
 import me.notanoticed.pdfmanager.feature.pdflist.PdfListEvent
@@ -65,22 +68,30 @@ fun PdfListEventHandler(
                 handleAfterNavigation(pdfListViewModel, clearSelection = false)
             }
             is PdfListEvent.OpenDeleteDialog -> {
-                pdfListViewModel.showDeleteDialog(event.pdf)
+                pdfListViewModel.showDeleteDialog(event.pdfs)
                 handleAfterNavigation(pdfListViewModel, clearSelection = false)
             }
             is PdfListEvent.SharePdf -> {
                 runCatching {
-                    val shareIntent = Intent(Intent.ACTION_SEND).apply {
-                        type = "application/pdf"
-                        putExtra(Intent.EXTRA_STREAM, event.pdf.uri)
-                        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                    }
-
-                    val chooser = Intent.createChooser(shareIntent, "Share PDF").apply {
-                        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                    }
-
-                    context.startActivity(chooser)
+                    context.startActivity(
+                        buildShareIntent(
+                            context = context,
+                            pdfs = listOf(event.pdf)
+                        )
+                    )
+                }.onFailure {
+                    toast("Failed to open share menu")
+                }
+                handleAfterNavigation(pdfListViewModel, clearSelection = false)
+            }
+            is PdfListEvent.SharePdfs -> {
+                runCatching {
+                    context.startActivity(
+                        buildShareIntent(
+                            context = context,
+                            pdfs = event.pdfs
+                        )
+                    )
                 }.onFailure {
                     toast("Failed to open share menu")
                 }
@@ -100,6 +111,44 @@ fun PdfListEventHandler(
             }
             null -> Unit
         }
+    }
+}
+
+
+private fun buildShareIntent(
+    context: Context,
+    pdfs: List<PdfFile>
+): Intent {
+    val shareIntent = if (pdfs.size == 1) {
+        Intent(Intent.ACTION_SEND).apply {
+            type = "application/pdf"
+            putExtra(Intent.EXTRA_STREAM, pdfs.first().uri)
+        }
+    } else {
+        Intent(Intent.ACTION_SEND_MULTIPLE).apply {
+            type = "application/pdf"
+            putParcelableArrayListExtra(Intent.EXTRA_STREAM, ArrayList(pdfs.map { it.uri }))
+        }
+    }
+
+    val clipData = ClipData.newUri(
+        context.contentResolver,
+        pdfs.first().name,
+        pdfs.first().uri
+    ).apply {
+        pdfs.drop(1).forEach { pdf ->
+            addItem(ClipData.Item(pdf.uri))
+        }
+    }
+
+    shareIntent.clipData = clipData
+    shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+
+    return Intent.createChooser(
+        shareIntent,
+        if (pdfs.size == 1) "Share PDF" else "Share PDFs"
+    ).apply {
+        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
     }
 }
 

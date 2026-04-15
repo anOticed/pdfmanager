@@ -72,7 +72,8 @@ fun RenamePdfDialog(
 @Composable
 fun DeletePdfDialog(
     visible: Boolean,
-    fileName: String,
+    fileName: String?,
+    fileCount: Int,
     isProcessing: Boolean,
     onDismiss: () -> Unit,
     onConfirm: () -> Unit
@@ -91,13 +92,21 @@ fun DeletePdfDialog(
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 Text(
-                    text = "This action permanently removes the selected PDF.",
+                    text = if (fileCount == 1) {
+                        "This action permanently removes the selected PDF."
+                    } else {
+                        "This action permanently removes the selected PDFs."
+                    },
                     color = Colors.Text.secondary,
                     fontSize = 13.sp
                 )
 
                 Text(
-                    text = "\"$fileName\"",
+                    text = if (fileCount == 1) {
+                        "\"${fileName.orEmpty()}\""
+                    } else {
+                        "$fileCount PDFs selected"
+                    },
                     color = Colors.Text.primary,
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Medium

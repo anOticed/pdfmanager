@@ -227,7 +227,7 @@ class PdfListViewModel : ViewModel(), ToastBindable {
             PdfFileOptionAction.PRINT -> PdfListEvent.PrintPdf(pdf)
             PdfFileOptionAction.SHARE -> PdfListEvent.SharePdf(pdf)
             PdfFileOptionAction.DETAILS -> PdfListEvent.OpenDetails(pdf)
-            PdfFileOptionAction.DELETE -> PdfListEvent.OpenDeleteDialog(pdf)
+            PdfFileOptionAction.DELETE -> PdfListEvent.OpenDeleteDialog(listOf(pdf))
             else -> null
         }
     }
@@ -248,7 +248,7 @@ class PdfListViewModel : ViewModel(), ToastBindable {
     var deleteDialogVisible by mutableStateOf(false)
         private set
 
-    var deleteDialogPdf: PdfFile? by mutableStateOf(null)
+    var deleteDialogPdfs by mutableStateOf<List<PdfFile>>(emptyList())
         private set
 
     var isFileActionInProgress by mutableStateOf(false)
@@ -304,39 +304,57 @@ class PdfListViewModel : ViewModel(), ToastBindable {
         }
     }
 
-    fun showDeleteDialog(pdf: PdfFile) {
-        deleteDialogPdf = pdf
+    fun showDeleteDialog(pdfs: List<PdfFile>) {
+        if (pdfs.isEmpty()) return
+
+        deleteDialogPdfs = pdfs
         deleteDialogVisible = true
     }
 
     fun closeDeleteDialog() {
         deleteDialogVisible = false
-        deleteDialogPdf = null
+        deleteDialogPdfs = emptyList()
     }
 
     fun confirmDelete(context: Context) {
-        val pdf = deleteDialogPdf ?: return
+        val pdfs = deleteDialogPdfs
+        if (pdfs.isEmpty()) return
         if (isFileActionInProgress) return
 
         viewModelScope.launch {
             isFileActionInProgress = true
 
-            val deleted = withContext(Dispatchers.IO) {
-                PdfDocumentActions.deletePdf(context, pdf)
+            val deletedCount = withContext(Dispatchers.IO) {
+                pdfs.count { pdf ->
+                    PdfDocumentActions.deletePdf(context, pdf)
+                }
             }
 
             isFileActionInProgress = false
 
-            if (!deleted) {
-                showToast("Failed to delete PDF")
+            if (deletedCount <= 0) {
+                showToast(
+                    if (pdfs.size == 1) "Failed to delete PDF"
+                    else "Failed to delete selected PDFs"
+                )
                 return@launch
             }
 
             closeDeleteDialog()
-            if (detailsPanelPdf?.uri == pdf.uri) {
+            if (detailsPanelPdf?.uri in pdfs.map { it.uri }.toSet()) {
                 closeDetails()
             }
-            showToast("PDF deleted successfully")
+
+            if (deletedCount == pdfs.size) {
+                showToast(
+                    if (pdfs.size == 1) "PDF deleted successfully"
+                    else "Selected PDFs deleted successfully"
+                )
+                exitSelectionMode()
+            } else {
+                showToast("Deleted $deletedCount of ${pdfs.size} PDFs")
+            }
+
             loadAll(context)
         }
     }
@@ -434,8 +452,18 @@ class PdfListViewModel : ViewModel(), ToastBindable {
 
         pendingEvent = PdfListEvent.OpenMerge(selectedPdfFiles.toList())
     }
-    fun shareSelected() { /* TODO */ }
-    fun deleteSelectedPdfs() { /* TODO */ }
+
+    fun shareSelected() {
+        if (selectedPdfFiles.isEmpty()) return
+
+        pendingEvent = PdfListEvent.SharePdfs(selectedPdfFiles.toList())
+    }
+
+    fun deleteSelectedPdfs() {
+        if (selectedPdfFiles.isEmpty()) return
+
+        pendingEvent = PdfListEvent.OpenDeleteDialog(selectedPdfFiles.toList())
+    }
     /* --------------------------------------------------- */
 }
 

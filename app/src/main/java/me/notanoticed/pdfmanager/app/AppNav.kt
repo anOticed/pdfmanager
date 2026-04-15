@@ -185,7 +185,8 @@ private fun AppContent(settingsViewModel: SettingsViewModel) {
 
                 DeletePdfDialog(
                     visible = pdfListViewModel.deleteDialogVisible,
-                    fileName = pdfListViewModel.deleteDialogPdf?.name.orEmpty(),
+                    fileName = pdfListViewModel.deleteDialogPdfs.firstOrNull()?.name,
+                    fileCount = pdfListViewModel.deleteDialogPdfs.size,
                     isProcessing = pdfListViewModel.isFileActionInProgress,
                     onDismiss = { pdfListViewModel.closeDeleteDialog() },
                     onConfirm = { pdfListViewModel.confirmDelete(context) }
