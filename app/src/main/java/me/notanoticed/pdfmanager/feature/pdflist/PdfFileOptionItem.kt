@@ -9,6 +9,7 @@ import androidx.compose.material.icons.outlined.CallMerge
 import androidx.compose.material.icons.outlined.CallSplit
 import androidx.compose.material.icons.outlined.Compress
 import androidx.compose.material.icons.outlined.Delete
+import androidx.compose.material.icons.outlined.Description
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Lock
@@ -23,6 +24,7 @@ import me.notanoticed.pdfmanager.ui.theme.Colors
 /* -------------------- FILE OPTIONS -------------------- */
 enum class PdfFileOptionAction {
     RENAME,
+    EDIT_METADATA,
     MERGE,
     SPLIT,
     COMPRESS,
@@ -50,6 +52,12 @@ val pdfFileOptionItems: List<PdfFileOptionItem> = listOf(
         title = "Rename",
         icon = Icons.Outlined.Edit,
         tint = Colors.Icon.rename
+    ),
+    PdfFileOptionItem(
+        action = PdfFileOptionAction.EDIT_METADATA,
+        title = "Edit metadata",
+        icon = Icons.Outlined.Description,
+        tint = Colors.Icon.blue
     ),
     PdfFileOptionItem(
         action = PdfFileOptionAction.MERGE,

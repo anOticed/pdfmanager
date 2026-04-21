@@ -16,6 +16,7 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
 import me.notanoticed.pdfmanager.core.pdf.PdfRepository
 import me.notanoticed.pdfmanager.core.pdf.PdfDocumentActions
+import me.notanoticed.pdfmanager.core.pdf.model.PdfDocumentMetadata
 import me.notanoticed.pdfmanager.core.pdf.model.PdfFile
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -222,6 +223,7 @@ class PdfListViewModel : ViewModel(), ToastBindable {
     fun onFileOptionSelected(action: PdfFileOptionAction, pdf: PdfFile) {
         pendingEvent = when (action) {
             PdfFileOptionAction.RENAME -> PdfListEvent.OpenRenameDialog(pdf)
+            PdfFileOptionAction.EDIT_METADATA -> PdfListEvent.OpenMetadataDialog(pdf)
             PdfFileOptionAction.MERGE -> PdfListEvent.OpenMerge(listOf(pdf))
             PdfFileOptionAction.SPLIT -> PdfListEvent.OpenSplit(pdf)
             PdfFileOptionAction.PRINT -> PdfListEvent.PrintPdf(pdf)
@@ -251,8 +253,31 @@ class PdfListViewModel : ViewModel(), ToastBindable {
     var deleteDialogPdfs by mutableStateOf<List<PdfFile>>(emptyList())
         private set
 
+    var metadataDialogVisible by mutableStateOf(false)
+        private set
+
+    var metadataDialogPdf: PdfFile? by mutableStateOf(null)
+        private set
+
+    var metadataTitleInput by mutableStateOf("")
+        private set
+
+    var metadataAuthorInput by mutableStateOf("")
+        private set
+
+    var metadataSubjectInput by mutableStateOf("")
+        private set
+
+    var metadataKeywordsInput by mutableStateOf("")
+        private set
+
+    var isMetadataLoading by mutableStateOf(false)
+        private set
+
     var isFileActionInProgress by mutableStateOf(false)
         private set
+
+    private var originalMetadata = PdfDocumentMetadata()
 
     fun showRenameDialog(pdf: PdfFile) {
         renameDialogPdf = pdf
@@ -268,6 +293,110 @@ class PdfListViewModel : ViewModel(), ToastBindable {
 
     fun updateRenameInput(value: String) {
         renameInput = value
+    }
+
+    fun showMetadataDialog(context: Context, pdf: PdfFile) {
+        metadataDialogPdf = pdf
+        metadataDialogVisible = true
+        isMetadataLoading = true
+        isFileActionInProgress = false
+        originalMetadata = PdfDocumentMetadata()
+        metadataTitleInput = ""
+        metadataAuthorInput = ""
+        metadataSubjectInput = ""
+        metadataKeywordsInput = ""
+
+        viewModelScope.launch {
+            val metadata = withContext(Dispatchers.IO) {
+                runCatching {
+                    PdfDocumentActions.readPdfMetadata(
+                        context = context,
+                        pdfUri = pdf.uri
+                    )
+                }.getOrNull()
+            }
+
+            isMetadataLoading = false
+
+            if (metadata == null) {
+                closeMetadataDialog()
+                showToast("Failed to load PDF metadata")
+                return@launch
+            }
+
+            originalMetadata = metadata.normalized()
+            metadataTitleInput = metadata.title
+            metadataAuthorInput = metadata.author
+            metadataSubjectInput = metadata.subject
+            metadataKeywordsInput = metadata.keywords
+        }
+    }
+
+    fun closeMetadataDialog() {
+        metadataDialogVisible = false
+        metadataDialogPdf = null
+        metadataTitleInput = ""
+        metadataAuthorInput = ""
+        metadataSubjectInput = ""
+        metadataKeywordsInput = ""
+        isMetadataLoading = false
+        originalMetadata = PdfDocumentMetadata()
+    }
+
+    fun updateMetadataTitle(value: String) {
+        metadataTitleInput = value
+    }
+
+    fun updateMetadataAuthor(value: String) {
+        metadataAuthorInput = value
+    }
+
+    fun updateMetadataSubject(value: String) {
+        metadataSubjectInput = value
+    }
+
+    fun updateMetadataKeywords(value: String) {
+        metadataKeywordsInput = value
+    }
+
+    fun confirmMetadataUpdate(context: Context) {
+        val pdf = metadataDialogPdf ?: return
+        if (isMetadataLoading || isFileActionInProgress) return
+
+        val updatedMetadata = PdfDocumentMetadata(
+            title = metadataTitleInput,
+            author = metadataAuthorInput,
+            subject = metadataSubjectInput,
+            keywords = metadataKeywordsInput
+        ).normalized()
+
+        if (updatedMetadata == originalMetadata) {
+            closeMetadataDialog()
+            return
+        }
+
+        viewModelScope.launch {
+            isFileActionInProgress = true
+
+            val updated = withContext(Dispatchers.IO) {
+                PdfDocumentActions.updatePdfMetadata(
+                    context = context,
+                    pdf = pdf,
+                    metadata = updatedMetadata
+                )
+            }
+
+            isFileActionInProgress = false
+
+            if (!updated) {
+                showToast("Failed to update PDF metadata")
+                return@launch
+            }
+
+            closeMetadataDialog()
+            showToast("PDF metadata updated successfully")
+            loadAll(context)
+        }
     }
 
     fun confirmRename(context: Context) {

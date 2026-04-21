@@ -114,6 +114,7 @@ private fun isOptionVisible(action: PdfFileOptionAction, isLocked: Boolean): Boo
         PdfFileOptionAction.SET_PASSWORD -> !isLocked
         PdfFileOptionAction.REMOVE_PASSWORD -> isLocked
 
+        PdfFileOptionAction.EDIT_METADATA,
         PdfFileOptionAction.MERGE,
         PdfFileOptionAction.SPLIT,
         PdfFileOptionAction.COMPRESS,

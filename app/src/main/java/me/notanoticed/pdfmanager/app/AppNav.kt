@@ -30,6 +30,7 @@ import me.notanoticed.pdfmanager.feature.merge.MergeActiveScreen
 import me.notanoticed.pdfmanager.feature.merge.MergeScreen
 import me.notanoticed.pdfmanager.feature.merge.MergeViewModel
 import me.notanoticed.pdfmanager.feature.pdflist.DeletePdfDialog
+import me.notanoticed.pdfmanager.feature.pdflist.EditPdfMetadataDialog
 import me.notanoticed.pdfmanager.feature.pdflist.OptionsOverlay
 import me.notanoticed.pdfmanager.feature.pdflist.PdfDetailsOverlay
 import me.notanoticed.pdfmanager.feature.pdflist.PdfListScreen
@@ -181,6 +182,12 @@ private fun AppContent(settingsViewModel: SettingsViewModel) {
                     onValueChange = pdfListViewModel::updateRenameInput,
                     onDismiss = { pdfListViewModel.closeRenameDialog() },
                     onConfirm = { pdfListViewModel.confirmRename(context) }
+                )
+
+                EditPdfMetadataDialog(
+                    viewModel = pdfListViewModel,
+                    onDismiss = { pdfListViewModel.closeMetadataDialog() },
+                    onConfirm = { pdfListViewModel.confirmMetadataUpdate(context) }
                 )
 
                 DeletePdfDialog(

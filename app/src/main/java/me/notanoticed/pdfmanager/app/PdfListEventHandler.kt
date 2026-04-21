@@ -63,6 +63,10 @@ fun PdfListEventHandler(
                 pdfListViewModel.openDetails(event.pdf)
                 handleAfterNavigation(pdfListViewModel, clearSelection = false)
             }
+            is PdfListEvent.OpenMetadataDialog -> {
+                pdfListViewModel.showMetadataDialog(context, event.pdf)
+                handleAfterNavigation(pdfListViewModel, clearSelection = false)
+            }
             is PdfListEvent.OpenRenameDialog -> {
                 pdfListViewModel.showRenameDialog(event.pdf)
                 handleAfterNavigation(pdfListViewModel, clearSelection = false)
