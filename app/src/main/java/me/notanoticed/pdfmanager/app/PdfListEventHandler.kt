@@ -67,6 +67,14 @@ fun PdfListEventHandler(
                 pdfListViewModel.showMetadataDialog(context, event.pdf)
                 handleAfterNavigation(pdfListViewModel, clearSelection = false)
             }
+            is PdfListEvent.OpenSetPasswordDialog -> {
+                pdfListViewModel.showSetPasswordDialog(event.pdf)
+                handleAfterNavigation(pdfListViewModel, clearSelection = false)
+            }
+            is PdfListEvent.OpenRemovePasswordDialog -> {
+                pdfListViewModel.showRemovePasswordDialog(event.pdf)
+                handleAfterNavigation(pdfListViewModel, clearSelection = false)
+            }
             is PdfListEvent.OpenRenameDialog -> {
                 pdfListViewModel.showRenameDialog(event.pdf)
                 handleAfterNavigation(pdfListViewModel, clearSelection = false)

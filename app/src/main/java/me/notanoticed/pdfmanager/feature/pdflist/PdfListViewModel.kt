@@ -16,6 +16,7 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
 import me.notanoticed.pdfmanager.core.pdf.PdfRepository
 import me.notanoticed.pdfmanager.core.pdf.PdfDocumentActions
+import me.notanoticed.pdfmanager.core.pdf.PdfPasswordActionResult
 import me.notanoticed.pdfmanager.core.pdf.model.PdfDocumentMetadata
 import me.notanoticed.pdfmanager.core.pdf.model.PdfFile
 import kotlinx.coroutines.Job
@@ -24,6 +25,11 @@ import kotlinx.coroutines.withContext
 import me.notanoticed.pdfmanager.core.toast.ToastBindable
 
 class PdfListViewModel : ViewModel(), ToastBindable {
+    enum class PasswordDialogMode {
+        SET,
+        REMOVE
+    }
+
     private var toast: ((String) -> Unit)? = null
 
     override fun bindToast(toast: (String) -> Unit) {
@@ -226,6 +232,8 @@ class PdfListViewModel : ViewModel(), ToastBindable {
             PdfFileOptionAction.EDIT_METADATA -> PdfListEvent.OpenMetadataDialog(pdf)
             PdfFileOptionAction.MERGE -> PdfListEvent.OpenMerge(listOf(pdf))
             PdfFileOptionAction.SPLIT -> PdfListEvent.OpenSplit(pdf)
+            PdfFileOptionAction.SET_PASSWORD -> PdfListEvent.OpenSetPasswordDialog(pdf)
+            PdfFileOptionAction.REMOVE_PASSWORD -> PdfListEvent.OpenRemovePasswordDialog(pdf)
             PdfFileOptionAction.PRINT -> PdfListEvent.PrintPdf(pdf)
             PdfFileOptionAction.SHARE -> PdfListEvent.SharePdf(pdf)
             PdfFileOptionAction.DETAILS -> PdfListEvent.OpenDetails(pdf)
@@ -269,6 +277,18 @@ class PdfListViewModel : ViewModel(), ToastBindable {
         private set
 
     var metadataKeywordsInput by mutableStateOf("")
+        private set
+
+    var passwordDialogMode: PasswordDialogMode? by mutableStateOf(null)
+        private set
+
+    var passwordDialogPdf: PdfFile? by mutableStateOf(null)
+        private set
+
+    var passwordPrimaryInput by mutableStateOf("")
+        private set
+
+    var passwordConfirmInput by mutableStateOf("")
         private set
 
     var isMetadataLoading by mutableStateOf(false)
@@ -357,6 +377,122 @@ class PdfListViewModel : ViewModel(), ToastBindable {
 
     fun updateMetadataKeywords(value: String) {
         metadataKeywordsInput = value
+    }
+
+    fun showSetPasswordDialog(pdf: PdfFile) {
+        passwordDialogMode = PasswordDialogMode.SET
+        passwordDialogPdf = pdf
+        passwordPrimaryInput = ""
+        passwordConfirmInput = ""
+        isFileActionInProgress = false
+    }
+
+    fun showRemovePasswordDialog(pdf: PdfFile) {
+        passwordDialogMode = PasswordDialogMode.REMOVE
+        passwordDialogPdf = pdf
+        passwordPrimaryInput = ""
+        passwordConfirmInput = ""
+        isFileActionInProgress = false
+    }
+
+    fun closePasswordDialog() {
+        passwordDialogMode = null
+        passwordDialogPdf = null
+        passwordPrimaryInput = ""
+        passwordConfirmInput = ""
+    }
+
+    fun updatePasswordPrimaryInput(value: String) {
+        passwordPrimaryInput = value
+    }
+
+    fun updatePasswordConfirmInput(value: String) {
+        passwordConfirmInput = value
+    }
+
+    fun confirmPasswordAction(context: Context) {
+        val pdf = passwordDialogPdf ?: return
+        val mode = passwordDialogMode ?: return
+        if (isFileActionInProgress) return
+
+        when (mode) {
+            PasswordDialogMode.SET -> {
+                val password = passwordPrimaryInput.trim()
+                val confirmation = passwordConfirmInput.trim()
+
+                if (password.isBlank()) {
+                    showToast("Enter a password first")
+                    return
+                }
+
+                if (password != confirmation) {
+                    showToast("Passwords do not match")
+                    return
+                }
+
+                viewModelScope.launch {
+                    isFileActionInProgress = true
+
+                    val updated = withContext(Dispatchers.IO) {
+                        PdfDocumentActions.setPdfPassword(
+                            context = context,
+                            pdf = pdf,
+                            password = password
+                        )
+                    }
+
+                    isFileActionInProgress = false
+
+                    if (!updated) {
+                        showToast("Failed to set PDF password")
+                        return@launch
+                    }
+
+                    closePasswordDialog()
+                    showToast("PDF password set successfully")
+                    loadAll(context)
+                }
+            }
+
+            PasswordDialogMode.REMOVE -> {
+                val password = passwordPrimaryInput.trim()
+
+                if (password.isBlank()) {
+                    showToast("Enter the current password first")
+                    return
+                }
+
+                viewModelScope.launch {
+                    isFileActionInProgress = true
+
+                    val result = withContext(Dispatchers.IO) {
+                        PdfDocumentActions.removePdfPassword(
+                            context = context,
+                            pdf = pdf,
+                            currentPassword = password
+                        )
+                    }
+
+                    isFileActionInProgress = false
+
+                    when (result) {
+                        PdfPasswordActionResult.SUCCESS -> {
+                            closePasswordDialog()
+                            showToast("PDF password removed successfully")
+                            loadAll(context)
+                        }
+
+                        PdfPasswordActionResult.INVALID_PASSWORD -> {
+                            showToast("Invalid password")
+                        }
+
+                        PdfPasswordActionResult.FAILED -> {
+                            showToast("Failed to remove PDF password")
+                        }
+                    }
+                }
+            }
+        }
     }
 
     fun confirmMetadataUpdate(context: Context) {

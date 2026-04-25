@@ -16,6 +16,8 @@ sealed class PdfListEvent {
     data class OpenPreview(val pdf: PdfFile): PdfListEvent()
     data class OpenDetails(val pdf: PdfFile): PdfListEvent()
     data class OpenMetadataDialog(val pdf: PdfFile): PdfListEvent()
+    data class OpenSetPasswordDialog(val pdf: PdfFile): PdfListEvent()
+    data class OpenRemovePasswordDialog(val pdf: PdfFile): PdfListEvent()
     data class OpenRenameDialog(val pdf: PdfFile): PdfListEvent()
     data class OpenDeleteDialog(val pdfs: List<PdfFile>): PdfListEvent()
     data class SharePdf(val pdf: PdfFile): PdfListEvent()

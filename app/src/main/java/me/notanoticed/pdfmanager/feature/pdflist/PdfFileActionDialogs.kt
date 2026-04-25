@@ -17,6 +17,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardCapitalization
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import me.notanoticed.pdfmanager.ui.theme.Colors
@@ -186,6 +188,78 @@ fun EditPdfMetadataDialog(
 }
 
 @Composable
+fun PdfPasswordDialog(
+    viewModel: PdfListViewModel,
+    onDismiss: () -> Unit,
+    onConfirm: () -> Unit
+) {
+    val mode = viewModel.passwordDialogMode ?: return
+
+    FileActionDialog(
+        title = if (mode == PdfListViewModel.PasswordDialogMode.SET) {
+            "Set PDF Password"
+        } else {
+            "Remove PDF Password"
+        },
+        confirmText = when {
+            viewModel.isFileActionInProgress && mode == PdfListViewModel.PasswordDialogMode.SET -> "Saving..."
+            viewModel.isFileActionInProgress -> "Removing..."
+            mode == PdfListViewModel.PasswordDialogMode.SET -> "Save"
+            else -> "Remove"
+        },
+        confirmContainerColor = Colors.Button.blue,
+        isProcessing = viewModel.isFileActionInProgress,
+        onDismiss = onDismiss,
+        onConfirm = onConfirm,
+        textContent = {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                Text(
+                    text = viewModel.passwordDialogPdf?.name.orEmpty(),
+                    color = Colors.Text.secondary,
+                    fontSize = 13.sp
+                )
+
+                if (mode == PdfListViewModel.PasswordDialogMode.SET) {
+                    Text(
+                        text = "Set a password to protect this PDF.",
+                        color = Colors.Text.secondary,
+                        fontSize = 13.sp
+                    )
+
+                    PasswordField(
+                        label = "New password",
+                        value = viewModel.passwordPrimaryInput,
+                        enabled = !viewModel.isFileActionInProgress,
+                        onValueChange = viewModel::updatePasswordPrimaryInput
+                    )
+                    PasswordField(
+                        label = "Confirm password",
+                        value = viewModel.passwordConfirmInput,
+                        enabled = !viewModel.isFileActionInProgress,
+                        onValueChange = viewModel::updatePasswordConfirmInput
+                    )
+                } else {
+                    Text(
+                        text = "Enter the current password to unlock this PDF.",
+                        color = Colors.Text.secondary,
+                        fontSize = 13.sp
+                    )
+
+                    PasswordField(
+                        label = "Current password",
+                        value = viewModel.passwordPrimaryInput,
+                        enabled = !viewModel.isFileActionInProgress,
+                        onValueChange = viewModel::updatePasswordPrimaryInput
+                    )
+                }
+            }
+        }
+    )
+}
+
+@Composable
 private fun MetadataField(
     label: String,
     value: String,
@@ -205,6 +279,37 @@ private fun MetadataField(
         },
         keyboardOptions = KeyboardOptions(
             capitalization = KeyboardCapitalization.Sentences
+        ),
+        colors = TextFieldDefaults.colors(
+            focusedContainerColor = Color.Transparent,
+            unfocusedContainerColor = Color.Transparent,
+            disabledContainerColor = Color.Transparent
+        ),
+        modifier = Modifier.fillMaxWidth()
+    )
+}
+
+@Composable
+private fun PasswordField(
+    label: String,
+    value: String,
+    enabled: Boolean,
+    onValueChange: (String) -> Unit
+) {
+    OutlinedTextField(
+        value = value,
+        onValueChange = onValueChange,
+        singleLine = true,
+        enabled = enabled,
+        label = {
+            Text(
+                text = label,
+                color = Colors.Text.secondary
+            )
+        },
+        visualTransformation = PasswordVisualTransformation(),
+        keyboardOptions = KeyboardOptions(
+            keyboardType = KeyboardType.Password
         ),
         colors = TextFieldDefaults.colors(
             focusedContainerColor = Color.Transparent,

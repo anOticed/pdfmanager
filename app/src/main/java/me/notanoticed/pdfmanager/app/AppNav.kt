@@ -33,6 +33,7 @@ import me.notanoticed.pdfmanager.feature.pdflist.DeletePdfDialog
 import me.notanoticed.pdfmanager.feature.pdflist.EditPdfMetadataDialog
 import me.notanoticed.pdfmanager.feature.pdflist.OptionsOverlay
 import me.notanoticed.pdfmanager.feature.pdflist.PdfDetailsOverlay
+import me.notanoticed.pdfmanager.feature.pdflist.PdfPasswordDialog
 import me.notanoticed.pdfmanager.feature.pdflist.PdfListScreen
 import me.notanoticed.pdfmanager.feature.pdflist.PdfListSelectionBottomBar
 import me.notanoticed.pdfmanager.feature.pdflist.PdfListViewModel
@@ -188,6 +189,12 @@ private fun AppContent(settingsViewModel: SettingsViewModel) {
                     viewModel = pdfListViewModel,
                     onDismiss = { pdfListViewModel.closeMetadataDialog() },
                     onConfirm = { pdfListViewModel.confirmMetadataUpdate(context) }
+                )
+
+                PdfPasswordDialog(
+                    viewModel = pdfListViewModel,
+                    onDismiss = { pdfListViewModel.closePasswordDialog() },
+                    onConfirm = { pdfListViewModel.confirmPasswordAction(context) }
                 )
 
                 DeletePdfDialog(
