@@ -26,8 +26,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import me.notanoticed.pdfmanager.R
 import me.notanoticed.pdfmanager.ui.theme.Colors
 
 /* -------------------- BOTTOM BAR -------------------- */
@@ -53,20 +55,20 @@ fun PdfListSelectionBottomBar(
                 PdfSelectionAction(
                     icon = Icons.Outlined.CallMerge,
                     tint = Colors.Primary.green,
-                    label = "Merge",
+                    label = stringResource(R.string.pdf_option_merge),
                     onClick = { viewModel.mergeSelected() },
                     enabled = viewModel.canMergeSelected
                 )
                 PdfSelectionAction(
                     icon = Icons.Outlined.Share,
-                    label = "Share",
+                    label = stringResource(R.string.pdf_option_share),
                     onClick = { viewModel.shareSelected() },
                     enabled = viewModel.selectionCount > 0
                 )
                 PdfSelectionAction(
                     icon = Icons.Outlined.Delete,
                     tint = Colors.Primary.red,
-                    label = "Delete",
+                    label = stringResource(R.string.pdf_option_delete),
                     onClick = { viewModel.deleteSelectedPdfs() },
                     enabled = viewModel.selectionCount > 0
                 )

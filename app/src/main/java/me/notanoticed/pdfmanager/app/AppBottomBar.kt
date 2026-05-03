@@ -26,7 +26,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import me.notanoticed.pdfmanager.R
 import me.notanoticed.pdfmanager.ui.theme.Colors
 
 /* -------------------- BOTTOM BAR -------------------- */
@@ -52,11 +54,11 @@ fun AppBottomBar(
             containerColor = Colors.Background.surface
         ) {
             val items = listOf(
-                BottomNavItem(title = "PDFs", route = Screen.PdfList.route, icon = Icons.Outlined.Description),
-                BottomNavItem(title = "Merge", route = Screen.Merge.route, icon = Icons.AutoMirrored.Outlined.CallMerge),
-                BottomNavItem(title = "Split", route = Screen.Split.route, icon = Icons.AutoMirrored.Outlined.CallSplit),
-                BottomNavItem(title = "Images", route = Screen.Images.route, icon = Icons.Outlined.Image),
-                BottomNavItem(title = "Settings", route = Screen.Settings.route, icon = Icons.Outlined.Settings)
+                BottomNavItem(title = stringResource(R.string.tab_pdfs), route = Screen.PdfList.route, icon = Icons.Outlined.Description),
+                BottomNavItem(title = stringResource(R.string.tab_merge), route = Screen.Merge.route, icon = Icons.AutoMirrored.Outlined.CallMerge),
+                BottomNavItem(title = stringResource(R.string.tab_split), route = Screen.Split.route, icon = Icons.AutoMirrored.Outlined.CallSplit),
+                BottomNavItem(title = stringResource(R.string.tab_images), route = Screen.Images.route, icon = Icons.Outlined.Image),
+                BottomNavItem(title = stringResource(R.string.tab_settings), route = Screen.Settings.route, icon = Icons.Outlined.Settings)
             )
 
             items.forEachIndexed { index, item ->

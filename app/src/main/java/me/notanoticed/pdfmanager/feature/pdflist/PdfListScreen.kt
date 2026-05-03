@@ -44,10 +44,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import me.notanoticed.pdfmanager.R
 import me.notanoticed.pdfmanager.core.pdf.model.PdfFile
 import me.notanoticed.pdfmanager.core.toast.BindViewModelToasts
 import me.notanoticed.pdfmanager.ui.theme.Colors
@@ -117,7 +119,7 @@ fun PdfListScreen(
                         Spacer(modifier = Modifier.height(8.dp))
 
                         Text(
-                            text = "Nothing matched your search",
+                            text = stringResource(R.string.pdflist_empty_search_title),
                             color = Colors.Text.secondary,
                             fontSize = 24.sp,
                             fontWeight = FontWeight.ExtraBold
@@ -126,7 +128,7 @@ fun PdfListScreen(
                         Spacer(modifier = Modifier.height(10.dp))
 
                         Text(
-                            text = "Check the spelling or try another keyword.",
+                            text = stringResource(R.string.pdflist_empty_search_subtitle),
                             color = Colors.Text.muted,
                             fontSize = 12.sp,
                             fontWeight = FontWeight.SemiBold,
@@ -211,13 +213,13 @@ fun DocumentCard(
                 )
             }
             else {
-                IconButton(onClick = onMoreClick) {
-                    Icon(
-                        Icons.Outlined.MoreVert,
-                        contentDescription = "More icon",
-                        tint = Colors.Icon.default
-                    )
-                }
+                    IconButton(onClick = onMoreClick) {
+                        Icon(
+                            Icons.Outlined.MoreVert,
+                            contentDescription = stringResource(R.string.pdf_more_actions_content_description),
+                            tint = Colors.Icon.default
+                        )
+                    }
             }
         }
     }

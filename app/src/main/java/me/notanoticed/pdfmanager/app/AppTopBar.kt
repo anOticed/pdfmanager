@@ -63,12 +63,12 @@ fun AppTopBar(
                                 )
                             },
                             onError = {
-                                imagesViewModel.onCameraLaunchFailed()
+                                imagesViewModel.onCameraLaunchFailed(context)
                             }
                         )
                     },
                     onDenied = {
-                        imagesViewModel.onCameraPermissionDenied()
+                        imagesViewModel.onCameraPermissionDenied(context)
                     }
                 )
             },

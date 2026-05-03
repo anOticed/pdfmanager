@@ -7,8 +7,10 @@
 
 package me.notanoticed.pdfmanager.core.pdf.model
 
+import android.content.Context
 import android.graphics.Bitmap
 import android.net.Uri
+import me.notanoticed.pdfmanager.R
 import me.notanoticed.pdfmanager.core.pdf.formatFileSize
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -26,14 +28,15 @@ data class PdfFile(
     val thumbnailBitmap: Bitmap? = null,
     val isLocked: Boolean
 ) {
-    fun metaLine(): String {
-        val sizeText = size()
+    fun metaLine(context: Context): String {
+        val sizeText = size(context)
         if (isLocked || pagesCount <= 0) return sizeText
 
-        val pagesText = when (pagesCount) {
-            1 -> "1 page"
-            else -> "$pagesCount pages"
-        }
+        val pagesText = context.resources.getQuantityString(
+            R.plurals.pdf_page_count,
+            pagesCount,
+            pagesCount
+        )
         return "$pagesText | $sizeText"
     }
 
@@ -41,7 +44,7 @@ data class PdfFile(
 
     fun lastModifiedDate(): String = formatDate(lastModifiedEpochSeconds)
 
-    fun size(): String = formatFileSize(sizeBytes)
+    fun size(context: Context): String = formatFileSize(context, sizeBytes)
 
     private fun formatDate(epochSeconds: Long): String {
         val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.US)

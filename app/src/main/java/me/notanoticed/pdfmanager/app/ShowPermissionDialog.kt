@@ -13,6 +13,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -36,12 +37,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import me.notanoticed.pdfmanager.R
 import me.notanoticed.pdfmanager.ui.theme.Colors
 import me.notanoticed.pdfmanager.ui.theme.PdfManagerTheme
 
@@ -55,34 +58,25 @@ data class PermissionDialogTexts(
 
 private fun buildPermissionDialogTexts(
     type: AppPermissionType,
-    isBlocking: Boolean
+    grantButtonText: String,
+    title: String,
+    message: String
 ): PermissionDialogTexts {
     return when (type) {
         AppPermissionType.STORAGE_ALL_FILES -> {
             PermissionDialogTexts(
                 icon = Icons.Outlined.Folder,
-                title = if (isBlocking) "Storage access is required" else "Permission required",
-                message = if (isBlocking) {
-                    "PDF Manager can't function properly without \"All files access\".\n\n" +
-                        "Please enable it in system settings to continue using the app."
-                } else {
-                    "PDF Manager needs access to your device storage to function properly.\n\n" +
-                        "Your documents stay private and secure."
-                },
-                grantButtonText = "Grant All Files Access"
+                title = title,
+                message = message,
+                grantButtonText = grantButtonText
             )
         }
         AppPermissionType.CAMERA -> {
             PermissionDialogTexts(
                 icon = Icons.Outlined.CameraAlt,
-                title = if (isBlocking) "Camera access is required" else "Permission required",
-                message = if (isBlocking) {
-                    "PDF Manager can't capture photos without camera access.\n\n" +
-                        "Please grant camera permission to continue."
-                } else {
-                    "PDF Manager needs access to your camera to capture photos."
-                },
-                grantButtonText = "Grant Camera Access"
+                title = title,
+                message = message,
+                grantButtonText = grantButtonText
             )
         }
     }
@@ -101,7 +95,48 @@ fun AppPermissionDialog(
 ) {
     if (!visible) return
 
-    val texts = buildPermissionDialogTexts(type = type, isBlocking = isBlocking)
+    val title = when (type) {
+        AppPermissionType.STORAGE_ALL_FILES -> {
+            if (isBlocking) {
+                stringResource(R.string.permission_storage_required_title)
+            } else {
+                stringResource(R.string.permission_required_title)
+            }
+        }
+        AppPermissionType.CAMERA -> {
+            if (isBlocking) {
+                stringResource(R.string.permission_camera_required_title)
+            } else {
+                stringResource(R.string.permission_required_title)
+            }
+        }
+    }
+    val message = when (type) {
+        AppPermissionType.STORAGE_ALL_FILES -> {
+            if (isBlocking) {
+                stringResource(R.string.permission_storage_blocking_message)
+            } else {
+                stringResource(R.string.permission_storage_message)
+            }
+        }
+        AppPermissionType.CAMERA -> {
+            if (isBlocking) {
+                stringResource(R.string.permission_camera_blocking_message)
+            } else {
+                stringResource(R.string.permission_camera_message)
+            }
+        }
+    }
+    val grantButtonText = when (type) {
+        AppPermissionType.STORAGE_ALL_FILES -> stringResource(R.string.permission_storage_grant)
+        AppPermissionType.CAMERA -> stringResource(R.string.permission_camera_grant)
+    }
+    val texts = buildPermissionDialogTexts(
+        type = type,
+        grantButtonText = grantButtonText,
+        title = title,
+        message = message
+    )
 
     Dialog(
         onDismissRequest = {
@@ -162,7 +197,7 @@ fun AppPermissionDialog(
 
                     Text(
                         text = texts.title,
-                        fontSize = 20.sp,
+                        fontSize = 18.sp,
                         fontWeight = FontWeight.SemiBold,
                         color = Colors.Text.primary
                     )
@@ -171,29 +206,38 @@ fun AppPermissionDialog(
 
                     Text(
                         text = texts.message,
-                        fontSize = 14.sp,
+                        fontSize = 13.sp,
+                        lineHeight = 20.sp,
                         color = Colors.Text.secondary
                     )
 
                     Spacer(modifier = Modifier.height(24.dp))
 
                     if (!isBlocking) {
-                        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.Center
+                        ) {
                             OutlinedButton(
                                 onClick = onCancel,
-                                modifier = Modifier.weight(0.5f),
                                 shape = RoundedCornerShape(50.dp),
                                 border = BorderStroke(1.5.dp, Colors.Border.blue),
                                 colors = ButtonDefaults.buttonColors(
                                     containerColor = Color.Transparent
+                                ),
+                                contentPadding = PaddingValues(
+                                    horizontal = 20.dp,
+                                    vertical = 12.dp
                                 )
                             ) {
                                 Text(
-                                    text = "Cancel",
-                                    fontSize = 14.sp,
+                                    text = stringResource(R.string.action_cancel),
+                                    fontSize = 13.sp,
                                     color = Colors.Text.blue
                                 )
                             }
+
+                            Spacer(modifier = Modifier.size(12.dp))
 
                             Button(
                                 onClick = onGrantClick,
@@ -201,11 +245,15 @@ fun AppPermissionDialog(
                                 shape = RoundedCornerShape(50.dp),
                                 colors = ButtonDefaults.buttonColors(
                                     containerColor = Colors.Button.blue
+                                ),
+                                contentPadding = PaddingValues(
+                                    horizontal = 20.dp,
+                                    vertical = 12.dp
                                 )
                             ) {
                                 Text(
                                     text = texts.grantButtonText,
-                                    fontSize = 14.sp,
+                                    fontSize = 13.sp,
                                     color = Colors.Primary.white
                                 )
                             }
@@ -221,7 +269,7 @@ fun AppPermissionDialog(
                         ) {
                             Text(
                                 text = texts.grantButtonText,
-                                fontSize = 14.sp,
+                                fontSize = 13.sp,
                                 color = Colors.Primary.white
                             )
                         }

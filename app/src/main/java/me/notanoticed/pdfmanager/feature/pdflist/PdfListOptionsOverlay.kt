@@ -29,6 +29,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
@@ -171,7 +172,7 @@ private fun FileOptionRow(
         Spacer(modifier = Modifier.width(24.dp))
 
         Text(
-            text = item.title,
+            text = stringResource(item.titleRes),
             color = Colors.Text.primary
         )
     }

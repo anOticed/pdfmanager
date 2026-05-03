@@ -18,6 +18,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import me.notanoticed.pdfmanager.R
 import me.notanoticed.pdfmanager.ui.theme.Colors
 
 /* -------------------- ACTIVITY -------------------- */
@@ -32,13 +34,17 @@ fun PreviewActivity(
         is PreviewRequest.Single -> request.allowSearch
         is PreviewRequest.Split -> true
     }
+    val title = when (request) {
+        is PreviewRequest.Single -> request.topBarTitle.orEmpty()
+        is PreviewRequest.Split -> stringResource(R.string.preview_split_title)
+    }
     val searchToggleRequestNonce = remember(request) { mutableIntStateOf(0) }
 
     Scaffold(
         containerColor = Colors.Background.app,
         topBar = {
             PreviewTopBar(
-                title = request.topBarTitle,
+                title = title,
                 onBack = onBack,
                 showSearch = canShowSearch,
                 onSearchClick = {

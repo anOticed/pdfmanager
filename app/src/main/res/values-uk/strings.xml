@@ -1,0 +1,364 @@
+﻿<resources>
+    <string name="app_name">PDF Manager</string>
+    <string name="title_activity_settings">Опції</string>
+    <string name="title_activity_pdfs_screen">PDF</string>
+    <string name="title_activity_pdfs">Усі PDF-файли</string>
+
+    <string name="action_cancel">Скасувати</string>
+    <string name="action_back">Назад</string>
+    <string name="action_search">Пошук</string>
+    <string name="action_more">Ще</string>
+    <string name="action_save">Зберегти</string>
+    <string name="action_saving">Збереження...</string>
+    <string name="action_delete">Видалити</string>
+    <string name="action_deleting">Видалення...</string>
+    <string name="action_remove">Видалити</string>
+    <string name="action_removing">Видалення...</string>
+    <string name="action_loading">Завантаження...</string>
+    <string name="action_preparing">Підготовка...</string>
+    <string name="action_reorder">Змінити порядок</string>
+    <string name="action_change">Змінити</string>
+    <string name="action_hide">Сховати</string>
+
+    <string name="language_english">English</string>
+    <string name="language_french">Français</string>
+    <string name="language_german">Deutsch</string>
+    <string name="language_japanese">日本語</string>
+    <string name="language_mandarin">中文</string>
+    <string name="language_slovak">Slovenčina</string>
+    <string name="language_spanish">Español</string>
+    <string name="language_ukrainian">Українська</string>
+
+    <string name="settings_section_app_preferences">НАЛАШТУВАННЯ ЗАСТОСУНКУ</string>
+    <string name="settings_section_more">ДОДАТКОВО</string>
+    <string name="settings_dark_mode_title">Темна тема</string>
+    <string name="settings_dark_mode_subtitle">Темне оформлення в усьому застосунку</string>
+    <string name="settings_language_title">Мова</string>
+    <string name="settings_language_subtitle">Мова інтерфейсу</string>
+    <string name="settings_license_title">Ліцензія</string>
+    <string name="settings_license_subtitle">GNU GPL v3</string>
+    <string name="settings_github_title">GitHub</string>
+    <string name="settings_share_app_title">Поділитися застосунком</string>
+    <string name="settings_share_app_subtitle">Надіслати посилання на PDF Manager</string>
+    <string name="settings_app_info_tagline">Ваш універсальний набір PDF-інструментів</string>
+    <string name="settings_language_dialog_title">Мова</string>
+    <string name="settings_version_format">Версія %1$s</string>
+    <string name="settings_share_app_chooser_title">Поділитися PDF Manager</string>
+    <string name="settings_share_app_text">PDF Manager для Android\n%1$s</string>
+    <string name="settings_title">Налаштування</string>
+    <string name="settings_subtitle">Налаштуйте застосунок під себе</string>
+
+    <string name="tab_pdfs">PDF</string>
+    <string name="tab_merge">Об’єднання</string>
+    <string name="tab_split">Розділення</string>
+    <string name="tab_images">Зображення</string>
+    <string name="tab_settings">Опції</string>
+
+    <string name="error_unknown">Невідома помилка</string>
+    <string name="output_choose_location">Обрати місце</string>
+    <string name="output_choose_folder">Вибрати папку</string>
+    <string name="output_processing_message">Файл обробляється, зачекайте...</string>
+    <string name="output_processing_files_message">Файли обробляються, зачекайте...</string>
+    <string name="output_save_failed">Не вдалося зберегти PDF</string>
+    <string name="output_create_directory_failed">Не вдалося створити папку</string>
+    <string name="output_create_temp_directory_failed">Не вдалося створити тимчасову папку</string>
+    <string name="output_open_destination_failed">Не вдалося відкрити місце збереження</string>
+    <string name="output_create_document_failed">Не вдалося створити PDF у вибраній папці</string>
+
+    <string name="permission_required_title">Потрібен дозвіл</string>
+    <string name="permission_storage_required_title">Потрібен доступ до файлів</string>
+    <string name="permission_camera_required_title">Потрібен доступ до камери</string>
+    <string name="permission_storage_blocking_message">Без доступу до всіх файлів PDF Manager не зможе працювати.\n\nУвімкніть цей дозвіл у системних налаштуваннях.</string>
+    <string name="permission_storage_message">Щоб працювати з PDF-файлами на пристрої, потрібен доступ до сховища.\n\nВаші документи залишаються приватними.</string>
+    <string name="permission_camera_blocking_message">Без доступу до камери не вийде зробити фото.\n\nНадайте дозвіл, щоб продовжити.</string>
+    <string name="permission_camera_message">Щоб зробити фото, потрібен доступ до камери.</string>
+    <string name="permission_storage_grant">Надати доступ</string>
+    <string name="permission_camera_grant">Надати доступ</string>
+
+    <string name="pages_per_sheet_title">Розташування сторінок</string>
+
+    <string name="file_size_unknown">Розмір невідомий</string>
+    <string name="file_size_bytes_zero">0 Б</string>
+    <string name="file_size_bytes_format">%1$d Б</string>
+    <string name="file_size_kilobytes_format">%1$.1f КБ</string>
+    <string name="file_size_megabytes_format">%1$.1f МБ</string>
+    <string name="file_size_gigabytes_format">%1$.1f ГБ</string>
+
+    <string name="pdf_default_name_with_extension">document.pdf</string>
+    <string name="pdf_icon_content_description">Іконка PDF</string>
+    <string name="pdf_locked_icon_content_description">Захищений PDF</string>
+    <string name="pdf_more_actions_content_description">Дії з файлом</string>
+
+    <string name="pdflist_title">Усі файли</string>
+    <string name="pdflist_search_placeholder">Пошук файлів</string>
+    <string name="pdflist_empty_search_title">Нічого не знайдено</string>
+    <string name="pdflist_empty_search_subtitle">Спробуйте інший запит або перевірте написання.</string>
+    <string name="pdflist_close_search_content_description">Закрити пошук</string>
+    <string name="pdflist_select_all">Вибрати все</string>
+    <string name="pdflist_menu_select">Вибрати</string>
+    <string name="pdflist_sort_name">Назва</string>
+    <string name="pdflist_sort_file_size">Розмір</string>
+    <string name="pdflist_sort_date">Дата</string>
+    <string name="pdflist_sort_ascending">За зростанням</string>
+    <string name="pdflist_sort_descending">За спаданням</string>
+
+    <string name="pdf_option_rename">Перейменувати</string>
+    <string name="pdf_option_edit_metadata">Метадані</string>
+    <string name="pdf_option_merge">Об’єднати</string>
+    <string name="pdf_option_split">Розділити</string>
+    <string name="pdf_option_compress">Стиснути PDF</string>
+    <string name="pdf_option_reorder_pages">Порядок сторінок</string>
+    <string name="pdf_option_set_password">Встановити пароль</string>
+    <string name="pdf_option_remove_password">Видалити пароль</string>
+    <string name="pdf_option_print">Друк</string>
+    <string name="pdf_option_share">Поділитися</string>
+    <string name="pdf_option_details">Інформація</string>
+    <string name="pdf_option_delete">Видалити</string>
+
+    <string name="pdflist_details_file_name">Назва файлу</string>
+    <string name="pdflist_details_storage_path">Шлях</string>
+    <string name="pdflist_details_created">Створено</string>
+    <string name="pdflist_details_last_modified">Востаннє змінено</string>
+    <string name="pdflist_details_file_size">Розмір файлу</string>
+
+    <string name="pdflist_rename_dialog_title">Перейменувати PDF</string>
+    <string name="pdflist_current_name_format">Поточна назва: %1$s</string>
+    <string name="pdflist_file_name_label">Назва файлу</string>
+    <string name="pdflist_delete_dialog_title">Видалити PDF</string>
+    <string name="pdflist_metadata_dialog_title">Метадані PDF</string>
+    <string name="pdflist_metadata_loading">Завантаження метаданих...</string>
+    <string name="pdflist_metadata_title">Назва</string>
+    <string name="pdflist_metadata_author">Автор</string>
+    <string name="pdflist_metadata_subject">Тема</string>
+    <string name="pdflist_metadata_keywords">Ключові слова</string>
+    <string name="pdflist_password_set_dialog_title">Пароль для PDF</string>
+    <string name="pdflist_password_remove_dialog_title">Видалити пароль із PDF</string>
+    <string name="pdflist_password_set_message">Задайте пароль для цього PDF.</string>
+    <string name="pdflist_password_remove_message">Введіть поточний пароль.</string>
+    <string name="pdflist_password_new_label">Новий пароль</string>
+    <string name="pdflist_password_confirm_label">Підтвердження пароля</string>
+    <string name="pdflist_password_current_label">Поточний пароль</string>
+    <string name="pdflist_share_menu_failed">Не вдалося відкрити меню поширення</string>
+    <string name="pdflist_print_dialog_failed">Не вдалося відкрити друк</string>
+    <string name="pdflist_metadata_load_failed">Не вдалося завантажити метадані PDF</string>
+    <string name="pdflist_password_enter_first">Спочатку введіть пароль</string>
+    <string name="pdflist_passwords_do_not_match">Паролі не збігаються</string>
+    <string name="pdflist_password_set_failed">Не вдалося встановити пароль</string>
+    <string name="pdflist_password_set_success">Пароль встановлено</string>
+    <string name="pdflist_password_enter_current">Введіть поточний пароль</string>
+    <string name="pdflist_password_remove_success">Пароль видалено</string>
+    <string name="pdflist_password_invalid">Неправильний пароль</string>
+    <string name="pdflist_password_remove_failed">Не вдалося видалити пароль</string>
+    <string name="pdflist_metadata_update_failed">Не вдалося оновити метадані</string>
+    <string name="pdflist_metadata_update_success">Метадані оновлено</string>
+    <string name="pdflist_rename_failed">Не вдалося перейменувати PDF</string>
+    <string name="pdflist_rename_success">PDF перейменовано</string>
+    <string name="pdflist_delete_partial_success">Видалено %1$d із %2$d PDF</string>
+
+    <string name="merge_title">Об’єднання PDF</string>
+    <string name="merge_add_pdfs">Додати PDF</string>
+    <string name="merge_close_files">Закрити файли</string>
+    <string name="merge_empty_title">PDF не вибрано</string>
+    <string name="merge_empty_subtitle_primary">Додайте PDF, щоб об’єднати їх в один файл.</string>
+    <string name="merge_empty_subtitle_secondary">Порядок можна змінювати перетягуванням.</string>
+    <string name="merge_order_title">Порядок файлів</string>
+    <string name="merge_order_subtitle">Перетягніть файли, щоб задати порядок у фінальному PDF.</string>
+    <string name="merge_preview_action">Прев’ю</string>
+    <string name="merge_export_action">Об’єднати PDF</string>
+    <string name="merge_locked_single">Цей PDF захищений паролем і недоступний для вибору</string>
+    <string name="merge_locked_multiple">Деякі PDF захищені паролем і не були додані</string>
+    <string name="merge_add_pdf_first">Спочатку додайте хоча б один PDF</string>
+    <string name="merge_preview_failed_format">Не вдалося підготувати прев’ю: %1$s</string>
+    <string name="merge_save_dialog_title">Зберегти об’єднаний PDF</string>
+    <string name="merge_save_dialog_hint">Вкажіть назву файлу. Місце збереження виберете далі.</string>
+    <string name="merge_export_success">PDF успішно збережено</string>
+    <string name="merge_error_no_source_pdfs">Не вибрано жодного PDF</string>
+    <string name="merge_error_open_source_pdf">Не вдалося відкрити вихідний PDF</string>
+    <string name="merge_error_no_pages">У вибраних PDF немає сторінок</string>
+    <string name="merge_output_fallback_name">merged</string>
+    <string name="merge_output_single_file_name">%1$s_merged.pdf</string>
+    <string name="merge_preview_title">Прев’ю об’єднання</string>
+
+    <string name="split_title">Розділення PDF</string>
+    <string name="split_no_file_selected">Файл не вибрано</string>
+    <string name="split_select_pdf">Вибрати PDF</string>
+    <string name="split_close_file">Закрити файл</string>
+    <string name="split_empty_title">PDF не вибрано</string>
+    <string name="split_empty_subtitle">Виберіть PDF, щоб розділити його на декілька файлів.</string>
+    <string name="split_method_title">Спосіб розділення</string>
+    <string name="split_preview_action">Прев’ю</string>
+    <string name="split_export_action">Розділити PDF</string>
+    <string name="split_method_ranges_title">За діапазоном сторінок</string>
+    <string name="split_method_ranges_description">Наприклад: 1-5, 10-15</string>
+    <string name="split_method_single_title">Одна сторінка = один файл</string>
+    <string name="split_method_single_description">Створити окремий файл для кожної сторінки</string>
+    <string name="split_method_every_n_title">Кожні N сторінок</string>
+    <string name="split_method_every_n_description">Створити файли по N сторінок у кожному</string>
+    <string name="split_ranges_input_title">Діапазони сторінок</string>
+    <string name="split_ranges_input_description">Введіть діапазони через кому, наприклад 1-5, 10-15, 20</string>
+    <string name="split_single_files_title">Окремі файли</string>
+    <string name="split_pages_per_file_title">Сторінок у файлі</string>
+    <string name="split_pages_per_file_description">Скільки сторінок має бути в кожному файлі</string>
+    <string name="split_ranges_placeholder">1-5, 10-15, 20</string>
+    <string name="split_pages_per_file_placeholder">5</string>
+    <string name="split_output_summary_title">Результат</string>
+    <string name="split_output_summary_empty">Виберіть PDF, щоб побачити результат розділення.</string>
+    <string name="split_output_file_label">Файл %1$d</string>
+    <string name="split_chunk_page_single">Сторінка %1$d</string>
+    <string name="split_chunk_page_range">Сторінки %1$d-%2$d</string>
+    <string name="split_chunk_page_list">Сторінки %1$s</string>
+    <string name="split_locked_single">Цей PDF захищений паролем і недоступний для вибору</string>
+    <string name="split_output_fallback_name">split_output</string>
+    <string name="split_save_dialog_title">Зберегти розділені PDF</string>
+    <string name="split_base_file_name_label">Базова назва</string>
+    <string name="split_save_dialog_hint">Вкажіть базову назву. Папку для збереження виберете далі.</string>
+    <string name="split_plan_error_no_pages">У вибраному PDF немає сторінок</string>
+    <string name="split_plan_error_invalid_pages_per_file_number">Вкажіть коректне число сторінок</string>
+    <string name="split_plan_error_pages_per_file_positive">Кількість сторінок має бути більшою за 0</string>
+    <string name="split_plan_error_generic">Не вдалося створити план розділення</string>
+    <string name="split_plan_error_enter_ranges_first">Спочатку введіть діапазони сторінок</string>
+    <string name="split_plan_error_empty_value">У діапазонах є порожнє значення</string>
+    <string name="split_plan_error_invalid_range">Неправильний діапазон: %1$s</string>
+    <string name="split_plan_error_invalid_page_number">Неправильний номер сторінки: %1$s</string>
+    <string name="split_plan_error_page_numbers_start_at_one">Нумерація сторінок починається з 1</string>
+    <string name="split_plan_error_exceeds_document_length">Діапазон виходить за межі документа</string>
+    <string name="split_error_open_selected_pdf">Не вдалося відкрити PDF</string>
+    <string name="split_output_part_file_name">%1$s_part_%2$02d.pdf</string>
+
+    <string name="images_title">Зображення в PDF</string>
+    <string name="images_camera_action">Камера</string>
+    <string name="images_gallery_action">Галерея</string>
+    <string name="images_close_action">Закрити</string>
+    <string name="images_empty_title">Зображення не вибрано</string>
+    <string name="images_empty_subtitle">Додайте зображення з галереї або зробіть фото, щоб створити PDF.</string>
+    <string name="images_order_title">Порядок зображень</string>
+    <string name="images_order_subtitle">Перетягніть зображення, щоб задати порядок сторінок. За потреби відкрийте прев’ю.</string>
+    <string name="images_preview_action">Прев’ю</string>
+    <string name="images_create_pdf_action">Створити PDF</string>
+    <string name="images_item_metadata_format">%1$d x %2$d | %3$s</string>
+    <string name="images_already_selected">Ці зображення вже додані</string>
+    <string name="images_add_failed">Не вдалося додати зображення</string>
+    <string name="images_capture_load_failed">Не вдалося завантажити фото</string>
+    <string name="images_camera_permission_required">Для фото потрібен доступ до камери</string>
+    <string name="images_camera_open_failed">Не вдалося відкрити камеру</string>
+    <string name="images_add_first">Спочатку додайте хоча б одне зображення</string>
+    <string name="images_preview_failed">Не вдалося створити прев’ю</string>
+    <string name="images_save_dialog_title">Зберегти PDF із зображень</string>
+    <string name="images_save_dialog_hint">Вкажіть назву PDF. Місце збереження виберете далі.</string>
+    <string name="images_export_success">PDF успішно створено</string>
+    <string name="images_item_fallback_name">image</string>
+    <string name="images_output_fallback_name">images</string>
+    <string name="images_preview_title">Прев’ю зображень</string>
+
+    <string name="preview_split_title">Прев’ю розділення</string>
+    <string name="preview_search_in_pdf">Пошук у PDF</string>
+    <string name="preview_unavailable">Прев’ю недоступне</string>
+    <string name="preview_split_prepare_failed">Не вдалося підготувати прев’ю</string>
+    <string name="preview_preparing_split">Підготовка прев’ю...</string>
+
+    <plurals name="pdf_page_count">
+        <item quantity="one">%d сторінка</item>
+        <item quantity="few">%d сторінки</item>
+        <item quantity="many">%d сторінок</item>
+        <item quantity="other">%d сторінки</item>
+    </plurals>
+    <plurals name="pdflist_document_count">
+        <item quantity="one">%d документ</item>
+        <item quantity="few">%d документи</item>
+        <item quantity="many">%d документів</item>
+        <item quantity="other">%d документи</item>
+    </plurals>
+    <plurals name="pdflist_selected_count">
+        <item quantity="one">%d вибрано</item>
+        <item quantity="few">%d вибрано</item>
+        <item quantity="many">%d вибрано</item>
+        <item quantity="other">%d вибрано</item>
+    </plurals>
+    <plurals name="pdflist_selected_pdf_count">
+        <item quantity="one">%d PDF вибрано</item>
+        <item quantity="few">%d PDF вибрано</item>
+        <item quantity="many">%d PDF вибрано</item>
+        <item quantity="other">%d PDF вибрано</item>
+    </plurals>
+    <plurals name="pdflist_delete_dialog_message">
+        <item quantity="one">PDF буде видалено без можливості відновлення.</item>
+        <item quantity="few">Вибрані PDF буде видалено без можливості відновлення.</item>
+        <item quantity="many">Вибрані PDF буде видалено без можливості відновлення.</item>
+        <item quantity="other">Вибрані PDF буде видалено без можливості відновлення.</item>
+    </plurals>
+    <plurals name="pdflist_delete_failed">
+        <item quantity="one">Не вдалося видалити PDF</item>
+        <item quantity="few">Не вдалося видалити вибрані PDF</item>
+        <item quantity="many">Не вдалося видалити вибрані PDF</item>
+        <item quantity="other">Не вдалося видалити вибрані PDF</item>
+    </plurals>
+    <plurals name="pdflist_delete_success">
+        <item quantity="one">PDF видалено</item>
+        <item quantity="few">PDF видалено</item>
+        <item quantity="many">PDF видалено</item>
+        <item quantity="other">PDF видалено</item>
+    </plurals>
+    <plurals name="pdflist_share_chooser_title">
+        <item quantity="one">Поділитися PDF</item>
+        <item quantity="few">Поділитися PDF</item>
+        <item quantity="many">Поділитися PDF</item>
+        <item quantity="other">Поділитися PDF</item>
+    </plurals>
+    <plurals name="merge_selected_file_count">
+        <item quantity="zero">Файли не вибрано</item>
+        <item quantity="one">Вибрано %d файл</item>
+        <item quantity="few">Вибрано %d файли</item>
+        <item quantity="many">Вибрано %d файлів</item>
+        <item quantity="other">Вибрано %d файли</item>
+    </plurals>
+    <plurals name="pages_per_sheet_summary">
+        <item quantity="one">%d сторінка на аркуші</item>
+        <item quantity="few">%d сторінки на аркуші</item>
+        <item quantity="many">%d сторінок на аркуші</item>
+        <item quantity="other">%d сторінки на аркуші</item>
+    </plurals>
+    <plurals name="split_chunk_page_count">
+        <item quantity="one">%d сторінка</item>
+        <item quantity="few">%d сторінки</item>
+        <item quantity="many">%d сторінок</item>
+        <item quantity="other">%d сторінки</item>
+    </plurals>
+    <plurals name="split_single_files_description">
+        <item quantity="one">Буде створено %1$d окремий PDF-файл.</item>
+        <item quantity="few">Буде створено %1$d окремі PDF-файли.</item>
+        <item quantity="many">Буде створено %1$d окремих PDF-файлів.</item>
+        <item quantity="other">Буде створено %1$d окремі PDF-файли.</item>
+    </plurals>
+    <plurals name="split_output_file_count_summary">
+        <item quantity="one">Буде створено %1$d файл</item>
+        <item quantity="few">Буде створено %1$d файли</item>
+        <item quantity="many">Буде створено %1$d файлів</item>
+        <item quantity="other">Буде створено %1$d файли</item>
+    </plurals>
+    <plurals name="split_output_total_pages_summary">
+        <item quantity="one">Усього %1$d сторінка</item>
+        <item quantity="few">Усього %1$d сторінки</item>
+        <item quantity="many">Усього %1$d сторінок</item>
+        <item quantity="other">Усього %1$d сторінки</item>
+    </plurals>
+    <plurals name="split_output_remaining_files_summary">
+        <item quantity="one">...і ще %1$d файл</item>
+        <item quantity="few">...і ще %1$d файли</item>
+        <item quantity="many">...і ще %1$d файлів</item>
+        <item quantity="other">...і ще %1$d файли</item>
+    </plurals>
+    <plurals name="split_export_success_count">
+        <item quantity="one">Збережено %1$d PDF-файл</item>
+        <item quantity="few">Збережено %1$d PDF-файли</item>
+        <item quantity="many">Збережено %1$d PDF-файлів</item>
+        <item quantity="other">Збережено %1$d PDF-файли</item>
+    </plurals>
+    <plurals name="images_selected_count">
+        <item quantity="zero">Зображення не вибрано</item>
+        <item quantity="one">Вибрано %1$d зображення</item>
+        <item quantity="few">Вибрано %1$d зображення</item>
+        <item quantity="many">Вибрано %1$d зображень</item>
+        <item quantity="other">Вибрано %1$d зображення</item>
+    </plurals>
+</resources>
+

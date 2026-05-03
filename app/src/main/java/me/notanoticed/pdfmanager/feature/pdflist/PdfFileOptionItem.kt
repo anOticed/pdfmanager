@@ -4,6 +4,7 @@
 
 package me.notanoticed.pdfmanager.feature.pdflist
 
+import androidx.annotation.StringRes
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.CallMerge
 import androidx.compose.material.icons.outlined.CallSplit
@@ -19,6 +20,7 @@ import androidx.compose.material.icons.outlined.Reorder
 import androidx.compose.material.icons.outlined.Share
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import me.notanoticed.pdfmanager.R
 import me.notanoticed.pdfmanager.ui.theme.Colors
 
 /* -------------------- FILE OPTIONS -------------------- */
@@ -40,7 +42,7 @@ enum class PdfFileOptionAction {
 
 data class PdfFileOptionItem(
     val action: PdfFileOptionAction,
-    val title: String,
+    @StringRes val titleRes: Int,
     val icon: ImageVector,
     val tint: Color = Colors.Icon.default
 )
@@ -49,70 +51,70 @@ data class PdfFileOptionItem(
 val pdfFileOptionItems: List<PdfFileOptionItem> = listOf(
     PdfFileOptionItem(
         action = PdfFileOptionAction.RENAME,
-        title = "Rename",
+        titleRes = R.string.pdf_option_rename,
         icon = Icons.Outlined.Edit,
         tint = Colors.Icon.rename
     ),
     PdfFileOptionItem(
         action = PdfFileOptionAction.EDIT_METADATA,
-        title = "Edit metadata",
+        titleRes = R.string.pdf_option_edit_metadata,
         icon = Icons.Outlined.Description,
         tint = Colors.Icon.blue
     ),
     PdfFileOptionItem(
         action = PdfFileOptionAction.MERGE,
-        title = "Merge",
+        titleRes = R.string.pdf_option_merge,
         icon = Icons.Outlined.CallMerge,
         tint = Colors.Icon.merge
     ),
     PdfFileOptionItem(
         action = PdfFileOptionAction.SPLIT,
-        title = "Split",
+        titleRes = R.string.pdf_option_split,
         icon = Icons.Outlined.CallSplit,
         tint = Colors.Icon.split
     ),
     PdfFileOptionItem(
         action = PdfFileOptionAction.COMPRESS,
-        title = "Compress PDF",
+        titleRes = R.string.pdf_option_compress,
         icon = Icons.Outlined.Compress
     ),
     PdfFileOptionItem(
         action = PdfFileOptionAction.REORDER_PAGES,
-        title = "Reorder pages",
+        titleRes = R.string.pdf_option_reorder_pages,
         icon = Icons.Outlined.Reorder
     ),
     PdfFileOptionItem(
         action = PdfFileOptionAction.SET_PASSWORD,
-        title = "Set password",
+        titleRes = R.string.pdf_option_set_password,
         icon = Icons.Outlined.Lock,
         tint = Colors.Icon.lock
     ),
     PdfFileOptionItem(
         action = PdfFileOptionAction.REMOVE_PASSWORD,
-        title = "Remove password",
+        titleRes = R.string.pdf_option_remove_password,
         icon = Icons.Outlined.LockOpen,
         tint = Colors.Icon.lock
     ),
     PdfFileOptionItem(
         action = PdfFileOptionAction.PRINT,
-        title = "Print",
+        titleRes = R.string.pdf_option_print,
         icon = Icons.Outlined.Print,
         tint = Colors.Icon.print
     ),
     PdfFileOptionItem(
         action = PdfFileOptionAction.SHARE,
-        title = "Share",
+        titleRes = R.string.pdf_option_share,
         icon = Icons.Outlined.Share,
         tint = Colors.Icon.share
     ),
     PdfFileOptionItem(
         action = PdfFileOptionAction.DETAILS,
-        title = "Details",
+        titleRes = R.string.pdf_option_details,
         icon = Icons.Outlined.Info
     ),
     PdfFileOptionItem(
         action = PdfFileOptionAction.DELETE,
-        title = "Delete",
+        titleRes = R.string.pdf_option_delete,
         icon = Icons.Outlined.Delete,
         tint = Colors.Icon.delete
     )

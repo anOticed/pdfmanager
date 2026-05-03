@@ -15,6 +15,7 @@ import androidx.compose.foundation.pager.PagerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.platform.LocalContext
+import me.notanoticed.pdfmanager.R
 import me.notanoticed.pdfmanager.core.pdf.PdfDocumentActions
 import me.notanoticed.pdfmanager.core.pdf.model.PdfFile
 import me.notanoticed.pdfmanager.core.toast.rememberToast
@@ -41,7 +42,10 @@ fun PdfListEventHandler(
     LaunchedEffect(event) {
         when (event) {
             is PdfListEvent.OpenMerge -> {
-                mergeViewModel.addMergeFiles(pdfFiles = event.pdfs)
+                mergeViewModel.addMergeFiles(
+                    context = context,
+                    pdfFiles = event.pdfs
+                )
 
                 val page = tabs.indexOf(Screen.Merge.route)
                 if (page >= 0) pagerState.animateScrollToPage(page)
@@ -49,7 +53,10 @@ fun PdfListEventHandler(
                 handleAfterNavigation(pdfListViewModel, clearSelection = true)
             }
             is PdfListEvent.OpenSplit -> {
-                splitViewModel.updateSelectedSplitPdf(pdfFile = event.pdf)
+                splitViewModel.updateSelectedSplitPdf(
+                    context = context,
+                    pdfFile = event.pdf
+                )
                 val page = tabs.indexOf(Screen.Split.route)
                 if (page >= 0) pagerState.animateScrollToPage(page)
 
@@ -92,7 +99,7 @@ fun PdfListEventHandler(
                         )
                     )
                 }.onFailure {
-                    toast("Failed to open share menu")
+                    toast(context.getString(R.string.pdflist_share_menu_failed))
                 }
                 handleAfterNavigation(pdfListViewModel, clearSelection = false)
             }
@@ -105,7 +112,7 @@ fun PdfListEventHandler(
                         )
                     )
                 }.onFailure {
-                    toast("Failed to open share menu")
+                    toast(context.getString(R.string.pdflist_share_menu_failed))
                 }
                 handleAfterNavigation(pdfListViewModel, clearSelection = false)
             }
@@ -117,7 +124,7 @@ fun PdfListEventHandler(
                         documentName = event.pdf.name
                     )
                 }.onFailure {
-                    toast("Failed to open print dialog")
+                    toast(context.getString(R.string.pdflist_print_dialog_failed))
                 }
                 handleAfterNavigation(pdfListViewModel, clearSelection = false)
             }
@@ -158,7 +165,10 @@ private fun buildShareIntent(
 
     return Intent.createChooser(
         shareIntent,
-        if (pdfs.size == 1) "Share PDF" else "Share PDFs"
+        context.resources.getQuantityString(
+            R.plurals.pdflist_share_chooser_title,
+            pdfs.size
+        )
     ).apply {
         addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
     }

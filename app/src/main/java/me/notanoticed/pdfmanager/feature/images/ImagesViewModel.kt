@@ -27,6 +27,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import me.notanoticed.pdfmanager.R
 import me.notanoticed.pdfmanager.core.pdf.fitRectIntoSlot
 import me.notanoticed.pdfmanager.core.pdf.pageCountForSheets
 import me.notanoticed.pdfmanager.core.pdf.PagesPerSheetOption
@@ -81,6 +82,14 @@ class ImagesViewModel : ViewModel(), ToastBindable {
         toast?.invoke(message)
     }
 
+    private fun showToast(
+        context: Context,
+        messageRes: Int,
+        vararg args: Any
+    ) {
+        showToast(context.getString(messageRes, *args))
+    }
+
     fun addFromGallery(context: Context, uris: List<Uri>) {
         if (uris.isEmpty()) return
 
@@ -89,7 +98,7 @@ class ImagesViewModel : ViewModel(), ToastBindable {
             val uniqueUris = uris.filter { existing.add(it) }
 
             if (uniqueUris.isEmpty()) {
-                showToast("These images are already selected")
+                showToast(context, R.string.images_already_selected)
                 return@launch
             }
 
@@ -98,7 +107,7 @@ class ImagesViewModel : ViewModel(), ToastBindable {
             }.awaitAll().filterNotNull()
 
             if (items.isEmpty()) {
-                showToast("Failed to add selected images")
+                showToast(context, R.string.images_add_failed)
                 return@launch
             }
 
@@ -116,7 +125,7 @@ class ImagesViewModel : ViewModel(), ToastBindable {
             }
 
             if (item == null) {
-                showToast("Failed to load captured image")
+                showToast(context, R.string.images_capture_load_failed)
                 return@launch
             }
 
@@ -124,12 +133,12 @@ class ImagesViewModel : ViewModel(), ToastBindable {
         }
     }
 
-    fun onCameraPermissionDenied() {
-        showToast("Camera permission is required to take a photo")
+    fun onCameraPermissionDenied(context: Context) {
+        showToast(context, R.string.images_camera_permission_required)
     }
 
-    fun onCameraLaunchFailed() {
-        showToast("Failed to open camera")
+    fun onCameraLaunchFailed(context: Context) {
+        showToast(context, R.string.images_camera_open_failed)
     }
 
     fun clear() {
@@ -157,7 +166,7 @@ class ImagesViewModel : ViewModel(), ToastBindable {
         onReady: (PdfFile) -> Unit
     ) {
         if (selectedImages.isEmpty()) {
-            showToast("Add at least one image first")
+            showToast(context, R.string.images_add_first)
             return
         }
         if (isPreparingPreview) return
@@ -178,7 +187,7 @@ class ImagesViewModel : ViewModel(), ToastBindable {
 
             if (preview == null) {
                 isPreparingPreview = false
-                showToast("Failed to generate preview")
+                showToast(context, R.string.images_preview_failed)
                 return@launch
             }
 
@@ -206,25 +215,29 @@ class ImagesViewModel : ViewModel(), ToastBindable {
     }
 
     fun requestCreatePdfExport(
+        context: Context,
         onRequest: (PdfOutputRequest) -> Unit
     ) {
         if (selectedImages.isEmpty()) {
-            showToast("Add at least one image first")
+            showToast(context, R.string.images_add_first)
             return
         }
 
         val snapshot = selectedImages
         val pagesPerSheetSnapshot = pagesPerSheetOption
-        val suggestedName = buildSuggestedImagesFileName(snapshot)
+        val suggestedName = buildSuggestedImagesFileName(
+            context = context,
+            images = snapshot
+        )
 
         onRequest(
             PdfOutputRequest.SaveFile(
-                dialogTitle = "Save PDF from images",
-                inputLabel = "File name",
-                inputHint = "Choose the final PDF name. You'll pick the save location in the next step.",
-                confirmLabel = "Choose Location",
+                dialogTitle = context.getString(R.string.images_save_dialog_title),
+                inputLabel = context.getString(R.string.pdflist_file_name_label),
+                inputHint = context.getString(R.string.images_save_dialog_hint),
+                confirmLabel = context.getString(R.string.output_choose_location),
                 suggestedName = suggestedName,
-                processingMessage = "Processing your file, please wait..."
+                processingMessage = context.getString(R.string.output_processing_message)
             ) { context, destinationUri, _ ->
                 exportImagesPdf(
                     context = context,
@@ -232,7 +245,7 @@ class ImagesViewModel : ViewModel(), ToastBindable {
                     pagesPerSheet = pagesPerSheetSnapshot,
                     destinationUri = destinationUri
                 )
-                "PDF created successfully"
+                context.getString(R.string.images_export_success)
             }
         )
     }
@@ -254,7 +267,7 @@ private fun buildImageItem(
 ): ImageItem? {
     val resolver = context.contentResolver
 
-    var name = "image_${System.currentTimeMillis()}.jpg"
+    var name = "${context.getString(R.string.images_item_fallback_name)}_${System.currentTimeMillis()}.jpg"
     var size = 0L
 
     if (uri.scheme == "file") {
@@ -446,6 +459,7 @@ private fun writeImagesPdfToFile(
 }
 
 private fun buildSuggestedImagesFileName(
+    context: Context,
     images: List<ImageItem>
 ): String {
     val firstName = images.firstOrNull()?.name
@@ -455,7 +469,7 @@ private fun buildSuggestedImagesFileName(
     return if (images.size == 1 && firstName.isNotBlank()) {
         "${firstName}.pdf"
     } else {
-        "images_${System.currentTimeMillis()}.pdf"
+        "${context.getString(R.string.images_output_fallback_name)}_${System.currentTimeMillis()}.pdf"
     }
 }
 

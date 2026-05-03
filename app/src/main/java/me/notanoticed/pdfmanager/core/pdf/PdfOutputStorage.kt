@@ -3,6 +3,7 @@ package me.notanoticed.pdfmanager.core.pdf
 import android.content.Context
 import android.net.Uri
 import android.provider.DocumentsContract
+import me.notanoticed.pdfmanager.R
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
@@ -14,7 +15,7 @@ fun createTempPdfFile(
 ): File {
     val outputDir = File(context.cacheDir, directoryName)
     if (!outputDir.exists() && !outputDir.mkdirs()) {
-        error("Failed to create temporary PDF directory")
+        error(context.getString(R.string.output_create_temp_directory_failed))
     }
 
     return File.createTempFile(filePrefix, ".pdf", outputDir)
@@ -34,7 +35,7 @@ fun copyFileToUri(
                 runCatching { descriptor.fileDescriptor.sync() }
             }
         }
-    } ?: error("Failed to open output destination")
+    } ?: error(context.getString(R.string.output_open_destination_failed))
 }
 
 fun createPdfDocumentInTree(
@@ -51,5 +52,5 @@ fun createPdfDocumentInTree(
         parentDocumentUri,
         "application/pdf",
         displayName
-    ) ?: error("Failed to create output PDF in the selected folder")
+    ) ?: error(context.getString(R.string.output_create_document_failed))
 }

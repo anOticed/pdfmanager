@@ -57,12 +57,14 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import me.notanoticed.pdfmanager.R
 import me.notanoticed.pdfmanager.core.pdf.formatFileSize
 import me.notanoticed.pdfmanager.core.toast.BindViewModelToasts
 import me.notanoticed.pdfmanager.feature.export.LocalPdfOutputFlow
@@ -93,7 +95,8 @@ fun ImageActiveScreen(
             onReady = { previewPdf ->
                 previewNav.openSingle(
                     pdf = previewPdf,
-                    allowSearch = false
+                    allowSearch = false,
+                    titleOverride = context.getString(R.string.images_preview_title)
                 )
             }
         )
@@ -124,7 +127,7 @@ fun ImageActiveScreen(
                 modifier = Modifier.padding(18.dp),
             ) {
                 Text(
-                    text = "Image Order",
+                    text = stringResource(R.string.images_order_title),
                     color = Colors.Text.blue,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.SemiBold
@@ -133,7 +136,7 @@ fun ImageActiveScreen(
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Text(
-                    text = "Drag images to reorder pages. Use Preview to check the final order.",
+                    text = stringResource(R.string.images_order_subtitle),
                     color = Colors.Text.secondary,
                     fontSize = 12.sp
                 )
@@ -218,7 +221,7 @@ fun ImageActiveScreen(
                 ) {
                     Icon(
                         imageVector = Icons.Outlined.Visibility,
-                        contentDescription = "Preview",
+                        contentDescription = stringResource(R.string.images_preview_action),
                         tint = Colors.Icon.white,
                         modifier = Modifier.size(18.dp)
                     )
@@ -226,7 +229,11 @@ fun ImageActiveScreen(
                     Spacer(modifier = Modifier.width(8.dp))
 
                     Text(
-                        text = if (viewModel.isPreparingPreview) "Preparing..." else "Preview",
+                        text = if (viewModel.isPreparingPreview) {
+                            stringResource(R.string.action_preparing)
+                        } else {
+                            stringResource(R.string.images_preview_action)
+                        },
                         color = Colors.Primary.white,
                         fontSize = 14.sp
                     )
@@ -234,7 +241,10 @@ fun ImageActiveScreen(
 
                 Button(
                     onClick = {
-                        viewModel.requestCreatePdfExport(pdfOutputFlow::start)
+                        viewModel.requestCreatePdfExport(
+                            context = context,
+                            onRequest = pdfOutputFlow::start
+                        )
                     },
                     colors = ButtonDefaults.buttonColors(
                         containerColor = Colors.Button.green
@@ -245,7 +255,7 @@ fun ImageActiveScreen(
                 ) {
                     Icon(
                         imageVector = Icons.Outlined.PictureAsPdf,
-                        contentDescription = "Create PDF",
+                        contentDescription = stringResource(R.string.images_create_pdf_action),
                         tint = Colors.Icon.white,
                         modifier = Modifier.size(20.dp)
                     )
@@ -253,7 +263,7 @@ fun ImageActiveScreen(
                     Spacer(modifier = Modifier.width(8.dp))
 
                     Text(
-                        text = "Create PDF",
+                        text = stringResource(R.string.images_create_pdf_action),
                         color = Colors.Primary.white,
                         fontSize = 14.sp
                     )
@@ -328,7 +338,16 @@ private fun ImageItemCard(
                 )
 
                 Text(
-                    text = "${image.widthPx} x ${image.heightPx} | ${formatFileSize(image.sizeBytes, unknownWhenNonPositive = true)}",
+                    text = stringResource(
+                        R.string.images_item_metadata_format,
+                        image.widthPx,
+                        image.heightPx,
+                        formatFileSize(
+                            context = LocalContext.current,
+                            bytes = image.sizeBytes,
+                            unknownWhenNonPositive = true
+                        )
+                    ),
                     color = Colors.Text.secondary,
                     fontSize = 11.sp,
                     maxLines = 1,
@@ -347,7 +366,7 @@ private fun ImageItemCard(
             ) {
                 Icon(
                     imageVector = Icons.Outlined.DragHandle,
-                    contentDescription = "Reorder",
+                    contentDescription = stringResource(R.string.action_reorder),
                     tint = Colors.Icon.default,
                     modifier = Modifier.size(16.dp)
                 )
@@ -366,7 +385,7 @@ private fun ImageItemCard(
             ) {
                 Icon(
                     Icons.Outlined.Close,
-                    contentDescription = "Remove",
+                    contentDescription = stringResource(R.string.action_remove),
                     modifier = Modifier.size(16.dp)
                 )
             }

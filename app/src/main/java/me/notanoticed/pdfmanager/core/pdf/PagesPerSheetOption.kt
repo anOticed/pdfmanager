@@ -10,12 +10,6 @@ enum class PagesPerSheetOption(
 ) {
     ONE(1),
     TWO(2),
-    FOUR(4);
-
-    val summaryLabel: String
-        get() = when (pagesPerSheet) {
-            1 -> "1 page per sheet"
-            else -> "$pagesPerSheet pages per sheet"
-        }
+    FOUR(4)
 }
 /* -------------------------------------------------------- */

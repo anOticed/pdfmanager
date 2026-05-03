@@ -52,9 +52,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import me.notanoticed.pdfmanager.R
 import me.notanoticed.pdfmanager.ui.theme.Colors
 
 /* -------------------- TOP BAR -------------------- */
@@ -72,7 +75,11 @@ fun PdfListTopBar(
                 when {
                     viewModel.isSelectionMode -> {
                         Text(
-                            text = "${viewModel.selectionCount} Selected",
+                            text = pluralStringResource(
+                                R.plurals.pdflist_selected_count,
+                                viewModel.selectionCount,
+                                viewModel.selectionCount
+                            ),
                             fontSize = 22.sp,
                             fontWeight = FontWeight.ExtraBold,
                             color = Colors.Text.primary
@@ -116,7 +123,7 @@ fun PdfListTopBar(
                                     ) {
                                         if (viewModel.searchQuery.isEmpty()) {
                                             Text(
-                                                text = "Search files",
+                                                text = stringResource(R.string.pdflist_search_placeholder),
                                                 color = Colors.Text.secondary,
                                                 fontSize = 14.sp
                                             )
@@ -131,13 +138,17 @@ fun PdfListTopBar(
                     else -> {
                         Column {
                             Text(
-                                text = "All Files",
+                                text = stringResource(R.string.pdflist_title),
                                 fontSize = 22.sp,
                                 fontWeight = FontWeight.ExtraBold,
                                 color = Colors.Text.primary
                             )
                             Text(
-                                text = "$totalDocuments documents",
+                                text = pluralStringResource(
+                                    R.plurals.pdflist_document_count,
+                                    totalDocuments,
+                                    totalDocuments
+                                ),
                                 fontSize = 12.sp,
                                 color = Colors.Text.secondary
                             )
@@ -149,13 +160,19 @@ fun PdfListTopBar(
                 when {
                     viewModel.isSelectionMode -> {
                         IconButton(onClick = { viewModel.exitSelectionMode() }) {
-                            Icon(Icons.Outlined.ArrowBack, contentDescription = "Back")
+                            Icon(
+                                Icons.Outlined.ArrowBack,
+                                contentDescription = stringResource(R.string.action_back)
+                            )
                         }
                     }
 
                     viewModel.isSearchMode -> {
                         IconButton(onClick = { viewModel.closeSearch() }) {
-                            Icon(Icons.Outlined.ArrowBack, contentDescription = "Close Search")
+                            Icon(
+                                Icons.Outlined.ArrowBack,
+                                contentDescription = stringResource(R.string.pdflist_close_search_content_description)
+                            )
                         }
                     }
                 }
@@ -168,7 +185,7 @@ fun PdfListTopBar(
                             modifier = Modifier.padding(end = 12.dp)
                         ) {
                             Text(
-                                text = "Select All",
+                                text = stringResource(R.string.pdflist_select_all),
                                 fontSize = 14.sp,
                                 color = Colors.Text.primary
                             )
@@ -195,7 +212,7 @@ fun PdfListTopBar(
                             ) {
                                 Icon(
                                     imageVector = Icons.Outlined.Search,
-                                    contentDescription = "Search"
+                                    contentDescription = stringResource(R.string.action_search)
                                 )
                             }
                         }
@@ -244,7 +261,7 @@ private fun PdfListMoreMenu(
     ) {
         Icon(
             imageVector = Icons.Outlined.MoreVert,
-            contentDescription = "More"
+            contentDescription = stringResource(R.string.action_more)
         )
     }
 
@@ -254,7 +271,7 @@ private fun PdfListMoreMenu(
         containerColor = Colors.Surface.card
     ) {
         DropdownMenuItem(
-            text = { Text(text = "Select", color = Colors.Text.primary) },
+            text = { Text(text = stringResource(R.string.pdflist_menu_select), color = Colors.Text.primary) },
             onClick = {
                 viewModel.enterSelectionMode()
                 onExpandedChange(false)
@@ -271,7 +288,7 @@ private fun PdfListMoreMenu(
         HorizontalDivider(color = Colors.Border.subtle)
 
         DropdownMenuItem(
-            text = { Text(text = "Name", color = Colors.Text.primary) },
+            text = { Text(text = stringResource(R.string.pdflist_sort_name), color = Colors.Text.primary) },
             onClick = {
                 viewModel.updateSortType(PdfSortType.NAME)
                 onExpandedChange(false)
@@ -295,7 +312,7 @@ private fun PdfListMoreMenu(
         )
 
         DropdownMenuItem(
-            text = { Text(text = "File size", color = Colors.Text.primary) },
+            text = { Text(text = stringResource(R.string.pdflist_sort_file_size), color = Colors.Text.primary) },
             onClick = {
                 viewModel.updateSortType(PdfSortType.FILE_SIZE)
                 onExpandedChange(false)
@@ -319,7 +336,7 @@ private fun PdfListMoreMenu(
         )
 
         DropdownMenuItem(
-            text = { Text(text = "Date", color = Colors.Text.primary) },
+            text = { Text(text = stringResource(R.string.pdflist_sort_date), color = Colors.Text.primary) },
             onClick = {
                 viewModel.updateSortType(PdfSortType.DATE)
                 onExpandedChange(false)
@@ -345,7 +362,7 @@ private fun PdfListMoreMenu(
         HorizontalDivider(color = Colors.Border.subtle)
 
         DropdownMenuItem(
-            text = { Text(text = "Ascending", color = Colors.Text.primary) },
+            text = { Text(text = stringResource(R.string.pdflist_sort_ascending), color = Colors.Text.primary) },
             onClick = {
                 viewModel.updateSortOrder(PdfSortOrder.ASCENDING)
                 onExpandedChange(false)
@@ -369,7 +386,7 @@ private fun PdfListMoreMenu(
         )
 
         DropdownMenuItem(
-            text = { Text(text = "Descending", color = Colors.Text.primary) },
+            text = { Text(text = stringResource(R.string.pdflist_sort_descending), color = Colors.Text.primary) },
             onClick = {
                 viewModel.updateSortOrder(PdfSortOrder.DESCENDING)
                 onExpandedChange(false)

@@ -15,12 +15,15 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import me.notanoticed.pdfmanager.R
 import me.notanoticed.pdfmanager.ui.theme.Colors
 
 @Composable
@@ -36,8 +39,8 @@ fun RenamePdfDialog(
     if (!visible) return
 
     FileActionDialog(
-        title = "Rename PDF",
-        confirmText = if (isProcessing) "Saving..." else "Save",
+        title = stringResource(R.string.pdflist_rename_dialog_title),
+        confirmText = if (isProcessing) stringResource(R.string.action_saving) else stringResource(R.string.action_save),
         confirmContainerColor = Colors.Button.blue,
         isProcessing = isProcessing,
         onDismiss = onDismiss,
@@ -47,7 +50,7 @@ fun RenamePdfDialog(
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 Text(
-                    text = "Current name: $currentName",
+                    text = stringResource(R.string.pdflist_current_name_format, currentName),
                     color = Colors.Text.secondary,
                     fontSize = 13.sp
                 )
@@ -59,7 +62,7 @@ fun RenamePdfDialog(
                     enabled = !isProcessing,
                     label = {
                         Text(
-                            text = "File name",
+                            text = stringResource(R.string.pdflist_file_name_label),
                             color = Colors.Text.secondary
                         )
                     },
@@ -85,8 +88,8 @@ fun DeletePdfDialog(
     if (!visible) return
 
     FileActionDialog(
-        title = "Delete PDF",
-        confirmText = if (isProcessing) "Deleting..." else "Delete",
+        title = stringResource(R.string.pdflist_delete_dialog_title),
+        confirmText = if (isProcessing) stringResource(R.string.action_deleting) else stringResource(R.string.action_delete),
         confirmContainerColor = Colors.Button.red,
         isProcessing = isProcessing,
         onDismiss = onDismiss,
@@ -96,11 +99,7 @@ fun DeletePdfDialog(
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 Text(
-                    text = if (fileCount == 1) {
-                        "This action permanently removes the selected PDF."
-                    } else {
-                        "This action permanently removes the selected PDFs."
-                    },
+                    text = pluralStringResource(R.plurals.pdflist_delete_dialog_message, fileCount),
                     color = Colors.Text.secondary,
                     fontSize = 13.sp
                 )
@@ -109,7 +108,7 @@ fun DeletePdfDialog(
                     text = if (fileCount == 1) {
                         "\"${fileName.orEmpty()}\""
                     } else {
-                        "$fileCount PDFs selected"
+                        pluralStringResource(R.plurals.pdflist_selected_pdf_count, fileCount, fileCount)
                     },
                     color = Colors.Text.primary,
                     fontSize = 14.sp,
@@ -129,11 +128,11 @@ fun EditPdfMetadataDialog(
     if (!viewModel.metadataDialogVisible) return
 
     FileActionDialog(
-        title = "Edit PDF Metadata",
+        title = stringResource(R.string.pdflist_metadata_dialog_title),
         confirmText = when {
-            viewModel.isMetadataLoading -> "Loading..."
-            viewModel.isFileActionInProgress -> "Saving..."
-            else -> "Save"
+            viewModel.isMetadataLoading -> stringResource(R.string.action_loading)
+            viewModel.isFileActionInProgress -> stringResource(R.string.action_saving)
+            else -> stringResource(R.string.action_save)
         },
         confirmContainerColor = Colors.Button.blue,
         isProcessing = viewModel.isFileActionInProgress || viewModel.isMetadataLoading,
@@ -151,32 +150,32 @@ fun EditPdfMetadataDialog(
 
                 if (viewModel.isMetadataLoading) {
                     Text(
-                        text = "Loading metadata...",
+                        text = stringResource(R.string.pdflist_metadata_loading),
                         color = Colors.Text.secondary,
                         fontSize = 13.sp,
                         modifier = Modifier.padding(vertical = 8.dp)
                     )
                 } else {
                     MetadataField(
-                        label = "Title",
+                        label = stringResource(R.string.pdflist_metadata_title),
                         value = viewModel.metadataTitleInput,
                         enabled = !viewModel.isFileActionInProgress,
                         onValueChange = viewModel::updateMetadataTitle
                     )
                     MetadataField(
-                        label = "Author",
+                        label = stringResource(R.string.pdflist_metadata_author),
                         value = viewModel.metadataAuthorInput,
                         enabled = !viewModel.isFileActionInProgress,
                         onValueChange = viewModel::updateMetadataAuthor
                     )
                     MetadataField(
-                        label = "Subject",
+                        label = stringResource(R.string.pdflist_metadata_subject),
                         value = viewModel.metadataSubjectInput,
                         enabled = !viewModel.isFileActionInProgress,
                         onValueChange = viewModel::updateMetadataSubject
                     )
                     MetadataField(
-                        label = "Keywords",
+                        label = stringResource(R.string.pdflist_metadata_keywords),
                         value = viewModel.metadataKeywordsInput,
                         enabled = !viewModel.isFileActionInProgress,
                         onValueChange = viewModel::updateMetadataKeywords
@@ -197,15 +196,15 @@ fun PdfPasswordDialog(
 
     FileActionDialog(
         title = if (mode == PdfListViewModel.PasswordDialogMode.SET) {
-            "Set PDF Password"
+            stringResource(R.string.pdflist_password_set_dialog_title)
         } else {
-            "Remove PDF Password"
+            stringResource(R.string.pdflist_password_remove_dialog_title)
         },
         confirmText = when {
-            viewModel.isFileActionInProgress && mode == PdfListViewModel.PasswordDialogMode.SET -> "Saving..."
-            viewModel.isFileActionInProgress -> "Removing..."
-            mode == PdfListViewModel.PasswordDialogMode.SET -> "Save"
-            else -> "Remove"
+            viewModel.isFileActionInProgress && mode == PdfListViewModel.PasswordDialogMode.SET -> stringResource(R.string.action_saving)
+            viewModel.isFileActionInProgress -> stringResource(R.string.action_removing)
+            mode == PdfListViewModel.PasswordDialogMode.SET -> stringResource(R.string.action_save)
+            else -> stringResource(R.string.action_remove)
         },
         confirmContainerColor = Colors.Button.blue,
         isProcessing = viewModel.isFileActionInProgress,
@@ -223,32 +222,32 @@ fun PdfPasswordDialog(
 
                 if (mode == PdfListViewModel.PasswordDialogMode.SET) {
                     Text(
-                        text = "Set a password to protect this PDF.",
+                        text = stringResource(R.string.pdflist_password_set_message),
                         color = Colors.Text.secondary,
                         fontSize = 13.sp
                     )
 
                     PasswordField(
-                        label = "New password",
+                        label = stringResource(R.string.pdflist_password_new_label),
                         value = viewModel.passwordPrimaryInput,
                         enabled = !viewModel.isFileActionInProgress,
                         onValueChange = viewModel::updatePasswordPrimaryInput
                     )
                     PasswordField(
-                        label = "Confirm password",
+                        label = stringResource(R.string.pdflist_password_confirm_label),
                         value = viewModel.passwordConfirmInput,
                         enabled = !viewModel.isFileActionInProgress,
                         onValueChange = viewModel::updatePasswordConfirmInput
                     )
                 } else {
                     Text(
-                        text = "Enter the current password to unlock this PDF.",
+                        text = stringResource(R.string.pdflist_password_remove_message),
                         color = Colors.Text.secondary,
                         fontSize = 13.sp
                     )
 
                     PasswordField(
-                        label = "Current password",
+                        label = stringResource(R.string.pdflist_password_current_label),
                         value = viewModel.passwordPrimaryInput,
                         enabled = !viewModel.isFileActionInProgress,
                         onValueChange = viewModel::updatePasswordPrimaryInput
@@ -363,7 +362,7 @@ private fun FileActionDialog(
                 enabled = !isProcessing
             ) {
                 Text(
-                    text = "Cancel",
+                    text = stringResource(R.string.action_cancel),
                     color = Colors.Text.secondary
                 )
             }

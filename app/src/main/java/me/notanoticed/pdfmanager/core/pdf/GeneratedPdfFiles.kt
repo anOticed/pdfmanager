@@ -2,6 +2,7 @@ package me.notanoticed.pdfmanager.core.pdf
 
 import android.content.Context
 import com.tom_roush.pdfbox.android.PDFBoxResourceLoader
+import me.notanoticed.pdfmanager.R
 import java.io.File
 import java.util.concurrent.atomic.AtomicBoolean
 
@@ -26,7 +27,7 @@ fun prepareGeneratedPdfFile(
 ): File {
     val outputDir = File(context.cacheDir, directoryName)
     if (!outputDir.exists() && !outputDir.mkdirs()) {
-        error("Failed to create output directory")
+        error(context.getString(R.string.output_create_directory_failed))
     }
 
     cleanupGeneratedPdfFiles(

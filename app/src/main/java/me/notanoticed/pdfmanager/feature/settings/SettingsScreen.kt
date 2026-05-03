@@ -56,6 +56,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import me.notanoticed.pdfmanager.BuildConfig
+import androidx.compose.ui.res.stringResource
+import me.notanoticed.pdfmanager.R
 import me.notanoticed.pdfmanager.ui.theme.Colors
 
 /* -------------------- SCREEN -------------------- */
@@ -72,11 +74,11 @@ fun SettingsScreen(
         verticalArrangement = Arrangement.spacedBy(18.dp)
     ) {
         item {
-            CardBlock(text = "APP PREFERENCES") {
+            CardBlock(text = stringResource(R.string.settings_section_app_preferences)) {
                 SwitchRow(
                     icon = Icons.Outlined.DarkMode,
-                    title = "Dark Mode",
-                    subtitle = "Use dark theme throughout the app",
+                    title = stringResource(R.string.settings_dark_mode_title),
+                    subtitle = stringResource(R.string.settings_dark_mode_subtitle),
                     checked = viewModel.isDarkModeEnabled,
                     onCheckedChange = viewModel::updateDarkModeEnabled
                 )
@@ -89,25 +91,25 @@ fun SettingsScreen(
         }
 
         item {
-            CardBlock(text = "MORE") {
+            CardBlock(text = stringResource(R.string.settings_section_more)) {
                 ActionRow(
                     icon = Icons.Outlined.LocalOffer,
-                    title = "License",
-                    subtitle = "GNU GPL v3",
+                    title = stringResource(R.string.settings_license_title),
+                    subtitle = stringResource(R.string.settings_license_subtitle),
                     onClick = viewModel::openLicense
                 )
                 SettingsDivider()
                 ActionRow(
                     icon = Icons.Outlined.OpenInNew,
-                    title = "GitHub",
+                    title = stringResource(R.string.settings_github_title),
                     subtitle = PROJECT_REPOSITORY_URL,
                     onClick = viewModel::openRepository
                 )
                 SettingsDivider()
                 ActionRow(
                     icon = Icons.Outlined.Share,
-                    title = "Share App",
-                    subtitle = "Tell others about PDF Manager",
+                    title = stringResource(R.string.settings_share_app_title),
+                    subtitle = stringResource(R.string.settings_share_app_subtitle),
                     onClick = viewModel::shareApp
                 )
             }
@@ -201,8 +203,8 @@ private fun LanguageRow(
 ) {
     BaseSettingsRow(
         icon = Icons.Outlined.Language,
-        title = "Language",
-        subtitle = "Choose application language",
+        title = stringResource(R.string.settings_language_title),
+        subtitle = stringResource(R.string.settings_language_subtitle),
         clickable = true,
         onClick = onClick,
         trailingContent = {
@@ -210,7 +212,7 @@ private fun LanguageRow(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = selectedLanguage.displayName,
+                    text = stringResource(selectedLanguage.labelRes),
                     color = Colors.Text.blue,
                     fontSize = 13.sp,
                     fontWeight = FontWeight.SemiBold
@@ -252,17 +254,20 @@ private fun AppInfoCard() {
             }
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = "PDF Manager",
+                text = stringResource(R.string.app_name),
                 color = Colors.Text.primary,
                 fontWeight = FontWeight.SemiBold
             )
             Text(
-                text = "Version ${BuildConfig.VERSION_NAME}",
+                text = stringResource(
+                    R.string.settings_version_format,
+                    BuildConfig.VERSION_NAME
+                ),
                 color = Colors.Text.secondary,
                 fontSize = 12.sp
             )
             Text(
-                text = "Your complete PDF toolkit",
+                text = stringResource(R.string.settings_app_info_tagline),
                 color = Colors.Text.secondary,
                 fontSize = 12.sp
             )
@@ -284,7 +289,7 @@ private fun LanguageDialog(
         containerColor = Colors.Surface.card,
         title = {
             Text(
-                text = "Language",
+                text = stringResource(R.string.settings_language_dialog_title),
                 color = Colors.Text.primary,
                 fontWeight = FontWeight.SemiBold
             )
@@ -303,7 +308,7 @@ private fun LanguageDialog(
         confirmButton = {
             TextButton(onClick = onDismiss) {
                 Text(
-                    text = "Cancel",
+                    text = stringResource(R.string.action_cancel),
                     color = Colors.Primary.blue
                 )
             }
@@ -333,7 +338,7 @@ private fun LanguageOptionRow(
             )
         )
         Text(
-            text = language.displayName,
+            text = stringResource(language.labelRes),
             color = Colors.Text.primary,
             fontWeight = FontWeight.Medium
         )

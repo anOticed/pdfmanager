@@ -20,10 +20,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import me.notanoticed.pdfmanager.R
 import me.notanoticed.pdfmanager.core.toast.BindViewModelToasts
 import me.notanoticed.pdfmanager.ui.theme.Colors
 
@@ -50,7 +52,7 @@ fun ImagesScreen(
         Spacer(modifier = Modifier.height(8.dp))
 
         Text(
-            text = "No images selected",
+            text = stringResource(R.string.images_empty_title),
             color = Colors.Text.secondary,
             fontSize = 24.sp,
             fontWeight = FontWeight.ExtraBold
@@ -59,7 +61,7 @@ fun ImagesScreen(
         Spacer(modifier = Modifier.height(10.dp))
 
         Text(
-            text = "Add images from your gallery or take new photos to create a PDF document.",
+            text = stringResource(R.string.images_empty_subtitle),
             color = Colors.Text.muted,
             fontSize = 12.sp,
             fontWeight = FontWeight.SemiBold,

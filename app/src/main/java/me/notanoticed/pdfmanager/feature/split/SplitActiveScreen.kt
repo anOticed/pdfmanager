@@ -66,6 +66,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
@@ -74,6 +77,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import me.notanoticed.pdfmanager.R
 import me.notanoticed.pdfmanager.core.pdf.PdfThumbnail
 import me.notanoticed.pdfmanager.core.toast.BindViewModelToasts
 import me.notanoticed.pdfmanager.feature.export.LocalPdfOutputFlow
@@ -88,6 +92,7 @@ fun SplitActiveScreen(
     viewModel: SplitViewModel
 ) {
     BindViewModelToasts(viewModel)
+    val context = LocalContext.current
     val pdfOutputFlow = LocalPdfOutputFlow.current
     val previewNav = LocalPreviewNav.current
     val selectedSplitPdf = viewModel.selectedSplitPdf ?: return
@@ -135,7 +140,7 @@ fun SplitActiveScreen(
                         )
 
                         Text(
-                            text = selectedSplitPdf.metaLine(),
+                            text = selectedSplitPdf.metaLine(context),
                             color = Colors.Text.secondary,
                             fontSize = 12.sp
                         )
@@ -146,7 +151,7 @@ fun SplitActiveScreen(
 
         item {
             Text(
-                text = "Split Method",
+                text = stringResource(R.string.split_method_title),
                 color = Colors.Text.primary,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.SemiBold,
@@ -210,7 +215,7 @@ fun SplitActiveScreen(
                     ) {
                         Icon(
                             imageVector = Icons.Outlined.Visibility,
-                            contentDescription = "Preview",
+                            contentDescription = stringResource(R.string.split_preview_action),
                             tint = Colors.Icon.white,
                             modifier = Modifier.size(18.dp)
                         )
@@ -218,7 +223,7 @@ fun SplitActiveScreen(
                         Spacer(modifier = Modifier.width(8.dp))
 
                         Text(
-                            text = "Preview",
+                            text = stringResource(R.string.split_preview_action),
                             color = Colors.Primary.white,
                             fontSize = 14.sp
                         )
@@ -226,7 +231,10 @@ fun SplitActiveScreen(
 
                     Button(
                         onClick = {
-                            viewModel.requestSplitExport(pdfOutputFlow::start)
+                            viewModel.requestSplitExport(
+                                context = context,
+                                onRequest = pdfOutputFlow::start
+                            )
                         },
                         enabled = splitPlanResult is SplitPlanResult.Ready,
                         colors = ButtonDefaults.buttonColors(
@@ -238,7 +246,7 @@ fun SplitActiveScreen(
                     ) {
                         Icon(
                             imageVector = Icons.Outlined.FileDownload,
-                            contentDescription = "Split PDF",
+                            contentDescription = stringResource(R.string.split_export_action),
                             tint = Colors.Icon.white,
                             modifier = Modifier.size(20.dp)
                         )
@@ -246,7 +254,7 @@ fun SplitActiveScreen(
                         Spacer(modifier = Modifier.width(8.dp))
 
                         Text(
-                            text = "Split PDF",
+                            text = stringResource(R.string.split_export_action),
                             color = Colors.Primary.white,
                             fontSize = 14.sp
                         )
@@ -266,16 +274,16 @@ fun SplitActiveScreen(
 
 data class SplitMethod(
     val type: SplitMethodType,
-    val title: String,
-    val description: String,
+    val titleRes: Int,
+    val descriptionRes: Int,
     val icon: ImageVector
 )
 
 
 data class MethodView(
     val type: SplitMethodType,
-    val title: String,
-    val description: String
+    val titleRes: Int,
+    val descriptionRes: Int
 )
 
 
@@ -289,20 +297,20 @@ fun RadioButtonSingleSelection(
     val radioOptions = listOf(
         SplitMethod(
             type = SplitMethodType.PAGE_RANGES,
-            title = "By Page Ranges",
-            description = "Split into specific ranges (e.g., 1-5, 10-15)",
+            titleRes = R.string.split_method_ranges_title,
+            descriptionRes = R.string.split_method_ranges_description,
             icon = Icons.Outlined.ContentCut
         ),
         SplitMethod(
             type = SplitMethodType.SINGLE_PAGE_PER_FILE,
-            title = "One Page Per File",
-            description = "Create a separate file for each page",
+            titleRes = R.string.split_method_single_title,
+            descriptionRes = R.string.split_method_single_description,
             icon = Icons.Outlined.FileCopy
         ),
         SplitMethod(
             type = SplitMethodType.EVERY_N_PAGES,
-            title = "Every N Pages",
-            description = "Split into files with N pages each",
+            titleRes = R.string.split_method_every_n_title,
+            descriptionRes = R.string.split_method_every_n_description,
             icon = Icons.Outlined.Tag
         )
     )
@@ -310,18 +318,18 @@ fun RadioButtonSingleSelection(
     val methodView = listOf(
         MethodView(
             type = SplitMethodType.PAGE_RANGES,
-            title = "Page Ranges",
-            description = "Enter page ranges separated by commas (e.g., 1-5, 10-15, 20)"
+            titleRes = R.string.split_ranges_input_title,
+            descriptionRes = R.string.split_ranges_input_description
         ),
         MethodView(
             type = SplitMethodType.SINGLE_PAGE_PER_FILE,
-            title = "Single Page Files",
-            description = "This will create ${selectedSplitPdf.pagesCount} separate PDF files, one for each page."
+            titleRes = R.string.split_single_files_title,
+            descriptionRes = R.string.split_method_single_description
         ),
         MethodView(
             type = SplitMethodType.EVERY_N_PAGES,
-            title = "Pages Per File",
-            description = "Enter how many pages should each file contain"
+            titleRes = R.string.split_pages_per_file_title,
+            descriptionRes = R.string.split_pages_per_file_description
         )
     )
 
@@ -356,14 +364,21 @@ fun RadioButtonSingleSelection(
                     modifier = Modifier.padding(vertical = 8.dp)
                 ) {
                     Text(
-                        text = selectedMethodView.title,
+                        text = stringResource(selectedMethodView.titleRes),
                         color = Colors.Text.blue,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.SemiBold,
                     )
 
                     Text(
-                        text = selectedMethodView.description,
+                        text = when (selectedMethod) {
+                            SplitMethodType.SINGLE_PAGE_PER_FILE -> pluralStringResource(
+                                R.plurals.split_single_files_description,
+                                selectedSplitPdf.pagesCount,
+                                selectedSplitPdf.pagesCount
+                            )
+                            else -> stringResource(selectedMethodView.descriptionRes)
+                        },
                         color = Colors.Text.secondary,
                         fontSize = 12.sp
                     )
@@ -372,14 +387,14 @@ fun RadioButtonSingleSelection(
                         SplitInputField(
                             value = viewModel.splitRangesText,
                             onValueChange = viewModel::updateSplitRangesText,
-                            placeholder = "1-5, 10-15, 20",
+                            placeholder = stringResource(R.string.split_ranges_placeholder),
                             width = 220.dp
                         )
                     } else if (selectedMethod == SplitMethodType.EVERY_N_PAGES) {
                         SplitInputField(
                             value = viewModel.splitPagesPerFileText,
                             onValueChange = viewModel::updateSplitPagesPerFileText,
-                            placeholder = "5",
+                            placeholder = stringResource(R.string.split_pages_per_file_placeholder),
                             width = 80.dp
                         )
                     }
@@ -438,14 +453,14 @@ fun MethodCard(
             },
             headlineContent = {
                 Text(
-                    text = method.title,
+                    text = stringResource(method.titleRes),
                     color = Colors.Text.primary,
                     fontWeight = FontWeight.SemiBold
                 )
             },
             supportingContent = {
                 Text(
-                    text = method.description,
+                    text = stringResource(method.descriptionRes),
                     color = Colors.Text.secondary,
                     fontSize = 12.sp
                 )
@@ -485,7 +500,7 @@ private fun SplitPlanSummaryCard(
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             Text(
-                text = "Output Summary",
+                text = stringResource(R.string.split_output_summary_title),
                 color = Colors.Text.blue,
                 fontSize = 14.sp,
                 fontWeight = FontWeight.SemiBold
@@ -494,18 +509,22 @@ private fun SplitPlanSummaryCard(
             when (splitPlanResult) {
                 is SplitPlanResult.Ready -> {
                     Text(
-                        text = buildString {
-                            append("${splitPlanResult.plan.outputFileCount} output ")
-                            append(if (splitPlanResult.plan.outputFileCount == 1) "file" else "files")
-                            append(" will be created")
-                        },
+                        text = pluralStringResource(
+                            R.plurals.split_output_file_count_summary,
+                            splitPlanResult.plan.outputFileCount,
+                            splitPlanResult.plan.outputFileCount
+                        ),
                         color = Colors.Text.primary,
                         fontSize = 13.sp,
                         fontWeight = FontWeight.Medium
                     )
 
                     Text(
-                        text = "${splitPlanResult.plan.totalPagesCovered} pages will be included in total",
+                        text = pluralStringResource(
+                            R.plurals.split_output_total_pages_summary,
+                            splitPlanResult.plan.totalPagesCovered,
+                            splitPlanResult.plan.totalPagesCovered
+                        ),
                         color = Colors.Text.secondary,
                         fontSize = 12.sp
                     )
@@ -522,7 +541,11 @@ private fun SplitPlanSummaryCard(
                     val remainingCount = splitPlanResult.plan.outputFileCount - 5
                     if (remainingCount > 0) {
                         Text(
-                            text = "...and $remainingCount more output files",
+                            text = pluralStringResource(
+                                R.plurals.split_output_remaining_files_summary,
+                                remainingCount,
+                                remainingCount
+                            ),
                             color = Colors.Text.secondary,
                             fontSize = 12.sp
                         )
@@ -531,7 +554,7 @@ private fun SplitPlanSummaryCard(
 
                 is SplitPlanResult.Error -> {
                     Text(
-                        text = splitPlanResult.message,
+                        text = splitPlanResult.resolveMessage(LocalContext.current),
                         color = Colors.Button.red,
                         fontSize = 12.sp
                     )
@@ -539,7 +562,7 @@ private fun SplitPlanSummaryCard(
 
                 null -> {
                     Text(
-                        text = "Select a PDF to see the split summary.",
+                        text = stringResource(R.string.split_output_summary_empty),
                         color = Colors.Text.secondary,
                         fontSize = 12.sp
                     )
@@ -564,14 +587,14 @@ private fun SplitChunkSummaryRow(
             verticalArrangement = Arrangement.spacedBy(2.dp)
         ) {
             Text(
-                text = "File $fileIndex",
+                text = stringResource(R.string.split_output_file_label, fileIndex),
                 color = Colors.Text.primary,
                 fontSize = 12.sp,
                 fontWeight = FontWeight.Medium
             )
 
             Text(
-                text = chunk.title,
+                text = chunk.title(LocalContext.current),
                 color = Colors.Text.secondary,
                 fontSize = 11.sp
             )
@@ -580,7 +603,7 @@ private fun SplitChunkSummaryRow(
         Spacer(modifier = Modifier.width(12.dp))
 
         Text(
-            text = chunk.summaryLine,
+            text = chunk.summaryLine(LocalContext.current),
             color = Colors.Text.secondary,
             fontSize = 11.sp
         )

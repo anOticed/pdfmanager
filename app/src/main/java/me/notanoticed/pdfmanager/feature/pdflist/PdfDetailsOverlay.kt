@@ -28,12 +28,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import me.notanoticed.pdfmanager.R
 import me.notanoticed.pdfmanager.core.pdf.model.PdfFile
 import me.notanoticed.pdfmanager.ui.theme.Colors
 import me.notanoticed.pdfmanager.ui.theme.PdfManagerTheme
@@ -48,6 +51,7 @@ fun PdfDetailsOverlay(
     onDismiss: () -> Unit
 ) {
     if (!visible || pdf == null) return
+    val context = LocalContext.current
 
     val sheetState = rememberModalBottomSheetState(
         skipPartiallyExpanded = true
@@ -78,7 +82,7 @@ fun PdfDetailsOverlay(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "Details",
+                    text = stringResource(R.string.pdf_option_details),
                     fontSize = 20.sp,
                     fontWeight = FontWeight.ExtraBold,
                     color = Colors.Text.primary
@@ -88,11 +92,11 @@ fun PdfDetailsOverlay(
             HorizontalDivider(color = Colors.Border.subtle)
             Spacer(modifier = Modifier.height(10.dp))
 
-            DetailsItem("File name", pdf.name)
-            DetailsItem("Storage path", pdf.storagePath)
-            DetailsItem("Created", pdf.createdDate())
-            DetailsItem("Last modified", pdf.lastModifiedDate())
-            DetailsItem("File size", pdf.size())
+            DetailsItem(stringResource(R.string.pdflist_details_file_name), pdf.name)
+            DetailsItem(stringResource(R.string.pdflist_details_storage_path), pdf.storagePath)
+            DetailsItem(stringResource(R.string.pdflist_details_created), pdf.createdDate())
+            DetailsItem(stringResource(R.string.pdflist_details_last_modified), pdf.lastModifiedDate())
+            DetailsItem(stringResource(R.string.pdflist_details_file_size), pdf.size(context))
 
             Spacer(modifier = Modifier.height(18.dp))
         }

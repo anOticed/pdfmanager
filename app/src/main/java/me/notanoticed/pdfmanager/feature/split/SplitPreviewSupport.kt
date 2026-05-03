@@ -8,6 +8,7 @@ import android.content.Context
 import android.net.Uri
 import androidx.core.content.FileProvider
 import com.tom_roush.pdfbox.pdmodel.PDDocument
+import me.notanoticed.pdfmanager.R
 import me.notanoticed.pdfmanager.core.pdf.PdfPageSource
 import me.notanoticed.pdfmanager.core.pdf.PagesPerSheetOption
 import me.notanoticed.pdfmanager.core.pdf.buildPdfFromPageGroups
@@ -97,6 +98,7 @@ internal fun exportSplitPlanToFolder(
             )
 
             val outputName = buildSplitOutputFileName(
+                context = context,
                 baseName = baseName,
                 fileIndex = index + 1
             )
@@ -131,7 +133,7 @@ private fun writeSplitPlanToFile(
     outputFile: File
 ): Int {
     val inputStream = context.contentResolver.openInputStream(sourcePdf.uri)
-        ?: error("Failed to open the selected PDF")
+        ?: error(context.getString(R.string.split_error_open_selected_pdf))
 
     inputStream.use { stream ->
         PDDocument.load(stream).use { sourceDocument ->
@@ -154,9 +156,13 @@ private fun writeSplitPlanToFile(
 }
 
 private fun buildSplitOutputFileName(
+    context: Context,
     baseName: String,
     fileIndex: Int
 ): String {
-    val normalizedIndex = fileIndex.toString().padStart(2, '0')
-    return "${baseName}_part_$normalizedIndex.pdf"
+    return context.getString(
+        R.string.split_output_part_file_name,
+        baseName,
+        fileIndex
+    )
 }

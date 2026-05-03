@@ -33,8 +33,18 @@ class PreviewNav internal constructor(
     private val openRequest: (PreviewRequest) -> Unit,
     private val setVisible: (Boolean) -> Unit
 ) {
-    fun openSingle(pdf: PdfFile, allowSearch: Boolean = true) {
-        openRequest(PreviewRequest.Single(pdf = pdf, allowSearch = allowSearch))
+    fun openSingle(
+        pdf: PdfFile,
+        allowSearch: Boolean = true,
+        titleOverride: String? = null
+    ) {
+        openRequest(
+            PreviewRequest.Single(
+                pdf = pdf,
+                allowSearch = allowSearch,
+                topBarTitle = titleOverride ?: pdf.name
+            )
+        )
         setVisible(true)
     }
     fun openSplit(

@@ -29,9 +29,11 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import me.notanoticed.pdfmanager.R
 import me.notanoticed.pdfmanager.ui.theme.Colors
 
 /* -------------------- TOP BAR -------------------- */
@@ -50,13 +52,13 @@ fun SplitTopBar(
             title = {
                 Column {
                     Text(
-                        text = "Split PDF",
+                        text = stringResource(R.string.split_title),
                         fontSize = 22.sp,
                         fontWeight = FontWeight.ExtraBold
                     )
 
                     Text(
-                        text = if (isActive) fileName else "No file selected",
+                        text = if (isActive) fileName else stringResource(R.string.split_no_file_selected),
                         fontSize = 12.sp,
                         color = Colors.Text.secondary
                     )
@@ -73,14 +75,18 @@ fun SplitTopBar(
                 ) {
                     Icon(
                         imageVector = Icons.Outlined.Description,
-                        contentDescription = "Change",
+                        contentDescription = stringResource(R.string.action_change),
                         tint = Colors.Icon.white
                     )
 
                     Spacer(modifier = Modifier.size(6.dp))
 
                     Text(
-                        text = if (isActive) "Change" else "Select PDF",
+                        text = if (isActive) {
+                            stringResource(R.string.action_change)
+                        } else {
+                            stringResource(R.string.split_select_pdf)
+                        },
                         color = Colors.Primary.white
                     )
                 }
@@ -98,7 +104,7 @@ fun SplitTopBar(
                     ) {
                         Icon(
                             imageVector = Icons.Outlined.Close,
-                            contentDescription = "Close File",
+                            contentDescription = stringResource(R.string.split_close_file),
                             modifier = Modifier.fillMaxSize(0.5f)
                         )
                     }

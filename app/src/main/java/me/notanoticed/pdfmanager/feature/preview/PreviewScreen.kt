@@ -22,10 +22,12 @@ import androidx.compose.runtime.produceState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import me.notanoticed.pdfmanager.R
 import me.notanoticed.pdfmanager.core.pdf.model.PdfFile
 import me.notanoticed.pdfmanager.feature.split.prepareSplitPreviewPdf
 import me.notanoticed.pdfmanager.ui.theme.Colors
@@ -85,7 +87,7 @@ private fun SplitPreviewContent(
                 onFailure = { error ->
                     SplitPreviewState.Error(
                         error.message?.takeIf { it.isNotBlank() }
-                            ?: "Failed to prepare split preview"
+                            ?: context.getString(R.string.preview_split_prepare_failed)
                     )
                 }
             )
@@ -105,7 +107,7 @@ private fun SplitPreviewContent(
                     CircularProgressIndicator(color = Colors.Primary.blue)
 
                     Text(
-                        text = "Preparing split preview...",
+                        text = stringResource(R.string.preview_preparing_split),
                         color = Colors.Text.secondary,
                         fontSize = 14.sp
                     )

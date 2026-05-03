@@ -11,12 +11,12 @@ package me.notanoticed.pdfmanager.app
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.fragment.app.FragmentActivity
+import androidx.appcompat.app.AppCompatActivity
 import me.notanoticed.pdfmanager.core.pickers.ProvidePickers
 import me.notanoticed.pdfmanager.core.toast.ProvideToasts
 import me.notanoticed.pdfmanager.feature.preview.ProvidePreview
 
-class MainActivity : FragmentActivity() {
+class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()

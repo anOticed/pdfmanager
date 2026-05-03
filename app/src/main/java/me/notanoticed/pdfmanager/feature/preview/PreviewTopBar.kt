@@ -26,10 +26,12 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import me.notanoticed.pdfmanager.R
 import me.notanoticed.pdfmanager.ui.theme.Colors
 
 /* -------------------- TOP BAR -------------------- */
@@ -53,7 +55,7 @@ fun PreviewTopBar(
                 ) {
                     Icon(
                         imageVector = Icons.Outlined.ArrowBack,
-                        contentDescription = "Back"
+                        contentDescription = stringResource(R.string.action_back)
                     )
                 }
             },
@@ -79,7 +81,7 @@ fun PreviewTopBar(
                     ) {
                         Icon(
                             imageVector = Icons.Outlined.Search,
-                            contentDescription = "Search in PDF"
+                            contentDescription = stringResource(R.string.preview_search_in_pdf)
                         )
                     }
                 } else {

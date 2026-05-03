@@ -15,6 +15,7 @@ import android.provider.DocumentsContract
 import android.provider.MediaStore
 import com.tom_roush.pdfbox.pdmodel.encryption.AccessPermission
 import com.tom_roush.pdfbox.pdmodel.encryption.StandardProtectionPolicy
+import me.notanoticed.pdfmanager.R
 import me.notanoticed.pdfmanager.core.pdf.model.PdfFile
 import me.notanoticed.pdfmanager.core.pdf.model.PdfDocumentMetadata
 import com.tom_roush.pdfbox.pdmodel.PDDocument
@@ -62,7 +63,7 @@ object PdfDocumentActions {
         val fallbackBaseName = fallbackName
             .let(::sanitizeFileName)
             .removePdfSuffix()
-            .ifBlank { "document" }
+            .ifBlank { PDF_EXTENSION.removePrefix(".") }
 
         return sanitized
             .removePdfSuffix()
@@ -145,7 +146,7 @@ object PdfDocumentActions {
         documentName: String
     ) {
         val printManager = context.getSystemService(PrintManager::class.java)
-            ?: error("Print service is unavailable")
+            ?: error(context.getString(R.string.pdflist_print_dialog_failed))
 
         printManager.print(
             documentName,
@@ -165,7 +166,7 @@ object PdfDocumentActions {
         ensurePdfBoxInitialized(context)
 
         val inputStream = context.contentResolver.openInputStream(pdfUri)
-            ?: error("Failed to open PDF for metadata reading")
+            ?: error(context.getString(R.string.pdflist_metadata_load_failed))
 
         inputStream.use { stream ->
             PDDocument.load(stream).use { document ->
@@ -366,11 +367,13 @@ object PdfDocumentActions {
                             output.flush()
                         }
                     }
-                } ?: error("Failed to open source PDF")
+                } ?: error(context.getString(R.string.merge_error_open_source_pdf))
 
                 callback.onWriteFinished(arrayOf(PageRange.ALL_PAGES))
             } catch (error: Exception) {
-                callback.onWriteFailed(error.message ?: "Failed to print PDF")
+                callback.onWriteFailed(
+                    error.message ?: context.getString(R.string.pdflist_print_dialog_failed)
+                )
             }
         }
     }

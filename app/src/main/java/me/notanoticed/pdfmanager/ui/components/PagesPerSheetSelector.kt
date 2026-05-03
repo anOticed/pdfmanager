@@ -31,9 +31,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import me.notanoticed.pdfmanager.R
 import me.notanoticed.pdfmanager.core.pdf.PagesPerSheetOption
 import me.notanoticed.pdfmanager.ui.theme.Colors
 
@@ -60,7 +63,7 @@ fun ExpandablePagesPerSheetSection(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "Sheet Layout",
+                text = stringResource(R.string.pages_per_sheet_title),
                 color = Colors.Text.primary,
                 fontSize = 14.sp,
                 fontWeight = FontWeight.SemiBold
@@ -77,7 +80,11 @@ fun ExpandablePagesPerSheetSection(
                         .padding(horizontal = 10.dp, vertical = 5.dp)
                 ) {
                     Text(
-                        text = selectedOption.summaryLabel,
+                        text = pluralStringResource(
+                            R.plurals.pages_per_sheet_summary,
+                            selectedOption.pagesPerSheet,
+                            selectedOption.pagesPerSheet
+                        ),
                         color = Colors.Text.secondary,
                         fontSize = 11.sp,
                         fontWeight = FontWeight.Medium
@@ -85,7 +92,11 @@ fun ExpandablePagesPerSheetSection(
                 }
 
                 Text(
-                    text = if (expanded) "Hide" else "Change",
+                    text = if (expanded) {
+                        stringResource(R.string.action_hide)
+                    } else {
+                        stringResource(R.string.action_change)
+                    },
                     color = Colors.Text.blue,
                     fontSize = 12.sp,
                     fontWeight = FontWeight.SemiBold

@@ -21,8 +21,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import me.notanoticed.pdfmanager.R
 import me.notanoticed.pdfmanager.core.pdf.model.PdfFile
 import me.notanoticed.pdfmanager.ui.theme.Colors
 
@@ -54,7 +56,7 @@ fun PdfThumbnail(
         } else {
             Icon(
                 imageVector = Icons.Outlined.Description,
-                contentDescription = "PDF icon",
+                contentDescription = stringResource(R.string.pdf_icon_content_description),
                 tint = placeholderIconTint,
                 modifier = Modifier.size(placeholderIconSize)
             )

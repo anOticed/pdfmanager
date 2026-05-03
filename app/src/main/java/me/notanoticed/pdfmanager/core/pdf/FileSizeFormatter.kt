@@ -1,8 +1,10 @@
 package me.notanoticed.pdfmanager.core.pdf
 
-import java.util.Locale
+import android.content.Context
+import me.notanoticed.pdfmanager.R
 
 fun formatFileSize(
+    context: Context,
     bytes: Long,
     unknownWhenNonPositive: Boolean = false
 ): String {
@@ -11,13 +13,17 @@ fun formatFileSize(
     val gb = mb * 1000
 
     if (bytes <= 0L) {
-        return if (unknownWhenNonPositive) "Unknown size" else "0 B"
+        return if (unknownWhenNonPositive) {
+            context.getString(R.string.file_size_unknown)
+        } else {
+            context.getString(R.string.file_size_bytes_zero)
+        }
     }
 
     return when {
-        bytes < kb -> "$bytes B"
-        bytes < mb -> String.format(Locale.US, "%.1f KB", bytes / kb)
-        bytes < gb -> String.format(Locale.US, "%.1f MB", bytes / mb)
-        else -> String.format(Locale.US, "%.1f GB", bytes / gb)
+        bytes < kb -> context.getString(R.string.file_size_bytes_format, bytes)
+        bytes < mb -> context.getString(R.string.file_size_kilobytes_format, bytes / kb)
+        bytes < gb -> context.getString(R.string.file_size_megabytes_format, bytes / mb)
+        else -> context.getString(R.string.file_size_gigabytes_format, bytes / gb)
     }
 }

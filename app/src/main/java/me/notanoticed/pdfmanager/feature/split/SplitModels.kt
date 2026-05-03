@@ -4,6 +4,10 @@
 
 package me.notanoticed.pdfmanager.feature.split
 
+import android.content.Context
+import androidx.annotation.StringRes
+import me.notanoticed.pdfmanager.R
+
 /* -------------------- SPLIT MODELS -------------------- */
 enum class SplitMethodType {
     PAGE_RANGES,
@@ -27,18 +31,28 @@ data class SplitChunk(
     val pageCount: Int
         get() = pages.size
 
-    val title: String
-        get() = when {
-            pageCount == 1 -> "Page ${pages.first()}"
-            pages.isContiguous() -> "Pages ${pages.first()}-${pages.last()}"
-            else -> "Pages ${pages.joinToString(", ")}"
+    fun title(context: Context): String {
+        return when {
+            pageCount == 1 -> context.getString(R.string.split_chunk_page_single, pages.first())
+            pages.isContiguous() -> context.getString(
+                R.string.split_chunk_page_range,
+                pages.first(),
+                pages.last()
+            )
+            else -> context.getString(
+                R.string.split_chunk_page_list,
+                pages.joinToString(", ")
+            )
         }
+    }
 
-    val summaryLine: String
-        get() = when (pageCount) {
-            1 -> "1 page"
-            else -> "$pageCount pages"
-        }
+    fun summaryLine(context: Context): String {
+        return context.resources.getQuantityString(
+            R.plurals.split_chunk_page_count,
+            pageCount,
+            pageCount
+        )
+    }
 }
 
 data class SplitPlan(
@@ -58,7 +72,10 @@ data class SplitPlan(
 
 sealed interface SplitPlanResult {
     data class Ready(val plan: SplitPlan) : SplitPlanResult
-    data class Error(val message: String) : SplitPlanResult
+    data class Error(
+        @StringRes val messageRes: Int,
+        val formatArgs: List<Any> = emptyList()
+    ) : SplitPlanResult
 }
 /* ------------------------------------------------------ */
 
@@ -69,7 +86,7 @@ fun buildSplitPlan(
     configuration: SplitConfiguration
 ): SplitPlanResult {
     if (totalPages <= 0) {
-        return SplitPlanResult.Error("Selected PDF contains no pages")
+        return SplitPlanResult.Error(R.string.split_plan_error_no_pages)
     }
 
     return runCatching {
@@ -96,10 +113,10 @@ fun buildSplitPlan(
 
             SplitMethodType.EVERY_N_PAGES -> {
                 val pagesPerFile = configuration.pagesPerFile.trim().toIntOrNull()
-                    ?: error("Pages per file must be a valid number")
+                    ?: splitPlanError(R.string.split_plan_error_invalid_pages_per_file_number)
 
                 if (pagesPerFile <= 0) {
-                    error("Pages per file must be greater than 0")
+                    splitPlanError(R.string.split_plan_error_pages_per_file_positive)
                 }
 
                 SplitPlan(
@@ -113,10 +130,8 @@ fun buildSplitPlan(
     }.fold(
         onSuccess = SplitPlanResult::Ready,
         onFailure = { error ->
-            SplitPlanResult.Error(
-                error.message?.takeIf { it.isNotBlank() }
-                    ?: "Failed to build split plan"
-            )
+            (error as? SplitPlanException)?.toResultError()
+                ?: SplitPlanResult.Error(R.string.split_plan_error_generic)
         }
     )
 }
@@ -130,46 +145,46 @@ private fun parseRangeChunks(
 ): List<SplitChunk> {
     val trimmed = rawRanges.trim()
     if (trimmed.isEmpty()) {
-        error("Enter page ranges first")
+        splitPlanError(R.string.split_plan_error_enter_ranges_first)
     }
 
     return trimmed.split(",").map { rawChunk ->
         val chunk = rawChunk.trim()
         if (chunk.isEmpty()) {
-            error("Page ranges contain an empty value")
+            splitPlanError(R.string.split_plan_error_empty_value)
         }
 
         if ("-" in chunk) {
             val parts = chunk.split("-", limit = 2).map(String::trim)
             if (parts.size != 2 || parts.any { it.isEmpty() }) {
-                error("Invalid page range: $chunk")
+                splitPlanError(R.string.split_plan_error_invalid_range, chunk)
             }
 
             val start = parts[0].toIntOrNull()
-                ?: error("Invalid page number: ${parts[0]}")
+                ?: splitPlanError(R.string.split_plan_error_invalid_page_number, parts[0])
             val end = parts[1].toIntOrNull()
-                ?: error("Invalid page number: ${parts[1]}")
+                ?: splitPlanError(R.string.split_plan_error_invalid_page_number, parts[1])
 
             if (start <= 0 || end <= 0) {
-                error("Page numbers must start from 1")
+                splitPlanError(R.string.split_plan_error_page_numbers_start_at_one)
             }
             if (start > end) {
-                error("Invalid page range: $chunk")
+                splitPlanError(R.string.split_plan_error_invalid_range, chunk)
             }
             if (end > totalPages) {
-                error("Page range exceeds document length")
+                splitPlanError(R.string.split_plan_error_exceeds_document_length)
             }
 
             SplitChunk(pages = (start..end).toList())
         } else {
             val page = chunk.toIntOrNull()
-                ?: error("Invalid page number: $chunk")
+                ?: splitPlanError(R.string.split_plan_error_invalid_page_number, chunk)
 
             if (page <= 0) {
-                error("Page numbers must start from 1")
+                splitPlanError(R.string.split_plan_error_page_numbers_start_at_one)
             }
             if (page > totalPages) {
-                error("Page range exceeds document length")
+                splitPlanError(R.string.split_plan_error_exceeds_document_length)
             }
 
             SplitChunk(pages = listOf(page))
@@ -180,5 +195,32 @@ private fun parseRangeChunks(
 private fun List<Int>.isContiguous(): Boolean {
     if (size < 2) return true
     return zipWithNext().all { (previous, next) -> next == previous + 1 }
+}
+
+private class SplitPlanException(
+    @StringRes val messageRes: Int,
+    val formatArgs: List<Any> = emptyList()
+) : IllegalStateException()
+
+private fun splitPlanError(
+    @StringRes messageRes: Int,
+    vararg formatArgs: Any
+): Nothing {
+    throw SplitPlanException(messageRes = messageRes, formatArgs = formatArgs.toList())
+}
+
+private fun SplitPlanException.toResultError(): SplitPlanResult.Error {
+    return SplitPlanResult.Error(
+        messageRes = messageRes,
+        formatArgs = formatArgs
+    )
+}
+
+fun SplitPlanResult.Error.resolveMessage(context: Context): String {
+    return if (formatArgs.isEmpty()) {
+        context.getString(messageRes)
+    } else {
+        context.getString(messageRes, *formatArgs.toTypedArray())
+    }
 }
 /* ------------------------------------------------ */

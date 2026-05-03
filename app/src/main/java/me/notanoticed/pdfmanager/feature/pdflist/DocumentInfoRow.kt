@@ -18,12 +18,14 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import me.notanoticed.pdfmanager.R
 import me.notanoticed.pdfmanager.core.pdf.PdfThumbnail
 import me.notanoticed.pdfmanager.core.pdf.model.PdfFile
 import me.notanoticed.pdfmanager.ui.theme.Colors
@@ -35,6 +37,8 @@ fun DocumentInfoRow(
     pdf: PdfFile,
     searchQuery: String = ""
 ) {
+    val context = LocalContext.current
+
     Row(
         modifier = modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
@@ -68,7 +72,7 @@ fun DocumentInfoRow(
             )
 
             Text(
-                text = pdf.metaLine(),
+                text = pdf.metaLine(context),
                 color = Colors.Text.secondary,
                 fontSize = 12.sp
             )
@@ -83,7 +87,7 @@ fun DocumentInfoRow(
             Spacer(modifier = Modifier.width(12.dp))
             Icon(
                 imageVector = Icons.Outlined.Lock,
-                contentDescription = "Locked icon",
+                contentDescription = context.getString(R.string.pdf_locked_icon_content_description),
                 tint = Colors.Icon.lock,
                 modifier = Modifier.size(16.dp)
             )

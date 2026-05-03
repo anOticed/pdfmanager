@@ -13,13 +13,13 @@ import me.notanoticed.pdfmanager.feature.split.SplitPlan
 
 /* -------------------- PREVIEW REQUEST -------------------- */
 sealed interface PreviewRequest {
-    val topBarTitle: String
+    val topBarTitle: String?
 
     data class Single(
         val pdf: PdfFile,
-        val allowSearch: Boolean = true
+        val allowSearch: Boolean = true,
+        override val topBarTitle: String? = pdf.name
     ): PreviewRequest {
-        override val topBarTitle: String = pdf.name
     }
 
     data class Split(
@@ -27,7 +27,7 @@ sealed interface PreviewRequest {
         val plan: SplitPlan,
         val pagesPerSheet: PagesPerSheetOption
     ): PreviewRequest {
-        override val topBarTitle: String = "Split Preview"
+        override val topBarTitle: String? = null
     }
 }
 /* --------------------------------------------------------- */

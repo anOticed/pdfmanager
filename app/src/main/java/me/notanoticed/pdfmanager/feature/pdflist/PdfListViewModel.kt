@@ -8,6 +8,7 @@
 package me.notanoticed.pdfmanager.feature.pdflist
 
 import android.content.Context
+import me.notanoticed.pdfmanager.R
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -42,6 +43,25 @@ class PdfListViewModel : ViewModel(), ToastBindable {
 
     private fun showToast(message: String) {
         toast?.invoke(message)
+    }
+
+    private fun showToast(
+        context: Context,
+        messageRes: Int,
+        vararg args: Any
+    ) {
+        showToast(context.getString(messageRes, *args))
+    }
+
+    private fun showPluralToast(
+        context: Context,
+        messageRes: Int,
+        quantity: Int,
+        vararg args: Any
+    ) {
+        showToast(
+            context.resources.getQuantityString(messageRes, quantity, *args)
+        )
     }
 
     /* -------------------- LOADING / DATA -------------------- */
@@ -340,7 +360,7 @@ class PdfListViewModel : ViewModel(), ToastBindable {
 
             if (metadata == null) {
                 closeMetadataDialog()
-                showToast("Failed to load PDF metadata")
+                showToast(context, R.string.pdflist_metadata_load_failed)
                 return@launch
             }
 
@@ -421,12 +441,12 @@ class PdfListViewModel : ViewModel(), ToastBindable {
                 val confirmation = passwordConfirmInput.trim()
 
                 if (password.isBlank()) {
-                    showToast("Enter a password first")
+                    showToast(context, R.string.pdflist_password_enter_first)
                     return
                 }
 
                 if (password != confirmation) {
-                    showToast("Passwords do not match")
+                    showToast(context, R.string.pdflist_passwords_do_not_match)
                     return
                 }
 
@@ -444,12 +464,12 @@ class PdfListViewModel : ViewModel(), ToastBindable {
                     isFileActionInProgress = false
 
                     if (!updated) {
-                        showToast("Failed to set PDF password")
+                        showToast(context, R.string.pdflist_password_set_failed)
                         return@launch
                     }
 
                     closePasswordDialog()
-                    showToast("PDF password set successfully")
+                    showToast(context, R.string.pdflist_password_set_success)
                     loadAll(context)
                 }
             }
@@ -458,7 +478,7 @@ class PdfListViewModel : ViewModel(), ToastBindable {
                 val password = passwordPrimaryInput.trim()
 
                 if (password.isBlank()) {
-                    showToast("Enter the current password first")
+                    showToast(context, R.string.pdflist_password_enter_current)
                     return
                 }
 
@@ -478,16 +498,16 @@ class PdfListViewModel : ViewModel(), ToastBindable {
                     when (result) {
                         PdfPasswordActionResult.SUCCESS -> {
                             closePasswordDialog()
-                            showToast("PDF password removed successfully")
+                            showToast(context, R.string.pdflist_password_remove_success)
                             loadAll(context)
                         }
 
                         PdfPasswordActionResult.INVALID_PASSWORD -> {
-                            showToast("Invalid password")
+                            showToast(context, R.string.pdflist_password_invalid)
                         }
 
                         PdfPasswordActionResult.FAILED -> {
-                            showToast("Failed to remove PDF password")
+                            showToast(context, R.string.pdflist_password_remove_failed)
                         }
                     }
                 }
@@ -525,12 +545,12 @@ class PdfListViewModel : ViewModel(), ToastBindable {
             isFileActionInProgress = false
 
             if (!updated) {
-                showToast("Failed to update PDF metadata")
+                showToast(context, R.string.pdflist_metadata_update_failed)
                 return@launch
             }
 
             closeMetadataDialog()
-            showToast("PDF metadata updated successfully")
+            showToast(context, R.string.pdflist_metadata_update_success)
             loadAll(context)
         }
     }
@@ -559,12 +579,12 @@ class PdfListViewModel : ViewModel(), ToastBindable {
             isFileActionInProgress = false
 
             if (!renamed) {
-                showToast("Failed to rename PDF")
+                showToast(context, R.string.pdflist_rename_failed)
                 return@launch
             }
 
             closeRenameDialog()
-            showToast("PDF renamed successfully")
+            showToast(context, R.string.pdflist_rename_success)
             loadAll(context)
         }
     }
@@ -598,9 +618,10 @@ class PdfListViewModel : ViewModel(), ToastBindable {
             isFileActionInProgress = false
 
             if (deletedCount <= 0) {
-                showToast(
-                    if (pdfs.size == 1) "Failed to delete PDF"
-                    else "Failed to delete selected PDFs"
+                showPluralToast(
+                    context = context,
+                    messageRes = R.plurals.pdflist_delete_failed,
+                    quantity = pdfs.size
                 )
                 return@launch
             }
@@ -611,13 +632,19 @@ class PdfListViewModel : ViewModel(), ToastBindable {
             }
 
             if (deletedCount == pdfs.size) {
-                showToast(
-                    if (pdfs.size == 1) "PDF deleted successfully"
-                    else "Selected PDFs deleted successfully"
+                showPluralToast(
+                    context = context,
+                    messageRes = R.plurals.pdflist_delete_success,
+                    quantity = pdfs.size
                 )
                 exitSelectionMode()
             } else {
-                showToast("Deleted $deletedCount of ${pdfs.size} PDFs")
+                showToast(
+                    context,
+                    R.string.pdflist_delete_partial_success,
+                    deletedCount,
+                    pdfs.size
+                )
             }
 
             loadAll(context)

@@ -25,6 +25,7 @@ import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withPermit
 import kotlinx.coroutines.withContext
+import me.notanoticed.pdfmanager.R
 import me.notanoticed.pdfmanager.core.pdf.model.PdfFile
 import java.io.File
 import java.io.FileInputStream
@@ -348,7 +349,7 @@ private suspend fun queryPdfDescriptor(
     withContext(Dispatchers.IO) {
         val contentResolver = context.contentResolver
 
-        var name = "document.pdf"
+        var name = context.getString(R.string.pdf_default_name_with_extension)
         var size = 0L
         var createdEpochSeconds = 0L
         var lastModifiedEpochSeconds = 0L

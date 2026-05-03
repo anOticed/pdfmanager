@@ -31,9 +31,12 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import me.notanoticed.pdfmanager.R
 import me.notanoticed.pdfmanager.ui.theme.Colors
 
 /* -------------------- TOP BAR -------------------- */
@@ -52,12 +55,16 @@ fun MergeTopBar(
             title = {
                 Column {
                     Text(
-                        text = "Merge PDFs",
+                        text = stringResource(R.string.merge_title),
                         fontSize = 22.sp,
                         fontWeight = FontWeight.ExtraBold
                     )
                     Text(
-                        text = if (total == 0) "No files selected" else "$total files selected",
+                        text = pluralStringResource(
+                            R.plurals.merge_selected_file_count,
+                            total,
+                            total
+                        ),
                         fontSize = 12.sp,
                         color = Colors.Text.secondary
                     )
@@ -72,9 +79,16 @@ fun MergeTopBar(
                     contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp),
                     shape = RoundedCornerShape(10.dp)
                 ) {
-                    Icon(imageVector = Icons.Outlined.Add, contentDescription = "Add PDFs", tint = Colors.Icon.white)
+                    Icon(
+                        imageVector = Icons.Outlined.Add,
+                        contentDescription = stringResource(R.string.merge_add_pdfs),
+                        tint = Colors.Icon.white
+                    )
                     Spacer(modifier = Modifier.size(6.dp))
-                    Text(text = "Add PDFs", color = Colors.Primary.white)
+                    Text(
+                        text = stringResource(R.string.merge_add_pdfs),
+                        color = Colors.Primary.white
+                    )
                 }
 
                 Spacer(modifier = Modifier.width(8.dp))
@@ -90,7 +104,7 @@ fun MergeTopBar(
                     ) {
                         Icon(
                             imageVector = Icons.Outlined.Close,
-                            contentDescription = "Close Files",
+                            contentDescription = stringResource(R.string.merge_close_files),
                             modifier = Modifier.fillMaxSize(0.5f)
                         )
                     }

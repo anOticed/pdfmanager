@@ -21,6 +21,7 @@ import com.tom_roush.pdfbox.multipdf.LayerUtility
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import me.notanoticed.pdfmanager.R
 import me.notanoticed.pdfmanager.core.pdf.PdfDocumentActions
 import me.notanoticed.pdfmanager.core.pdf.PdfPageSource
 import me.notanoticed.pdfmanager.core.pdf.PagesPerSheetOption
@@ -60,11 +61,22 @@ class MergeViewModel : ViewModel(), ToastBindable {
         toast?.invoke(message)
     }
 
-    fun addMergeFiles(pdfFiles: List<PdfFile>) {
+    private fun showToast(
+        context: Context,
+        messageRes: Int,
+        vararg args: Any
+    ) {
+        showToast(context.getString(messageRes, *args))
+    }
+
+    fun addMergeFiles(
+        context: Context,
+        pdfFiles: List<PdfFile>
+    ) {
         if (pdfFiles.any { it.isLocked }) {
             when (pdfFiles.size) {
-                1 -> showToast("This PDF is password-protected and can't be selected")
-                else -> showToast("Some PDFs are password-protected and can't be selected")
+                1 -> showToast(context, R.string.merge_locked_single)
+                else -> showToast(context, R.string.merge_locked_multiple)
             }
             return
         }
@@ -96,7 +108,7 @@ class MergeViewModel : ViewModel(), ToastBindable {
                     }
                 }
 
-                addMergeFiles(mergeFiles)
+                addMergeFiles(context, mergeFiles)
             }
         }
     }
@@ -118,7 +130,7 @@ class MergeViewModel : ViewModel(), ToastBindable {
         onReady: (PdfFile) -> Unit
     ) {
         if (pdfMergeFiles.isEmpty()) {
-            showToast("Add at least one PDF first")
+            showToast(context, R.string.merge_add_pdf_first)
             return
         }
         if (isPreparingPreview) return
@@ -144,8 +156,8 @@ class MergeViewModel : ViewModel(), ToastBindable {
                 isPreparingPreview = false
                 val reason = previewResult.exceptionOrNull()?.message
                     ?.takeIf { it.isNotBlank() }
-                    ?: "Unknown error"
-                showToast("Failed to prepare merge preview: $reason")
+                    ?: context.getString(R.string.error_unknown)
+                showToast(context, R.string.merge_preview_failed_format, reason)
                 return@launch
             }
 
@@ -173,25 +185,29 @@ class MergeViewModel : ViewModel(), ToastBindable {
     }
 
     fun requestMergeExport(
+        context: Context,
         onRequest: (PdfOutputRequest) -> Unit
     ) {
         if (pdfMergeFiles.isEmpty()) {
-            showToast("Add at least one PDF first")
+            showToast(context, R.string.merge_add_pdf_first)
             return
         }
 
         val snapshot = pdfMergeFiles
         val pagesPerSheetSnapshot = pagesPerSheetOption
-        val suggestedName = buildSuggestedMergedFileName(snapshot)
+        val suggestedName = buildSuggestedMergedFileName(
+            context = context,
+            pdfs = snapshot
+        )
 
         onRequest(
             PdfOutputRequest.SaveFile(
-                dialogTitle = "Save merged PDF",
-                inputLabel = "File name",
-                inputHint = "Choose the final file name. You'll pick the save location in the next step.",
-                confirmLabel = "Choose Location",
+                dialogTitle = context.getString(R.string.merge_save_dialog_title),
+                inputLabel = context.getString(R.string.pdflist_file_name_label),
+                inputHint = context.getString(R.string.merge_save_dialog_hint),
+                confirmLabel = context.getString(R.string.output_choose_location),
                 suggestedName = suggestedName,
-                processingMessage = "Processing your file, please wait..."
+                processingMessage = context.getString(R.string.output_processing_message)
             ) { context, destinationUri, _ ->
                 exportMergedPdf(
                     context = context,
@@ -199,7 +215,7 @@ class MergeViewModel : ViewModel(), ToastBindable {
                     pagesPerSheet = pagesPerSheetSnapshot,
                     destinationUri = destinationUri
                 )
-                "Merged PDF saved successfully"
+                context.getString(R.string.merge_export_success)
             }
         )
     }
@@ -217,7 +233,7 @@ private fun buildMergedPreviewPdf(
     pdfs: List<PdfFile>,
     pagesPerSheet: PagesPerSheetOption
 ): PreviewPdfResult {
-    require(pdfs.isNotEmpty()) { "No source PDFs selected" }
+    require(pdfs.isNotEmpty()) { context.getString(R.string.merge_error_no_source_pdfs) }
 
     ensurePdfBoxInitialized(context)
 
@@ -325,7 +341,7 @@ private fun writeMergedPdfToFile(
         try {
             pdfs.forEach { inputPdf ->
                 val inputStream = context.contentResolver.openInputStream(inputPdf.uri)
-                    ?: throw IllegalStateException("Failed to open source PDF: ${inputPdf.uri}")
+                    ?: throw IllegalStateException(context.getString(R.string.merge_error_open_source_pdf))
 
                 val sourceDocument = inputStream.use { stream ->
                     PDDocument.load(stream)
@@ -351,7 +367,7 @@ private fun writeMergedPdfToFile(
             }
 
             if (pendingPages.isEmpty() && outputPages == 0) {
-                error("Selected PDFs contain no pages")
+                error(context.getString(R.string.merge_error_no_pages))
             }
 
             flushPending(currentDocument = null)
@@ -366,18 +382,19 @@ private fun writeMergedPdfToFile(
 }
 
 private fun buildSuggestedMergedFileName(
+    context: Context,
     pdfs: List<PdfFile>
 ): String {
     val firstName = pdfs.firstOrNull()?.name?.let { name ->
         PdfDocumentActions.normalizeBaseName(
             rawName = name,
-            fallbackName = "merged"
+            fallbackName = context.getString(R.string.merge_output_fallback_name)
         )
     }.orEmpty()
 
     return if (pdfs.size == 1 && firstName.isNotBlank()) {
-        "${firstName}_merged.pdf"
+        context.getString(R.string.merge_output_single_file_name, firstName)
     } else {
-        "merged_${System.currentTimeMillis()}.pdf"
+        "${context.getString(R.string.merge_output_fallback_name)}_${System.currentTimeMillis()}.pdf"
     }
 }

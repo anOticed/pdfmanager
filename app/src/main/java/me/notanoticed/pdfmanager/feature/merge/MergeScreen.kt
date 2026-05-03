@@ -19,9 +19,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import me.notanoticed.pdfmanager.R
 import me.notanoticed.pdfmanager.core.toast.BindViewModelToasts
 import me.notanoticed.pdfmanager.ui.theme.Colors
 
@@ -48,7 +50,7 @@ fun MergeScreen(
         Spacer(modifier = Modifier.height(8.dp))
 
         Text(
-            text = "No PDFs selected",
+            text = stringResource(R.string.merge_empty_title),
             color = Colors.Text.secondary,
             fontSize = 24.sp,
             fontWeight = FontWeight.ExtraBold
@@ -57,13 +59,13 @@ fun MergeScreen(
         Spacer(modifier = Modifier.height(10.dp))
 
         Text(
-            text = "Add PDFs to merge them into a single document.",
+            text = stringResource(R.string.merge_empty_subtitle_primary),
             color = Colors.Text.muted,
             fontSize = 12.sp,
             fontWeight = FontWeight.SemiBold
         )
         Text(
-            text = "You can reorder them by dragging.",
+            text = stringResource(R.string.merge_empty_subtitle_secondary),
             color = Colors.Text.muted,
             fontSize = 12.sp,
             fontWeight = FontWeight.SemiBold

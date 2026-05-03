@@ -31,6 +31,7 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -40,6 +41,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import me.notanoticed.pdfmanager.R
 import me.notanoticed.pdfmanager.core.pdf.PdfDocumentActions
 import me.notanoticed.pdfmanager.core.pickers.LocalPickers
 import me.notanoticed.pdfmanager.core.pickers.Pickers
@@ -171,7 +173,7 @@ fun ProvidePdfOutputFlow(
                 processingMessage = null
                 toast(
                     error.message?.takeIf { it.isNotBlank() }
-                        ?: "Failed to save PDF"
+                        ?: context.getString(R.string.output_save_failed)
                 )
             }
         )
@@ -325,7 +327,7 @@ private fun PdfOutputDialog(
         dismissButton = {
             TextButton(onClick = onDismiss) {
                 Text(
-                    text = "Cancel",
+                    text = stringResource(R.string.action_cancel),
                     color = Colors.Text.secondary
                 )
             }

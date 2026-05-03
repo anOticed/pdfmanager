@@ -49,10 +49,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import me.notanoticed.pdfmanager.R
 import me.notanoticed.pdfmanager.core.pdf.PdfThumbnail
 import me.notanoticed.pdfmanager.core.pdf.model.PdfFile
 import me.notanoticed.pdfmanager.core.toast.BindViewModelToasts
@@ -102,7 +104,7 @@ fun MergeActiveScreen(
                 modifier = Modifier.padding(18.dp),
             ) {
                 Text(
-                    text = "Merge Order",
+                    text = stringResource(R.string.merge_order_title),
                     color = Colors.Text.blue,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.SemiBold
@@ -111,7 +113,7 @@ fun MergeActiveScreen(
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Text(
-                    text = "Drag files up or down to reorder them. The final PDF will follow this exact order.",
+                    text = stringResource(R.string.merge_order_subtitle),
                     color = Colors.Text.secondary,
                     fontSize = 12.sp
                 )
@@ -193,7 +195,8 @@ fun MergeActiveScreen(
                             onReady = { previewPdf ->
                                 previewNav.openSingle(
                                     pdf = previewPdf,
-                                    allowSearch = true
+                                    allowSearch = true,
+                                    titleOverride = context.getString(R.string.merge_preview_title)
                                 )
                             }
                         )
@@ -208,7 +211,7 @@ fun MergeActiveScreen(
                 ) {
                     Icon(
                         imageVector = Icons.Outlined.Visibility,
-                        contentDescription = "Preview",
+                        contentDescription = stringResource(R.string.merge_preview_action),
                         tint = Colors.Icon.white,
                         modifier = Modifier.size(18.dp)
                     )
@@ -216,7 +219,11 @@ fun MergeActiveScreen(
                     Spacer(modifier = Modifier.width(8.dp))
 
                     Text(
-                        text = if (viewModel.isPreparingPreview) "Preparing..." else "Preview",
+                        text = if (viewModel.isPreparingPreview) {
+                            stringResource(R.string.action_preparing)
+                        } else {
+                            stringResource(R.string.merge_preview_action)
+                        },
                         color = Colors.Primary.white,
                         fontSize = 14.sp
                     )
@@ -224,7 +231,10 @@ fun MergeActiveScreen(
 
                 Button(
                     onClick = {
-                        viewModel.requestMergeExport(pdfOutputFlow::start)
+                        viewModel.requestMergeExport(
+                            context = context,
+                            onRequest = pdfOutputFlow::start
+                        )
                     },
                     colors = ButtonDefaults.buttonColors(
                         containerColor = Colors.Button.green
@@ -235,7 +245,7 @@ fun MergeActiveScreen(
                 ) {
                     Icon(
                         imageVector = Icons.Outlined.FileDownload,
-                        contentDescription = "Merge PDFs",
+                        contentDescription = stringResource(R.string.merge_export_action),
                         tint = Colors.Icon.white,
                         modifier = Modifier.size(20.dp)
                     )
@@ -243,7 +253,7 @@ fun MergeActiveScreen(
                     Spacer(modifier = Modifier.width(8.dp))
 
                     Text(
-                        text = "Merge PDFs",
+                        text = stringResource(R.string.merge_export_action),
                         color = Colors.Primary.white,
                         fontSize = 14.sp
                     )
@@ -262,6 +272,8 @@ fun MergeFileCard(
     modifier: Modifier = Modifier,
     dragHandleModifier: Modifier = Modifier
 ) {
+    val context = LocalContext.current
+
     Surface(
         shape = RoundedCornerShape(10.dp),
         color = Colors.Surface.card,
@@ -316,7 +328,7 @@ fun MergeFileCard(
                     overflow = TextOverflow.Ellipsis
                 )
                 Text(
-                    text = file.metaLine(),
+                    text = file.metaLine(context),
                     color = Colors.Text.secondary,
                     fontSize = 11.sp,
                 )
@@ -333,7 +345,7 @@ fun MergeFileCard(
             ) {
                 Icon(
                     Icons.Outlined.DragHandle,
-                    contentDescription = "Reorder",
+                    contentDescription = stringResource(R.string.action_reorder),
                     tint = Colors.Icon.default,
                     modifier = Modifier.size(16.dp)
                 )
@@ -352,7 +364,7 @@ fun MergeFileCard(
             ) {
                 Icon(
                     Icons.Outlined.Close,
-                    contentDescription = "Remove",
+                    contentDescription = stringResource(R.string.action_remove),
                     modifier = Modifier.size(16.dp)
                 )
             }
