@@ -7,7 +7,7 @@ The application works completely offline. The user opens a PDF through the syste
 - display of page previews, multiple selection, moving, deleting, rotating;
 - merging multiple PDFs into one with visible page order;
 - splitting a PDF: by ranges, one page per file, or every N pages;
-- "pages per sheet": 2/4/6/9 pages per sheet, margins, orientation, fill order, live preview;
+- "pages per sheet": 1/2/4 pages per sheet, margins, orientation, fill order, live preview;
 - PDF size reduction by lowering image quality/resolution with estimated final size;
 - metadata editing (title, author, keywords, subject);
 - password management: set a password when saving or remove it after entering the correct one;
@@ -29,14 +29,15 @@ https://pdfmanager.dev
 ## Screenshots
 <img src = ".assets/screenshot-01.jpg" width = "240"/> <img src = ".assets/screenshot-02.jpg" width = "240"/> <img src = ".assets/screenshot-03.jpg" width = "240"/> 
 <img src = ".assets/screenshot-04.jpg" width = "240"/> <img src = ".assets/screenshot-05.jpg" width = "240"/> <img src = ".assets/screenshot-06.jpg" width = "240"/>
-<img src = ".assets/screenshot-07.jpg" width = "240"/>
+<img src = ".assets/screenshot-07.jpg" width = "240"/> <img src = ".assets/screenshot-08.jpg" width = "240"/> <img src = ".assets/screenshot-09.jpg" width = "240"/>
+<img src = ".assets/screenshot-10.jpg" width = "240"/>
 
 ---
 
 ## Demo
 <img src = ".assets/demo_1.gif" width = "240"/> <img src = ".assets/demo_2.gif" width = "240"/> <img src = ".assets/demo_3.gif" width = "240"/> 
 <img src = ".assets/demo_4.gif" width = "240"/> <img src = ".assets/demo_5.gif" width = "240"/> <img src = ".assets/demo_6.gif" width = "240"/>
-<img src = ".assets/demo_7.gif" width = "240"/> <img src = ".assets/demo_8.gif" width = "240"/>
+<img src = ".assets/demo_7.gif" width = "240"/> <img src = ".assets/demo_8.gif" width = "240"/> <img src = ".assets/demo_9.gif" width = "240"/>
 
 ---
 
