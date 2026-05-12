@@ -52,6 +52,11 @@
     <string name="output_create_temp_directory_failed">无法创建临时 PDF 文件夹</string>
     <string name="output_open_destination_failed">无法打开保存位置</string>
     <string name="output_create_document_failed">无法在所选文件夹中创建 PDF</string>
+    <string name="external_pdf_open_failed">无法打开外部 PDF</string>
+    <string name="external_pdf_action_title">选择对此 PDF 执行的操作</string>
+    <string name="external_pdf_action_preview">预览</string>
+    <string name="external_pdf_action_split">拆分</string>
+    <string name="external_pdf_action_add_to_merge">添加到合并</string>
     <string name="settings_title">设置</string>
     <string name="settings_subtitle">按你的方式使用应用</string>
     <string name="tab_pdfs">PDF</string>

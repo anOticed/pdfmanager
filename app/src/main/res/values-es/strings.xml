@@ -52,6 +52,11 @@
     <string name="output_create_temp_directory_failed">No se pudo crear la carpeta temporal de PDF</string>
     <string name="output_open_destination_failed">No se pudo abrir el destino</string>
     <string name="output_create_document_failed">No se pudo crear el PDF en la carpeta elegida</string>
+    <string name="external_pdf_open_failed">No se pudo abrir el PDF externo</string>
+    <string name="external_pdf_action_title">Elige una acción para este PDF</string>
+    <string name="external_pdf_action_preview">Vista previa</string>
+    <string name="external_pdf_action_split">Dividir</string>
+    <string name="external_pdf_action_add_to_merge">Añadir a la unión</string>
     <string name="settings_title">Ajustes</string>
     <string name="settings_subtitle">Personaliza la app</string>
     <string name="tab_pdfs">PDF</string>

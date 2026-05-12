@@ -12,6 +12,9 @@
     <cache-path
         name="split_preview_pdfs"
         path="split_preview_pdf/" />
+    <cache-path
+        name="external_input_pdfs"
+        path="external_input_pdf/" />
     <external-files-path
         name="external_pictures"
         path="Pictures/" />

@@ -23,6 +23,11 @@
     <string name="settings_github_title">GitHub</string>
     <string name="settings_share_app_title">アプリを共有</string>
     <string name="settings_share_app_subtitle">PDF Manager を紹介</string>
+    <string name="external_pdf_open_failed">外部PDFを開けませんでした</string>
+    <string name="external_pdf_action_title">このPDFに対する操作を選択</string>
+    <string name="external_pdf_action_preview">プレビュー</string>
+    <string name="external_pdf_action_split">分割</string>
+    <string name="external_pdf_action_add_to_merge">結合に追加</string>
     <string name="settings_app_info_tagline">あなたのためのPDFツールキット</string>
     <string name="settings_language_dialog_title">言語</string>
     <string name="settings_version_format">バージョン %1$s</string>

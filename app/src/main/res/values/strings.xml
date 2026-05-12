@@ -52,6 +52,11 @@
     <string name="output_create_temp_directory_failed">Failed to create temporary PDF directory</string>
     <string name="output_open_destination_failed">Failed to open output destination</string>
     <string name="output_create_document_failed">Failed to create output PDF in the selected folder</string>
+    <string name="external_pdf_open_failed">Failed to open external PDF</string>
+    <string name="external_pdf_action_title">Choose what to do with this PDF</string>
+    <string name="external_pdf_action_preview">Preview</string>
+    <string name="external_pdf_action_split">Split</string>
+    <string name="external_pdf_action_add_to_merge">Add to Merge</string>
     <string name="settings_title">Settings</string>
     <string name="settings_subtitle">Customize your experience</string>
     <string name="tab_pdfs">PDFs</string>

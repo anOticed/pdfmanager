@@ -52,6 +52,11 @@
     <string name="output_create_temp_directory_failed">Nepodarilo sa vytvoriť dočasný priečinok PDF</string>
     <string name="output_open_destination_failed">Nepodarilo sa otvoriť miesto uloženia</string>
     <string name="output_create_document_failed">Nepodarilo sa vytvoriť PDF vo vybranom priečinku</string>
+    <string name="external_pdf_open_failed">Nepodarilo sa otvoriť externé PDF</string>
+    <string name="external_pdf_action_title">Vyberte akciu pre toto PDF</string>
+    <string name="external_pdf_action_preview">Náhľad</string>
+    <string name="external_pdf_action_split">Rozdeliť</string>
+    <string name="external_pdf_action_add_to_merge">Pridať do zlúčenia</string>
     <string name="settings_title">Nastavenia</string>
     <string name="settings_subtitle">Prispôsobte si aplikáciu</string>
     <string name="tab_pdfs">PDF</string>

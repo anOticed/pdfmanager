@@ -52,6 +52,11 @@
     <string name="output_create_temp_directory_failed">Temporärer PDF-Ordner konnte nicht erstellt werden</string>
     <string name="output_open_destination_failed">Ziel konnte nicht geöffnet werden</string>
     <string name="output_create_document_failed">PDF konnte im gewählten Ordner nicht erstellt werden</string>
+    <string name="external_pdf_open_failed">Externes PDF konnte nicht geöffnet werden</string>
+    <string name="external_pdf_action_title">Aktion für dieses PDF wählen</string>
+    <string name="external_pdf_action_preview">Vorschau</string>
+    <string name="external_pdf_action_split">Teilen</string>
+    <string name="external_pdf_action_add_to_merge">Zur Zusammenführung hinzufügen</string>
     <string name="settings_title">Einstellungen</string>
     <string name="settings_subtitle">App nach Wunsch anpassen</string>
     <string name="tab_pdfs">PDF</string>

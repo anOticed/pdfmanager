@@ -65,6 +65,12 @@
     <string name="output_open_destination_failed">Не вдалося відкрити місце збереження</string>
     <string name="output_create_document_failed">Не вдалося створити PDF у вибраній папці</string>
 
+    <string name="external_pdf_open_failed">Не вдалося відкрити зовнішній PDF</string>
+    <string name="external_pdf_action_title">Оберіть дію для цього PDF</string>
+    <string name="external_pdf_action_preview">Прев’ю</string>
+    <string name="external_pdf_action_split">Розділити</string>
+    <string name="external_pdf_action_add_to_merge">Додати до об’єднання</string>
+
     <string name="permission_required_title">Потрібен дозвіл</string>
     <string name="permission_storage_required_title">Потрібен доступ до файлів</string>
     <string name="permission_camera_required_title">Потрібен доступ до камери</string>

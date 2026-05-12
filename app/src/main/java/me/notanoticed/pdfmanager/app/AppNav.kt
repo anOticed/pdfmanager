@@ -8,6 +8,7 @@
 
 package me.notanoticed.pdfmanager.app
 
+import android.content.Intent
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
@@ -38,6 +39,7 @@ import me.notanoticed.pdfmanager.feature.pdflist.PdfListScreen
 import me.notanoticed.pdfmanager.feature.pdflist.PdfListSelectionBottomBar
 import me.notanoticed.pdfmanager.feature.pdflist.PdfListViewModel
 import me.notanoticed.pdfmanager.feature.pdflist.RenamePdfDialog
+import me.notanoticed.pdfmanager.feature.preview.LocalPreviewNav
 import me.notanoticed.pdfmanager.feature.settings.SettingsScreen
 import me.notanoticed.pdfmanager.feature.settings.SettingsViewModel
 import me.notanoticed.pdfmanager.feature.split.SplitActiveScreen
@@ -48,16 +50,24 @@ import me.notanoticed.pdfmanager.ui.theme.PdfManagerTheme
 
 /* -------------------- APP -------------------- */
 @Composable
-fun App() {
+fun App(
+    externalIntent: Intent? = null
+) {
     val settingsViewModel: SettingsViewModel = viewModel()
 
     PdfManagerTheme(darkTheme = settingsViewModel.isDarkModeEnabled) {
-        AppContent(settingsViewModel = settingsViewModel)
+        AppContent(
+            settingsViewModel = settingsViewModel,
+            externalIntent = externalIntent
+        )
     }
 }
 
 @Composable
-private fun AppContent(settingsViewModel: SettingsViewModel) {
+private fun AppContent(
+    settingsViewModel: SettingsViewModel,
+    externalIntent: Intent?
+) {
     val scope = rememberCoroutineScope()
     val pagerState = rememberPagerState(pageCount = { appScreens.size })
 
@@ -67,6 +77,7 @@ private fun AppContent(settingsViewModel: SettingsViewModel) {
     val imagesViewModel: ImagesViewModel = viewModel()
 
     val context = LocalContext.current
+    val previewNav = LocalPreviewNav.current
 
     ProvideAppPermissions {
         val appPermissions = LocalAppPermissions.current
@@ -93,6 +104,25 @@ private fun AppContent(settingsViewModel: SettingsViewModel) {
             Box(
                 modifier = Modifier.fillMaxSize()
             ) {
+                ExternalPdfIntentHost(
+                    incomingIntent = externalIntent,
+                    onPreview = { pdf ->
+                        previewNav.openSingle(pdf = pdf)
+                    },
+                    onSplit = { pdf ->
+                        splitViewModel.updateSelectedSplitPdf(context, pdf)
+                        scope.launch {
+                            pagerState.animateScrollToPage(page = appScreens.indexOf(Screen.Split.route))
+                        }
+                    },
+                    onMerge = { pdf ->
+                        mergeViewModel.addMergeFiles(context, listOf(pdf))
+                        scope.launch {
+                            pagerState.animateScrollToPage(page = appScreens.indexOf(Screen.Merge.route))
+                        }
+                    }
+                )
+
                 Scaffold(
                     topBar = {
                         AppTopBar(

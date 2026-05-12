@@ -52,6 +52,11 @@
     <string name="output_create_temp_directory_failed">Impossible de créer le dossier PDF temporaire</string>
     <string name="output_open_destination_failed">Impossible d\'ouvrir la destination</string>
     <string name="output_create_document_failed">Impossible de créer le PDF dans le dossier choisi</string>
+    <string name="external_pdf_open_failed">Impossible d\’ouvrir le PDF externe</string>
+    <string name="external_pdf_action_title">Choisissez une action pour ce PDF</string>
+    <string name="external_pdf_action_preview">Aperçu</string>
+    <string name="external_pdf_action_split">Scinder</string>
+    <string name="external_pdf_action_add_to_merge">Ajouter à la fusion</string>
     <string name="settings_title">Paramètres</string>
     <string name="settings_subtitle">Personnalisez l\'application</string>
     <string name="tab_pdfs">PDF</string>
