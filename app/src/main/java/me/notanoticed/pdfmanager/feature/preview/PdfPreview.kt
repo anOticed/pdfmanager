@@ -76,12 +76,16 @@ fun PdfPreview(
 
                     val created = AppPdfViewerFragment()
                     fragmentManager.beginTransaction()
+                        .setReorderingAllowed(true)
                         .replace(container.id, created, fragmentTag)
                         .commitNowAllowingStateLoss()
+                    created.documentUri = pdf.uri
                     created
                 }
 
-            fragment.documentUri = pdf.uri
+            if (fragment.documentUri != pdf.uri) {
+                fragment.documentUri = pdf.uri
+            }
             if (searchToggleRequestNonce > lastAppliedSearchToggleRequest) {
                 fragment.isTextSearchActive = !fragment.isTextSearchActive
                 lastAppliedSearchToggleRequest = searchToggleRequestNonce

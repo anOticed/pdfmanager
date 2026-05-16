@@ -7,7 +7,9 @@ plugins {
 android {
     namespace = "me.notanoticed.pdfmanager"
     compileSdk {
-        version = release(36)
+        version = release(36) {
+            sdkExtension = 19
+        }
     }
 
     defaultConfig {
