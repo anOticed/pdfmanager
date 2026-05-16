@@ -19,6 +19,7 @@ import me.notanoticed.pdfmanager.R
 import me.notanoticed.pdfmanager.core.pdf.PdfDocumentActions
 import me.notanoticed.pdfmanager.core.pdf.model.PdfFile
 import me.notanoticed.pdfmanager.core.toast.rememberToast
+import me.notanoticed.pdfmanager.feature.compress.CompressViewModel
 import me.notanoticed.pdfmanager.feature.merge.MergeViewModel
 import me.notanoticed.pdfmanager.feature.pdflist.PdfListEvent
 import me.notanoticed.pdfmanager.feature.pdflist.PdfListViewModel
@@ -29,6 +30,7 @@ import me.notanoticed.pdfmanager.feature.split.SplitViewModel
 @Composable
 fun PdfListEventHandler(
     pdfListViewModel: PdfListViewModel,
+    compressViewModel: CompressViewModel,
     mergeViewModel: MergeViewModel,
     splitViewModel: SplitViewModel,
     pagerState: PagerState,
@@ -72,6 +74,10 @@ fun PdfListEventHandler(
             }
             is PdfListEvent.OpenMetadataDialog -> {
                 pdfListViewModel.showMetadataDialog(context, event.pdf)
+                handleAfterNavigation(pdfListViewModel, clearSelection = false)
+            }
+            is PdfListEvent.OpenCompressDialog -> {
+                compressViewModel.open(event.pdf)
                 handleAfterNavigation(pdfListViewModel, clearSelection = false)
             }
             is PdfListEvent.OpenSetPasswordDialog -> {

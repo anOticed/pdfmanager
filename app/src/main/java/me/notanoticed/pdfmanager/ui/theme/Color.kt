@@ -66,6 +66,7 @@ internal data class AppButtonColors(
     val outline: Color,
     val green: Color,
     val red: Color,
+    val compress: Color,
     val iconBackground: Color,
     val iconBackgroundDisabled: Color
 )
@@ -76,6 +77,7 @@ internal data class AppIconColors(
     val blue: Color,
     val green: Color,
     val red: Color,
+    val compress: Color,
     val yellow: Color,
     val rename: Color,
     val split: Color,
@@ -151,6 +153,7 @@ private val DarkPalette = AppColorPalette(
         outline = Color(0x33FFFFFF),
         green = Color(0xFF059568),
         red = Color(0xFFE82D2C),
+        compress = Color(0xFF8B5CF6),
         iconBackground = Color(0xFF4A5462),
         iconBackgroundDisabled = Color(0xFF2F343C)
     ),
@@ -160,6 +163,7 @@ private val DarkPalette = AppColorPalette(
         blue = Color(0xFF3B82F6),
         green = Color(0xFF059568),
         red = Color(0xFFE82D2C),
+        compress = Color(0xFF8B5CF6),
         yellow = Color(0xFFFFB74D),
         rename = Color(0xFFB38CFF),
         split = Color(0xFFFFA24C),
@@ -226,6 +230,7 @@ private val LightPalette = AppColorPalette(
         outline = Color(0x180F172A),
         green = Color(0xFF20B874),
         red = Color(0xFFD94B4B),
+        compress = Color(0xFF7C3AED),
         iconBackground = Color(0xFFDEE7F1),
         iconBackgroundDisabled = Color(0xFFE9EFF6)
     ),
@@ -235,6 +240,7 @@ private val LightPalette = AppColorPalette(
         blue = Color(0xFF1F6BFF),
         green = Color(0xFF20B874),
         red = Color(0xFFD94B4B),
+        compress = Color(0xFF7C3AED),
         yellow = Color(0xFFE49B34),
         rename = Color(0xFF7A52E8),
         split = Color(0xFFE97818),
@@ -317,6 +323,7 @@ object Colors {
         val outline: Color get() = activePalette.button.outline
         val green: Color get() = activePalette.button.green
         val red: Color get() = activePalette.button.red
+        val compress: Color get() = activePalette.button.compress
         val iconBackground: Color get() = activePalette.button.iconBackground
         val iconBackgroundDisabled: Color get() = activePalette.button.iconBackgroundDisabled
     }
@@ -327,6 +334,7 @@ object Colors {
         val blue: Color get() = activePalette.icon.blue
         val green: Color get() = activePalette.icon.green
         val red: Color get() = activePalette.icon.red
+        val compress: Color get() = activePalette.icon.compress
         val yellow: Color get() = activePalette.icon.yellow
         val rename: Color get() = activePalette.icon.rename
         val split: Color get() = activePalette.icon.split

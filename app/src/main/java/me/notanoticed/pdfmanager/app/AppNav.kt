@@ -24,6 +24,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.launch
 import me.notanoticed.pdfmanager.feature.export.ProvidePdfOutputFlow
+import me.notanoticed.pdfmanager.feature.compress.CompressSheet
+import me.notanoticed.pdfmanager.feature.compress.CompressViewModel
 import me.notanoticed.pdfmanager.feature.images.ImageActiveScreen
 import me.notanoticed.pdfmanager.feature.images.ImagesScreen
 import me.notanoticed.pdfmanager.feature.images.ImagesViewModel
@@ -72,6 +74,7 @@ private fun AppContent(
     val pagerState = rememberPagerState(pageCount = { appScreens.size })
 
     val pdfListViewModel: PdfListViewModel = viewModel()
+    val compressViewModel: CompressViewModel = viewModel()
     val mergeViewModel: MergeViewModel = viewModel()
     val splitViewModel: SplitViewModel = viewModel()
     val imagesViewModel: ImagesViewModel = viewModel()
@@ -92,6 +95,7 @@ private fun AppContent(
 
         PdfListEventHandler(
             pdfListViewModel = pdfListViewModel,
+            compressViewModel = compressViewModel,
             mergeViewModel = mergeViewModel,
             splitViewModel = splitViewModel,
             pagerState = pagerState,
@@ -235,6 +239,8 @@ private fun AppContent(
                     onDismiss = { pdfListViewModel.closeDeleteDialog() },
                     onConfirm = { pdfListViewModel.confirmDelete(context) }
                 )
+
+                CompressSheet(viewModel = compressViewModel)
             }
         }
     }

@@ -76,7 +76,8 @@ val pdfFileOptionItems: List<PdfFileOptionItem> = listOf(
     PdfFileOptionItem(
         action = PdfFileOptionAction.COMPRESS,
         titleRes = R.string.pdf_option_compress,
-        icon = Icons.Outlined.Compress
+        icon = Icons.Outlined.Compress,
+        tint = Colors.Icon.compress
     ),
     PdfFileOptionItem(
         action = PdfFileOptionAction.REORDER_PAGES,
