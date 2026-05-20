@@ -253,6 +253,7 @@ class PdfListViewModel : ViewModel(), ToastBindable {
             PdfFileOptionAction.MERGE -> PdfListEvent.OpenMerge(listOf(pdf))
             PdfFileOptionAction.SPLIT -> PdfListEvent.OpenSplit(pdf)
             PdfFileOptionAction.COMPRESS -> PdfListEvent.OpenCompressDialog(pdf)
+            PdfFileOptionAction.REORDER_PAGES -> PdfListEvent.OpenPageEditor(pdf)
             PdfFileOptionAction.SET_PASSWORD -> PdfListEvent.OpenSetPasswordDialog(pdf)
             PdfFileOptionAction.REMOVE_PASSWORD -> PdfListEvent.OpenRemovePasswordDialog(pdf)
             PdfFileOptionAction.PRINT -> PdfListEvent.PrintPdf(pdf)

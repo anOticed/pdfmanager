@@ -82,7 +82,8 @@ val pdfFileOptionItems: List<PdfFileOptionItem> = listOf(
     PdfFileOptionItem(
         action = PdfFileOptionAction.REORDER_PAGES,
         titleRes = R.string.pdf_option_reorder_pages,
-        icon = Icons.Outlined.Reorder
+        icon = Icons.Outlined.Reorder,
+        tint = Colors.Icon.reorder
     ),
     PdfFileOptionItem(
         action = PdfFileOptionAction.SET_PASSWORD,

@@ -16,6 +16,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -47,6 +48,7 @@ import me.notanoticed.pdfmanager.core.pickers.LocalPickers
 import me.notanoticed.pdfmanager.core.pickers.Pickers
 import me.notanoticed.pdfmanager.core.toast.rememberToast
 import me.notanoticed.pdfmanager.ui.theme.Colors
+import android.provider.DocumentsContract
 
 enum class PdfOutputTarget {
     FILE,
@@ -171,6 +173,20 @@ fun ProvidePdfOutputFlow(
             },
             onError = { error ->
                 processingMessage = null
+                runCatching {
+                    if (activeRequest?.target == PdfOutputTarget.FILE) {
+                        if (DocumentsContract.isDocumentUri(context, destinationUri)) {
+                            DocumentsContract.deleteDocument(
+                                context.contentResolver,
+                                destinationUri
+                            )
+                        } else {
+                            context.contentResolver.delete(destinationUri, null, null)
+                        }
+                    }
+                }
+                activeRequest = null
+                inputName = ""
                 toast(
                     error.message?.takeIf { it.isNotBlank() }
                         ?: context.getString(R.string.output_save_failed)
@@ -307,7 +323,19 @@ private fun PdfOutputDialog(
                             color = Colors.Text.secondary
                         )
                     },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedTextColor = Colors.Text.primary,
+                        unfocusedTextColor = Colors.Text.primary,
+                        disabledTextColor = Colors.Text.secondary,
+                        cursorColor = Colors.Primary.blue,
+                        focusedBorderColor = Colors.Border.blue,
+                        unfocusedBorderColor = Colors.Border.gray,
+                        focusedLabelColor = Colors.Text.secondary,
+                        unfocusedLabelColor = Colors.Text.secondary,
+                        focusedContainerColor = Colors.Surface.card,
+                        unfocusedContainerColor = Colors.Surface.card
+                    )
                 )
             }
         },

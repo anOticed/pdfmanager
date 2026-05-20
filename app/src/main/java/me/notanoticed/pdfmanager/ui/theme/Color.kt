@@ -78,6 +78,7 @@ internal data class AppIconColors(
     val green: Color,
     val red: Color,
     val compress: Color,
+    val reorder: Color,
     val yellow: Color,
     val rename: Color,
     val split: Color,
@@ -164,6 +165,7 @@ private val DarkPalette = AppColorPalette(
         green = Color(0xFF059568),
         red = Color(0xFFE82D2C),
         compress = Color(0xFF8B5CF6),
+        reorder = Color(0xFF2DD4BF),
         yellow = Color(0xFFFFB74D),
         rename = Color(0xFFB38CFF),
         split = Color(0xFFFFA24C),
@@ -241,6 +243,7 @@ private val LightPalette = AppColorPalette(
         green = Color(0xFF20B874),
         red = Color(0xFFD94B4B),
         compress = Color(0xFF7C3AED),
+        reorder = Color(0xFF0F9F8C),
         yellow = Color(0xFFE49B34),
         rename = Color(0xFF7A52E8),
         split = Color(0xFFE97818),
@@ -335,6 +338,7 @@ object Colors {
         val green: Color get() = activePalette.icon.green
         val red: Color get() = activePalette.icon.red
         val compress: Color get() = activePalette.icon.compress
+        val reorder: Color get() = activePalette.icon.reorder
         val yellow: Color get() = activePalette.icon.yellow
         val rename: Color get() = activePalette.icon.rename
         val split: Color get() = activePalette.icon.split

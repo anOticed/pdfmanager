@@ -21,6 +21,7 @@ import me.notanoticed.pdfmanager.core.pdf.model.PdfFile
 import me.notanoticed.pdfmanager.core.toast.rememberToast
 import me.notanoticed.pdfmanager.feature.compress.CompressViewModel
 import me.notanoticed.pdfmanager.feature.merge.MergeViewModel
+import me.notanoticed.pdfmanager.feature.pageeditor.LocalPageEditorNav
 import me.notanoticed.pdfmanager.feature.pdflist.PdfListEvent
 import me.notanoticed.pdfmanager.feature.pdflist.PdfListViewModel
 import me.notanoticed.pdfmanager.feature.preview.LocalPreviewNav
@@ -38,6 +39,7 @@ fun PdfListEventHandler(
 ) {
     val event = pdfListViewModel.pendingEvent
     val previewNav = LocalPreviewNav.current
+    val pageEditorNav = LocalPageEditorNav.current
     val context = LocalContext.current
     val toast = rememberToast()
 
@@ -66,6 +68,10 @@ fun PdfListEventHandler(
             }
             is PdfListEvent.OpenPreview -> {
                 previewNav.openSingle(pdf = event.pdf)
+                handleAfterNavigation(pdfListViewModel, clearSelection = false)
+            }
+            is PdfListEvent.OpenPageEditor -> {
+                pageEditorNav.open(pdf = event.pdf)
                 handleAfterNavigation(pdfListViewModel, clearSelection = false)
             }
             is PdfListEvent.OpenDetails -> {
