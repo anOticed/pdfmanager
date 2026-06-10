@@ -1,13 +1,8 @@
-/**
- * ViewModel for the PDF list tab.
- *
- * Owns the loaded PDF list, selection mode, and the state for file option overlays.
- * It also exposes one-shot navigation/events (pendingEvent) consumed by App-level code.
- */
-
 package me.notanoticed.pdfmanager.feature.pdflist
 
+import android.content.ClipData
 import android.content.Context
+import android.content.Intent
 import me.notanoticed.pdfmanager.R
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -15,15 +10,18 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
-import me.notanoticed.pdfmanager.core.pdf.PdfRepository
-import me.notanoticed.pdfmanager.core.pdf.PdfDocumentActions
-import me.notanoticed.pdfmanager.core.pdf.PdfPasswordActionResult
+import me.notanoticed.pdfmanager.core.pdf.util.PdfFileNamePolicy
+import me.notanoticed.pdfmanager.core.pdf.catalog.PdfFileService
+import me.notanoticed.pdfmanager.core.pdf.catalog.PdfMetadataService
+import me.notanoticed.pdfmanager.core.pdf.catalog.PdfPasswordService
+import me.notanoticed.pdfmanager.core.pdf.catalog.PdfCatalogRepository
+import me.notanoticed.pdfmanager.core.pdf.catalog.PdfPasswordActionResult
 import me.notanoticed.pdfmanager.core.pdf.model.PdfDocumentMetadata
 import me.notanoticed.pdfmanager.core.pdf.model.PdfFile
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import me.notanoticed.pdfmanager.core.toast.ToastBindable
+import me.notanoticed.pdfmanager.core.system.toast.ToastBindable
 
 class PdfListViewModel : ViewModel(), ToastBindable {
     enum class PasswordDialogMode {
@@ -84,7 +82,7 @@ class PdfListViewModel : ViewModel(), ToastBindable {
         loadJob = viewModelScope.launch {
             isLoading = true
             try {
-                val initial = PdfRepository.loadAllPdfs(
+                val initial = PdfCatalogRepository.loadAllPdfs(
                     context = context,
                     renderMissingVisuals = false
                 )
@@ -98,7 +96,7 @@ class PdfListViewModel : ViewModel(), ToastBindable {
                     if (hasCompleteVisual(pdf)) return@forEach
 
                     val updated = try {
-                        PdfRepository.enrichPdfVisual(context, pdf)
+                        PdfCatalogRepository.enrichPdfVisual(context, pdf)
                     } catch (_: Exception) {
                         null
                     } ?: return@forEach
@@ -248,19 +246,18 @@ class PdfListViewModel : ViewModel(), ToastBindable {
 
     fun onFileOptionSelected(action: PdfFileOptionAction, pdf: PdfFile) {
         pendingEvent = when (action) {
-            PdfFileOptionAction.RENAME -> PdfListEvent.OpenRenameDialog(pdf)
-            PdfFileOptionAction.EDIT_METADATA -> PdfListEvent.OpenMetadataDialog(pdf)
-            PdfFileOptionAction.MERGE -> PdfListEvent.OpenMerge(listOf(pdf))
-            PdfFileOptionAction.SPLIT -> PdfListEvent.OpenSplit(pdf)
-            PdfFileOptionAction.COMPRESS -> PdfListEvent.OpenCompressDialog(pdf)
-            PdfFileOptionAction.REORDER_PAGES -> PdfListEvent.OpenPageEditor(pdf)
-            PdfFileOptionAction.SET_PASSWORD -> PdfListEvent.OpenSetPasswordDialog(pdf)
-            PdfFileOptionAction.REMOVE_PASSWORD -> PdfListEvent.OpenRemovePasswordDialog(pdf)
-            PdfFileOptionAction.PRINT -> PdfListEvent.PrintPdf(pdf)
-            PdfFileOptionAction.SHARE -> PdfListEvent.SharePdf(pdf)
-            PdfFileOptionAction.DETAILS -> PdfListEvent.OpenDetails(pdf)
-            PdfFileOptionAction.DELETE -> PdfListEvent.OpenDeleteDialog(listOf(pdf))
-            else -> null
+            PdfFileOptionAction.RENAME -> PdfListAction.OpenRenameDialog(pdf)
+            PdfFileOptionAction.EDIT_METADATA -> PdfListAction.OpenMetadataDialog(pdf)
+            PdfFileOptionAction.MERGE -> PdfListAction.OpenMerge(listOf(pdf))
+            PdfFileOptionAction.SPLIT -> PdfListAction.OpenSplit(pdf)
+            PdfFileOptionAction.COMPRESS -> PdfListAction.OpenCompressDialog(pdf)
+            PdfFileOptionAction.EDIT_PAGES -> PdfListAction.OpenPageEditor(pdf)
+            PdfFileOptionAction.SET_PASSWORD -> PdfListAction.OpenSetPasswordDialog(pdf)
+            PdfFileOptionAction.REMOVE_PASSWORD -> PdfListAction.OpenRemovePasswordDialog(pdf)
+            PdfFileOptionAction.PRINT -> PdfListAction.PrintPdf(pdf)
+            PdfFileOptionAction.SHARE -> PdfListAction.SharePdf(pdf)
+            PdfFileOptionAction.DETAILS -> PdfListAction.OpenDetails(pdf)
+            PdfFileOptionAction.DELETE -> PdfListAction.OpenDeleteDialog(listOf(pdf))
         }
     }
     /* ------------------------------------------------------- */
@@ -351,7 +348,7 @@ class PdfListViewModel : ViewModel(), ToastBindable {
         viewModelScope.launch {
             val metadata = withContext(Dispatchers.IO) {
                 runCatching {
-                    PdfDocumentActions.readPdfMetadata(
+                    PdfMetadataService.readPdfMetadata(
                         context = context,
                         pdfUri = pdf.uri
                     )
@@ -456,7 +453,7 @@ class PdfListViewModel : ViewModel(), ToastBindable {
                     isFileActionInProgress = true
 
                     val updated = withContext(Dispatchers.IO) {
-                        PdfDocumentActions.setPdfPassword(
+                        PdfPasswordService.setPdfPassword(
                             context = context,
                             pdf = pdf,
                             password = password
@@ -488,7 +485,7 @@ class PdfListViewModel : ViewModel(), ToastBindable {
                     isFileActionInProgress = true
 
                     val result = withContext(Dispatchers.IO) {
-                        PdfDocumentActions.removePdfPassword(
+                        PdfPasswordService.removePdfPassword(
                             context = context,
                             pdf = pdf,
                             currentPassword = password
@@ -537,7 +534,7 @@ class PdfListViewModel : ViewModel(), ToastBindable {
             isFileActionInProgress = true
 
             val updated = withContext(Dispatchers.IO) {
-                PdfDocumentActions.updatePdfMetadata(
+                PdfMetadataService.updatePdfMetadata(
                     context = context,
                     pdf = pdf,
                     metadata = updatedMetadata
@@ -561,7 +558,7 @@ class PdfListViewModel : ViewModel(), ToastBindable {
         val pdf = renameDialogPdf ?: return
         if (isFileActionInProgress) return
 
-        val targetName = PdfDocumentActions.normalizeDisplayName(
+        val targetName = PdfFileNamePolicy.normalizeDisplayName(
             rawName = renameInput,
             fallbackName = pdf.name
         )
@@ -575,7 +572,7 @@ class PdfListViewModel : ViewModel(), ToastBindable {
             isFileActionInProgress = true
 
             val renamed = withContext(Dispatchers.IO) {
-                PdfDocumentActions.renamePdf(context, pdf, targetName)
+                PdfFileService.renamePdf(context, pdf, targetName)
             }
 
             isFileActionInProgress = false
@@ -613,7 +610,7 @@ class PdfListViewModel : ViewModel(), ToastBindable {
 
             val deletedCount = withContext(Dispatchers.IO) {
                 pdfs.count { pdf ->
-                    PdfDocumentActions.deletePdf(context, pdf)
+                    PdfFileService.deletePdf(context, pdf)
                 }
             }
 
@@ -677,11 +674,66 @@ class PdfListViewModel : ViewModel(), ToastBindable {
 
 
     /* -------------------- EVENTS -------------------- */
-    var pendingEvent: PdfListEvent? by mutableStateOf(null)
+    var pendingEvent: PdfListAction? by mutableStateOf(null)
         private set
 
     fun clearPendingEvent() {
         pendingEvent = null
+    }
+
+    fun finishAction(clearSelection: Boolean) {
+        closeOptions()
+        if (clearSelection) {
+            exitSelectionMode()
+        }
+        clearPendingEvent()
+    }
+
+    fun sharePdfs(
+        context: Context,
+        pdfs: List<PdfFile>,
+        onFailure: () -> Unit
+    ) {
+        runCatching {
+            context.startActivity(buildShareIntent(context, pdfs))
+        }.onFailure {
+            onFailure()
+        }
+    }
+
+    private fun buildShareIntent(
+        context: Context,
+        pdfs: List<PdfFile>
+    ): Intent {
+        val shareIntent = if (pdfs.size == 1) {
+            Intent(Intent.ACTION_SEND).apply {
+                type = "application/pdf"
+                putExtra(Intent.EXTRA_STREAM, pdfs.first().uri)
+            }
+        } else {
+            Intent(Intent.ACTION_SEND_MULTIPLE).apply {
+                type = "application/pdf"
+                putParcelableArrayListExtra(Intent.EXTRA_STREAM, ArrayList(pdfs.map { it.uri }))
+            }
+        }
+
+        shareIntent.clipData = ClipData.newUri(
+            context.contentResolver,
+            pdfs.first().name,
+            pdfs.first().uri
+        ).apply {
+            pdfs.drop(1).forEach { pdf ->
+                addItem(ClipData.Item(pdf.uri))
+            }
+        }
+        shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+
+        return Intent.createChooser(
+            shareIntent,
+            context.resources.getQuantityString(R.plurals.pdflist_share_chooser_title, pdfs.size)
+        ).apply {
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        }
     }
     /* ------------------------------------------------ */
 
@@ -712,7 +764,7 @@ class PdfListViewModel : ViewModel(), ToastBindable {
 
     fun onItemClick(pdf: PdfFile) {
         if (!isSelectionMode) {
-            pendingEvent = PdfListEvent.OpenPreview(pdf)
+            pendingEvent = PdfListAction.OpenPreview(pdf)
             return
         }
 
@@ -744,19 +796,19 @@ class PdfListViewModel : ViewModel(), ToastBindable {
     fun mergeSelected() {
         if (!canMergeSelected) return
 
-        pendingEvent = PdfListEvent.OpenMerge(selectedPdfFiles.toList())
+        pendingEvent = PdfListAction.OpenMerge(selectedPdfFiles.toList())
     }
 
     fun shareSelected() {
         if (selectedPdfFiles.isEmpty()) return
 
-        pendingEvent = PdfListEvent.SharePdfs(selectedPdfFiles.toList())
+        pendingEvent = PdfListAction.SharePdfs(selectedPdfFiles.toList())
     }
 
     fun deleteSelectedPdfs() {
         if (selectedPdfFiles.isEmpty()) return
 
-        pendingEvent = PdfListEvent.OpenDeleteDialog(selectedPdfFiles.toList())
+        pendingEvent = PdfListAction.OpenDeleteDialog(selectedPdfFiles.toList())
     }
     /* --------------------------------------------------- */
 }

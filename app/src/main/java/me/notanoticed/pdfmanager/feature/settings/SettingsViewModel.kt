@@ -1,9 +1,3 @@
-/**
- * Settings ViewModel.
- *
- * Handles persistent application settings
- */
-
 package me.notanoticed.pdfmanager.feature.settings
 
 import android.app.Application

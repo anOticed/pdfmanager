@@ -1,15 +1,8 @@
-/**
- * Design tokens (colors).
- *
- * To make light/dark mode work across the whole UI, the active token palette is switched
- * at runtime by PdfManagerTheme.
- */
-
 package me.notanoticed.pdfmanager.ui.theme
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.ReadOnlyComposable
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
 
 internal data class AppPrimaryColors(
@@ -260,98 +253,277 @@ private val LightPalette = AppColorPalette(
     )
 )
 
-private var activePalette by mutableStateOf(DarkPalette)
+internal val LocalAppPalette = staticCompositionLocalOf { DarkPalette }
 
 internal fun paletteForTheme(darkTheme: Boolean): AppColorPalette {
     return if (darkTheme) DarkPalette else LightPalette
 }
 
-internal fun updateActivePalette(darkTheme: Boolean) {
-    activePalette = paletteForTheme(darkTheme)
-}
-
 /* -------------------- COLORS -------------------- */
 object Colors {
     object Primary {
-        val blue: Color get() = activePalette.primary.blue
-        val lightBlue: Color get() = activePalette.primary.lightBlue
-        val darkBlue: Color get() = activePalette.primary.darkBlue
-        val green: Color get() = activePalette.primary.green
-        val red: Color get() = activePalette.primary.red
-        val yellow: Color get() = activePalette.primary.yellow
-        val white: Color get() = activePalette.primary.white
-        val lightGray: Color get() = activePalette.primary.lightGray
-        val gray: Color get() = activePalette.primary.gray
-        val slateGray: Color get() = activePalette.primary.slateGray
-        val darkSlate: Color get() = activePalette.primary.darkSlate
-        val nearBlack: Color get() = activePalette.primary.nearBlack
-        val charcoal: Color get() = activePalette.primary.charcoal
+        val blue: Color
+            @Composable
+            @ReadOnlyComposable
+            get() = LocalAppPalette.current.primary.blue
+        val lightBlue: Color
+            @Composable
+            @ReadOnlyComposable
+            get() = LocalAppPalette.current.primary.lightBlue
+        val darkBlue: Color
+            @Composable
+            @ReadOnlyComposable
+            get() = LocalAppPalette.current.primary.darkBlue
+        val green: Color
+            @Composable
+            @ReadOnlyComposable
+            get() = LocalAppPalette.current.primary.green
+        val red: Color
+            @Composable
+            @ReadOnlyComposable
+            get() = LocalAppPalette.current.primary.red
+        val yellow: Color
+            @Composable
+            @ReadOnlyComposable
+            get() = LocalAppPalette.current.primary.yellow
+        val white: Color
+            @Composable
+            @ReadOnlyComposable
+            get() = LocalAppPalette.current.primary.white
+        val lightGray: Color
+            @Composable
+            @ReadOnlyComposable
+            get() = LocalAppPalette.current.primary.lightGray
+        val gray: Color
+            @Composable
+            @ReadOnlyComposable
+            get() = LocalAppPalette.current.primary.gray
+        val slateGray: Color
+            @Composable
+            @ReadOnlyComposable
+            get() = LocalAppPalette.current.primary.slateGray
+        val darkSlate: Color
+            @Composable
+            @ReadOnlyComposable
+            get() = LocalAppPalette.current.primary.darkSlate
+        val nearBlack: Color
+            @Composable
+            @ReadOnlyComposable
+            get() = LocalAppPalette.current.primary.nearBlack
+        val charcoal: Color
+            @Composable
+            @ReadOnlyComposable
+            get() = LocalAppPalette.current.primary.charcoal
     }
 
     object Background {
-        val app: Color get() = activePalette.background.app
-        val surface: Color get() = activePalette.background.surface
+        val app: Color
+            @Composable
+            @ReadOnlyComposable
+            get() = LocalAppPalette.current.background.app
+        val surface: Color
+            @Composable
+            @ReadOnlyComposable
+            get() = LocalAppPalette.current.background.surface
     }
 
     object Surface {
-        val card: Color get() = activePalette.surface.card
-        val selectedCard: Color get() = activePalette.surface.selectedCard
-        val thumbnail: Color get() = activePalette.surface.thumbnail
-        val charcoalSlate: Color get() = activePalette.surface.charcoalSlate
+        val card: Color
+            @Composable
+            @ReadOnlyComposable
+            get() = LocalAppPalette.current.surface.card
+        val selectedCard: Color
+            @Composable
+            @ReadOnlyComposable
+            get() = LocalAppPalette.current.surface.selectedCard
+        val thumbnail: Color
+            @Composable
+            @ReadOnlyComposable
+            get() = LocalAppPalette.current.surface.thumbnail
+        val charcoalSlate: Color
+            @Composable
+            @ReadOnlyComposable
+            get() = LocalAppPalette.current.surface.charcoalSlate
     }
 
     object Text {
-        val primary: Color get() = activePalette.text.primary
-        val secondary: Color get() = activePalette.text.secondary
-        val muted: Color get() = activePalette.text.muted
-        val blue: Color get() = activePalette.text.blue
+        val primary: Color
+            @Composable
+            @ReadOnlyComposable
+            get() = LocalAppPalette.current.text.primary
+        val secondary: Color
+            @Composable
+            @ReadOnlyComposable
+            get() = LocalAppPalette.current.text.secondary
+        val muted: Color
+            @Composable
+            @ReadOnlyComposable
+            get() = LocalAppPalette.current.text.muted
+        val blue: Color
+            @Composable
+            @ReadOnlyComposable
+            get() = LocalAppPalette.current.text.blue
     }
 
     object Border {
-        val default: Color get() = activePalette.border.default
-        val blue: Color get() = activePalette.border.blue
-        val darkBlue: Color get() = activePalette.border.darkBlue
-        val lightBlue: Color get() = activePalette.border.lightBlue
-        val gray: Color get() = activePalette.border.gray
-        val darkGray: Color get() = activePalette.border.darkGray
-        val subtle: Color get() = activePalette.border.subtle
+        val default: Color
+            @Composable
+            @ReadOnlyComposable
+            get() = LocalAppPalette.current.border.default
+        val blue: Color
+            @Composable
+            @ReadOnlyComposable
+            get() = LocalAppPalette.current.border.blue
+        val darkBlue: Color
+            @Composable
+            @ReadOnlyComposable
+            get() = LocalAppPalette.current.border.darkBlue
+        val lightBlue: Color
+            @Composable
+            @ReadOnlyComposable
+            get() = LocalAppPalette.current.border.lightBlue
+        val gray: Color
+            @Composable
+            @ReadOnlyComposable
+            get() = LocalAppPalette.current.border.gray
+        val darkGray: Color
+            @Composable
+            @ReadOnlyComposable
+            get() = LocalAppPalette.current.border.darkGray
+        val subtle: Color
+            @Composable
+            @ReadOnlyComposable
+            get() = LocalAppPalette.current.border.subtle
     }
 
     object Button {
-        val blue: Color get() = activePalette.button.blue
-        val primaryPressed: Color get() = activePalette.button.primaryPressed
-        val darkSlate: Color get() = activePalette.button.darkSlate
-        val skyBlue: Color get() = activePalette.button.skyBlue
-        val lightGray: Color get() = activePalette.button.lightGray
-        val outline: Color get() = activePalette.button.outline
-        val green: Color get() = activePalette.button.green
-        val red: Color get() = activePalette.button.red
-        val compress: Color get() = activePalette.button.compress
-        val iconBackground: Color get() = activePalette.button.iconBackground
-        val iconBackgroundDisabled: Color get() = activePalette.button.iconBackgroundDisabled
+        val blue: Color
+            @Composable
+            @ReadOnlyComposable
+            get() = LocalAppPalette.current.button.blue
+        val primaryPressed: Color
+            @Composable
+            @ReadOnlyComposable
+            get() = LocalAppPalette.current.button.primaryPressed
+        val darkSlate: Color
+            @Composable
+            @ReadOnlyComposable
+            get() = LocalAppPalette.current.button.darkSlate
+        val skyBlue: Color
+            @Composable
+            @ReadOnlyComposable
+            get() = LocalAppPalette.current.button.skyBlue
+        val lightGray: Color
+            @Composable
+            @ReadOnlyComposable
+            get() = LocalAppPalette.current.button.lightGray
+        val outline: Color
+            @Composable
+            @ReadOnlyComposable
+            get() = LocalAppPalette.current.button.outline
+        val green: Color
+            @Composable
+            @ReadOnlyComposable
+            get() = LocalAppPalette.current.button.green
+        val red: Color
+            @Composable
+            @ReadOnlyComposable
+            get() = LocalAppPalette.current.button.red
+        val compress: Color
+            @Composable
+            @ReadOnlyComposable
+            get() = LocalAppPalette.current.button.compress
+        val iconBackground: Color
+            @Composable
+            @ReadOnlyComposable
+            get() = LocalAppPalette.current.button.iconBackground
+        val iconBackgroundDisabled: Color
+            @Composable
+            @ReadOnlyComposable
+            get() = LocalAppPalette.current.button.iconBackgroundDisabled
     }
 
     object Icon {
-        val default: Color get() = activePalette.icon.default
-        val white: Color get() = activePalette.icon.white
-        val blue: Color get() = activePalette.icon.blue
-        val green: Color get() = activePalette.icon.green
-        val red: Color get() = activePalette.icon.red
-        val compress: Color get() = activePalette.icon.compress
-        val reorder: Color get() = activePalette.icon.reorder
-        val yellow: Color get() = activePalette.icon.yellow
-        val rename: Color get() = activePalette.icon.rename
-        val split: Color get() = activePalette.icon.split
-        val share: Color get() = activePalette.icon.share
-        val print: Color get() = activePalette.icon.print
-        val gray: Color get() = activePalette.icon.gray
-        val disabledGray: Color get() = activePalette.icon.disabledGray
-        val darkGray: Color get() = activePalette.icon.darkGray
-        val pdf: Color get() = activePalette.icon.pdf
-        val merge: Color get() = activePalette.icon.merge
-        val lock: Color get() = activePalette.icon.lock
-        val delete: Color get() = activePalette.icon.delete
-        val thumbnailBackground: Color get() = activePalette.icon.thumbnailBackground
+        val default: Color
+            @Composable
+            @ReadOnlyComposable
+            get() = LocalAppPalette.current.icon.default
+        val white: Color
+            @Composable
+            @ReadOnlyComposable
+            get() = LocalAppPalette.current.icon.white
+        val blue: Color
+            @Composable
+            @ReadOnlyComposable
+            get() = LocalAppPalette.current.icon.blue
+        val green: Color
+            @Composable
+            @ReadOnlyComposable
+            get() = LocalAppPalette.current.icon.green
+        val red: Color
+            @Composable
+            @ReadOnlyComposable
+            get() = LocalAppPalette.current.icon.red
+        val compress: Color
+            @Composable
+            @ReadOnlyComposable
+            get() = LocalAppPalette.current.icon.compress
+        val reorder: Color
+            @Composable
+            @ReadOnlyComposable
+            get() = LocalAppPalette.current.icon.reorder
+        val yellow: Color
+            @Composable
+            @ReadOnlyComposable
+            get() = LocalAppPalette.current.icon.yellow
+        val rename: Color
+            @Composable
+            @ReadOnlyComposable
+            get() = LocalAppPalette.current.icon.rename
+        val split: Color
+            @Composable
+            @ReadOnlyComposable
+            get() = LocalAppPalette.current.icon.split
+        val share: Color
+            @Composable
+            @ReadOnlyComposable
+            get() = LocalAppPalette.current.icon.share
+        val print: Color
+            @Composable
+            @ReadOnlyComposable
+            get() = LocalAppPalette.current.icon.print
+        val gray: Color
+            @Composable
+            @ReadOnlyComposable
+            get() = LocalAppPalette.current.icon.gray
+        val disabledGray: Color
+            @Composable
+            @ReadOnlyComposable
+            get() = LocalAppPalette.current.icon.disabledGray
+        val darkGray: Color
+            @Composable
+            @ReadOnlyComposable
+            get() = LocalAppPalette.current.icon.darkGray
+        val pdf: Color
+            @Composable
+            @ReadOnlyComposable
+            get() = LocalAppPalette.current.icon.pdf
+        val merge: Color
+            @Composable
+            @ReadOnlyComposable
+            get() = LocalAppPalette.current.icon.merge
+        val lock: Color
+            @Composable
+            @ReadOnlyComposable
+            get() = LocalAppPalette.current.icon.lock
+        val delete: Color
+            @Composable
+            @ReadOnlyComposable
+            get() = LocalAppPalette.current.icon.delete
+        val thumbnailBackground: Color
+            @Composable
+            @ReadOnlyComposable
+            get() = LocalAppPalette.current.icon.thumbnailBackground
     }
 }
 /* ----------------------------------------------- */

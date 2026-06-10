@@ -1,13 +1,3 @@
-/**
- * Split tab "active" state.
- *
- * Displayed once a PDF is selected.
- *
- * - Shows the selected file summary.
- * - Lets the user choose a split method.
- * - Exposes actions (Preview / Split).
- */
-
 package me.notanoticed.pdfmanager.feature.split
 
 import androidx.compose.foundation.BorderStroke
@@ -78,20 +68,21 @@ import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import me.notanoticed.pdfmanager.R
-import me.notanoticed.pdfmanager.core.pdf.PdfThumbnail
-import me.notanoticed.pdfmanager.core.toast.BindViewModelToasts
-import me.notanoticed.pdfmanager.feature.export.LocalPdfOutputFlow
+import me.notanoticed.pdfmanager.core.pdf.edit.SplitChunk
+import me.notanoticed.pdfmanager.core.system.export.LocalPdfOutputFlow
+import me.notanoticed.pdfmanager.ui.components.PdfThumbnail
+import me.notanoticed.pdfmanager.core.pdf.edit.SplitMethodType
+import me.notanoticed.pdfmanager.core.pdf.edit.SplitPlanResult
+import me.notanoticed.pdfmanager.core.pdf.edit.resolveMessage
 import me.notanoticed.pdfmanager.feature.preview.LocalPreviewNav
 import me.notanoticed.pdfmanager.ui.components.ExpandablePagesPerSheetSection
 import me.notanoticed.pdfmanager.ui.theme.Colors
 
-/* -------------------- ACTIVE SCREEN -------------------- */
 @Composable
-fun SplitActiveScreen(
+internal fun SplitActiveScreen(
     modifier: Modifier = Modifier,
     viewModel: SplitViewModel
 ) {
-    BindViewModelToasts(viewModel)
     val context = LocalContext.current
     val pdfOutputFlow = LocalPdfOutputFlow.current
     val previewNav = LocalPreviewNav.current
@@ -484,7 +475,6 @@ fun MethodCard(
 
     }
 }
-/* ------------------------------------------------------- */
 
 @Composable
 private fun SplitPlanSummaryCard(

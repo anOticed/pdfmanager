@@ -1,12 +1,3 @@
-/**
- * Top bar for the PDF list tab.
- *
- * Supports three modes:
- * - selection mode
- * - normal mode
- * - search mode
- */
-
 package me.notanoticed.pdfmanager.feature.pdflist
 
 import androidx.compose.foundation.background

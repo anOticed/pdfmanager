@@ -1,9 +1,3 @@
-/**
- * Preview screen implementation.
- *
- * Interprets PreviewRequest and renders the appropriate preview UI.
- */
-
 package me.notanoticed.pdfmanager.feature.preview
 
 import androidx.compose.foundation.layout.Arrangement
@@ -29,10 +23,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import me.notanoticed.pdfmanager.R
 import me.notanoticed.pdfmanager.core.pdf.model.PdfFile
-import me.notanoticed.pdfmanager.feature.split.prepareSplitPreviewPdf
+import me.notanoticed.pdfmanager.core.pdf.render.loadPreviewPdf
+import me.notanoticed.pdfmanager.core.pdf.write.SplitPdfWriter
 import me.notanoticed.pdfmanager.ui.theme.Colors
 
-/* -------------------- SCREEN -------------------- */
 @Composable
 fun PreviewScreen(
     modifier: Modifier = Modifier,
@@ -49,7 +43,7 @@ fun PreviewScreen(
         }
 
         is PreviewRequest.Split -> {
-            SplitPreviewContent(
+            SplitPreviewActiveScreen(
                 modifier = modifier,
                 request = request,
                 searchToggleRequestNonce = searchToggleRequestNonce
@@ -57,12 +51,9 @@ fun PreviewScreen(
         }
     }
 }
-/* ------------------------------------------------ */
 
-
-/* -------------------- SPLIT PREVIEW -------------------- */
 @Composable
-private fun SplitPreviewContent(
+private fun SplitPreviewActiveScreen(
     modifier: Modifier,
     request: PreviewRequest.Split,
     searchToggleRequestNonce: Int
@@ -76,12 +67,13 @@ private fun SplitPreviewContent(
     ) {
         value = withContext(Dispatchers.IO) {
             runCatching {
-                prepareSplitPreviewPdf(
+                val preview = SplitPdfWriter.buildPreviewPdf(
                     context = context,
                     sourcePdf = request.pdf,
                     plan = request.plan,
                     pagesPerSheet = request.pagesPerSheet
                 )
+                loadPreviewPdf(context, preview)
             }.fold(
                 onSuccess = SplitPreviewState::Ready,
                 onFailure = { error ->
@@ -156,4 +148,3 @@ private sealed interface SplitPreviewState {
     data class Ready(val pdf: PdfFile) : SplitPreviewState
     data class Error(val message: String) : SplitPreviewState
 }
-/* ------------------------------------------------------ */

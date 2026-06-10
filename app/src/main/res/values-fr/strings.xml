@@ -115,7 +115,7 @@
     <string name="compress_processing_message">Compression du PDF, veuillez patienter...</string>
     <string name="compress_export_success">PDF compressé enregistré</string>
     <string name="compress_output_fallback_name">compressed_pdf</string>
-    <string name="pdf_option_reorder_pages">Réordonner les pages</string>
+    <string name="pdf_option_edit_pages">Modifier les pages</string>
     <string name="page_editor_title">Modifier les pages</string>
     <string name="page_editor_pages_button">Pages (%1$d)</string>
     <string name="page_editor_drawer_title">Pages</string>

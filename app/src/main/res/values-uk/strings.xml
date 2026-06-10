@@ -127,7 +127,7 @@
     <string name="compress_processing_message">Стискаємо PDF, зачекайте...</string>
     <string name="compress_export_success">Стиснений PDF збережено</string>
     <string name="compress_output_fallback_name">compressed_pdf</string>
-    <string name="pdf_option_reorder_pages">Порядок сторінок</string>
+    <string name="pdf_option_edit_pages">Редагувати сторінки</string>
     <string name="page_editor_title">Редагувати сторінки</string>
     <string name="page_editor_pages_button">Сторінки (%1$d)</string>
     <string name="page_editor_drawer_title">Сторінки</string>

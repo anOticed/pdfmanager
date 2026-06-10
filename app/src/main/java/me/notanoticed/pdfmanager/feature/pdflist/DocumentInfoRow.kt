@@ -1,7 +1,3 @@
-/**
- * Small UI helper for rendering a label/value metadata row.
- */
-
 package me.notanoticed.pdfmanager.feature.pdflist
 
 import androidx.compose.foundation.layout.Column
@@ -26,7 +22,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import me.notanoticed.pdfmanager.R
-import me.notanoticed.pdfmanager.core.pdf.PdfThumbnail
+import me.notanoticed.pdfmanager.ui.components.PdfThumbnail
 import me.notanoticed.pdfmanager.core.pdf.model.PdfFile
 import me.notanoticed.pdfmanager.ui.theme.Colors
 
@@ -97,6 +93,7 @@ fun DocumentInfoRow(
 }
 
 
+@Composable
 private fun buildHighlightedName(fileName: String, query: String) = buildAnnotatedString {
     val key = query.trim()
 

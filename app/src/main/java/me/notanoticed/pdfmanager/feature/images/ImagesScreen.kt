@@ -1,9 +1,3 @@
-/**
- * Images tab "empty" state.
- *
- * Entry screen for the "Images to PDF" workflow.
- */
-
 package me.notanoticed.pdfmanager.feature.images
 
 import androidx.compose.foundation.layout.Arrangement
@@ -26,7 +20,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import me.notanoticed.pdfmanager.R
-import me.notanoticed.pdfmanager.core.toast.BindViewModelToasts
+import me.notanoticed.pdfmanager.core.system.toast.BindViewModelToasts
 import me.notanoticed.pdfmanager.ui.theme.Colors
 
 /* -------------------- SCREEN -------------------- */
@@ -36,6 +30,14 @@ fun ImagesScreen(
     viewModel: ImagesViewModel
 ) {
     BindViewModelToasts(viewModel)
+
+    if (viewModel.isActive) {
+        ImagesActiveScreen(
+            modifier = modifier,
+            viewModel = viewModel
+        )
+        return
+    }
 
     Column(
         modifier = modifier.fillMaxSize(),

@@ -1,15 +1,3 @@
-/**
- * PDF list tab UI.
- *
- * Renders the list of PDFs loaded from PdfRepository and supports:
- * - single-tap open options
- * - long-press selection mode
- * - multi-selection actions (merge, etc.)
- *
- * One-shot actions (open merge/split/preview/details) are emitted via PdfListViewModel.pendingEvent
- * and handled at the app layer by PdfListEventHandler.
- */
-
 package me.notanoticed.pdfmanager.feature.pdflist
 
 import androidx.compose.foundation.combinedClickable
@@ -51,7 +39,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import me.notanoticed.pdfmanager.R
 import me.notanoticed.pdfmanager.core.pdf.model.PdfFile
-import me.notanoticed.pdfmanager.core.toast.BindViewModelToasts
+import me.notanoticed.pdfmanager.core.system.toast.BindViewModelToasts
 import me.notanoticed.pdfmanager.ui.theme.Colors
 
 /* -------------------- SCREEN -------------------- */
@@ -82,17 +70,16 @@ fun PdfListScreen(
     }
     else {
         val pullState = rememberPullToRefreshState()
-        val isRefreshing = isLoading && hasData
 
         PullToRefreshBox(
             modifier = modifier.fillMaxSize(),
             state = pullState,
-            isRefreshing = isRefreshing,
+            isRefreshing = isLoading,
             onRefresh = { viewModel.loadAll(context) },
             indicator = {
                 Indicator(
                     state = pullState,
-                    isRefreshing = isRefreshing,
+                    isRefreshing = isLoading,
                     modifier = Modifier.align(Alignment.TopCenter),
                     containerColor = Colors.Surface.card,
                     color = Colors.Primary.blue

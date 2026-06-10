@@ -1,9 +1,3 @@
-/**
- * ViewModel for the Split tab.
- *
- * Holds the selected PDF and the current split configuration.
- */
-
 package me.notanoticed.pdfmanager.feature.split
 
 import android.content.Context
@@ -12,15 +6,21 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import me.notanoticed.pdfmanager.R
-import me.notanoticed.pdfmanager.core.pdf.PdfDocumentActions
-import me.notanoticed.pdfmanager.core.pdf.PagesPerSheetOption
-import me.notanoticed.pdfmanager.core.pdf.PdfRepository
-import me.notanoticed.pdfmanager.core.pdf.model.PdfFile
-import me.notanoticed.pdfmanager.core.pickers.Pickers
-import me.notanoticed.pdfmanager.feature.export.PdfOutputRequest
 import kotlinx.coroutines.launch
-import me.notanoticed.pdfmanager.core.toast.ToastBindable
+import me.notanoticed.pdfmanager.R
+import me.notanoticed.pdfmanager.core.pdf.catalog.PdfCatalogRepository
+import me.notanoticed.pdfmanager.core.pdf.util.PagesPerSheetOption
+import me.notanoticed.pdfmanager.core.pdf.edit.SplitConfiguration
+import me.notanoticed.pdfmanager.core.pdf.edit.SplitMethodType
+import me.notanoticed.pdfmanager.core.pdf.edit.SplitPlan
+import me.notanoticed.pdfmanager.core.pdf.edit.SplitPlanResult
+import me.notanoticed.pdfmanager.core.pdf.edit.buildSplitPlan
+import me.notanoticed.pdfmanager.core.pdf.model.PdfFile
+import me.notanoticed.pdfmanager.core.pdf.write.SplitPdfWriter
+import me.notanoticed.pdfmanager.core.system.export.PdfOutputRequest
+import me.notanoticed.pdfmanager.core.pdf.edit.resolveMessage
+import me.notanoticed.pdfmanager.core.system.pickers.FilePickers
+import me.notanoticed.pdfmanager.core.system.toast.ToastBindable
 
 class SplitViewModel : ViewModel(), ToastBindable {
     var selectedSplitPdf: PdfFile? by mutableStateOf(null)
@@ -130,9 +130,9 @@ class SplitViewModel : ViewModel(), ToastBindable {
         }
 
         val pagesPerSheetSnapshot = pagesPerSheetOption
-        val suggestedBaseName = PdfDocumentActions.normalizeBaseName(
-            rawName = pdf.name,
-            fallbackName = context.getString(R.string.split_output_fallback_name)
+        val suggestedBaseName = SplitPdfWriter.buildSuggestedBaseName(
+            context = context,
+            sourcePdf = pdf
         )
 
         onRequest(
@@ -144,7 +144,7 @@ class SplitViewModel : ViewModel(), ToastBindable {
                 suggestedName = suggestedBaseName,
                 processingMessage = context.getString(R.string.output_processing_files_message)
             ) { context, destinationUri, baseName ->
-                val createdCount = exportSplitPlanToFolder(
+                val createdCount = SplitPdfWriter.exportPdf(
                     context = context,
                     sourcePdf = pdf,
                     plan = plan,
@@ -162,10 +162,10 @@ class SplitViewModel : ViewModel(), ToastBindable {
         )
     }
 
-    fun pickSplitPdf(context: Context, pickers: Pickers) {
+    fun pickSplitPdf(context: Context, pickers: FilePickers) {
         pickers.pickPdf { uri ->
             viewModelScope.launch {
-                val selectedPdf = PdfRepository.loadPdfMetadata(context, uri)
+                val selectedPdf = PdfCatalogRepository.loadPdfMetadata(context, uri)
                 updateSelectedSplitPdf(context, selectedPdf)
             }
         }

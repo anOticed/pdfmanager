@@ -1,20 +1,12 @@
-/**
- * Shared PDF model used across the UI.
- *
- * PdfFile represents a single document selected from MediaStore or SAF and contains
- * metadata needed by the UI (name, size, page count, timestamps, storage path).
- */
-
 package me.notanoticed.pdfmanager.core.pdf.model
 
 import android.content.Context
 import android.graphics.Bitmap
 import android.net.Uri
 import me.notanoticed.pdfmanager.R
-import me.notanoticed.pdfmanager.core.pdf.formatFileSize
-import java.text.SimpleDateFormat
+import me.notanoticed.pdfmanager.core.pdf.util.formatFileSize
+import java.text.DateFormat
 import java.util.Date
-import java.util.Locale
 
 /* -------------------- PDF FILE -------------------- */
 data class PdfFile(
@@ -47,8 +39,11 @@ data class PdfFile(
     fun size(context: Context): String = formatFileSize(context, sizeBytes)
 
     private fun formatDate(epochSeconds: Long): String {
-        val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.US)
-        return sdf.format(Date(epochSeconds * 1000L))
+        val formatter = DateFormat.getDateTimeInstance(
+            DateFormat.SHORT,
+            DateFormat.SHORT
+        )
+        return formatter.format(Date(epochSeconds * 1000L))
     }
 }
 /* ------------------------------------------------- */

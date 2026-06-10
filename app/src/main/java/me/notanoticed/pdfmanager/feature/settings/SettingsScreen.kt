@@ -1,11 +1,6 @@
-/**
- * Settings tab UI.
- *
- * Contains persistent app preferences and compact app information.
- */
-
 package me.notanoticed.pdfmanager.feature.settings
 
+import android.widget.ImageView
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -26,7 +21,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ChevronRight
 import androidx.compose.material.icons.outlined.DarkMode
-import androidx.compose.material.icons.outlined.Description
 import androidx.compose.material.icons.outlined.Language
 import androidx.compose.material.icons.outlined.LocalOffer
 import androidx.compose.material.icons.outlined.OpenInNew
@@ -52,9 +46,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
 import me.notanoticed.pdfmanager.BuildConfig
 import androidx.compose.ui.res.stringResource
 import me.notanoticed.pdfmanager.R
@@ -229,6 +225,13 @@ private fun LanguageRow(
 
 @Composable
 private fun AppInfoCard() {
+    val context = LocalContext.current
+    val appIcon = remember(context) {
+        runCatching {
+            context.packageManager.getApplicationIcon(context.packageName)
+        }.getOrNull()
+    }
+
     Surface(
         modifier = Modifier.fillMaxWidth(),
         color = Colors.Surface.card,
@@ -238,18 +241,17 @@ private fun AppInfoCard() {
             modifier = Modifier.padding(20.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Box(
-                modifier = Modifier
-                    .size(54.dp)
-                    .clip(CircleShape)
-                    .background(Colors.Primary.blue),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = Icons.Outlined.Description,
-                    contentDescription = null,
-                    tint = Colors.Icon.white,
-                    modifier = Modifier.fillMaxSize(0.5f)
+            if (appIcon != null) {
+                AndroidView(
+                    factory = { viewContext ->
+                        ImageView(viewContext).apply {
+                            scaleType = ImageView.ScaleType.FIT_CENTER
+                            setImageDrawable(appIcon)
+                        }
+                    },
+                    modifier = Modifier
+                        .size(54.dp)
+                        .clip(RoundedCornerShape(14.dp))
                 )
             }
             Spacer(modifier = Modifier.height(8.dp))

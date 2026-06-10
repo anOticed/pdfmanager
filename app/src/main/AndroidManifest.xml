@@ -21,21 +21,6 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.PDFManager">
         <activity
-            android:name=".PDFsActivity"
-            android:exported="false"
-            android:label="@string/title_activity_pdfs"
-            android:theme="@style/Theme.PDFManager" />
-        <activity
-            android:name=".PDFsScreen"
-            android:exported="false"
-            android:label="@string/title_activity_pdfs_screen"
-            android:theme="@style/Theme.PDFManager" />
-        <activity
-            android:name=".SettingsActivity"
-            android:exported="false"
-            android:label="@string/title_activity_settings"
-            android:theme="@style/Theme.PDFManager" />
-        <activity
             android:name=".app.MainActivity"
             android:exported="true"
             android:launchMode="singleTop"

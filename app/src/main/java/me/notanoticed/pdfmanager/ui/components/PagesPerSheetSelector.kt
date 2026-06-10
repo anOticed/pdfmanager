@@ -1,7 +1,3 @@
-/**
- * Shared compact selector for choosing how many pages should be placed on one sheet.
- */
-
 package me.notanoticed.pdfmanager.ui.components
 
 import androidx.compose.animation.AnimatedVisibility
@@ -37,7 +33,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import me.notanoticed.pdfmanager.R
-import me.notanoticed.pdfmanager.core.pdf.PagesPerSheetOption
+import me.notanoticed.pdfmanager.core.pdf.util.PagesPerSheetOption
 import me.notanoticed.pdfmanager.ui.theme.Colors
 
 /* -------------------- SELECTOR -------------------- */

@@ -115,7 +115,7 @@
     <string name="compress_processing_message">PDF を圧縮しています。しばらくお待ちください...</string>
     <string name="compress_export_success">圧縮した PDF を保存しました</string>
     <string name="compress_output_fallback_name">compressed_pdf</string>
-    <string name="pdf_option_reorder_pages">ページを並び替え</string>
+    <string name="pdf_option_edit_pages">ページを編集</string>
     <string name="page_editor_title">ページを編集</string>
     <string name="page_editor_pages_button">ページ（%1$d）</string>
     <string name="page_editor_drawer_title">ページ</string>

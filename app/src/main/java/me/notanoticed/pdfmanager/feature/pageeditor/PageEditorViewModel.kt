@@ -1,57 +1,27 @@
 package me.notanoticed.pdfmanager.feature.pageeditor
 
 import android.content.Context
-import android.graphics.Bitmap
-import android.graphics.Color
-import android.graphics.pdf.PdfRenderer
-import android.net.Uri
-import android.os.ParcelFileDescriptor
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.core.content.FileProvider
-import androidx.core.graphics.createBitmap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.tom_roush.pdfbox.pdmodel.PDDocument
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.notanoticed.pdfmanager.R
-import me.notanoticed.pdfmanager.core.pdf.cleanupGeneratedPdfFiles
-import me.notanoticed.pdfmanager.core.pdf.copyFileToUri
-import me.notanoticed.pdfmanager.core.pdf.ensurePdfBoxInitialized
+import me.notanoticed.pdfmanager.core.pdf.edit.PageEditorSession
+import me.notanoticed.pdfmanager.core.pdf.edit.PageEditorSessionStore
+import me.notanoticed.pdfmanager.core.pdf.util.PdfFileNamePolicy
 import me.notanoticed.pdfmanager.core.pdf.model.PdfFile
-import me.notanoticed.pdfmanager.core.toast.ToastBindable
-import me.notanoticed.pdfmanager.feature.export.PdfOutputRequest
+import me.notanoticed.pdfmanager.core.pdf.write.PageEditorWriter
+import me.notanoticed.pdfmanager.core.system.export.PdfExportException
+import me.notanoticed.pdfmanager.core.system.export.PreparedPdfFile
+import me.notanoticed.pdfmanager.core.system.toast.ToastBindable
+import me.notanoticed.pdfmanager.core.system.export.PdfOutputRequest
 import java.io.File
-import kotlin.math.min
-import kotlin.math.roundToInt
-
-private const val PAGE_EDITOR_THUMBNAIL_MAX_WIDTH_PX = 120
-private const val PAGE_EDITOR_THUMBNAIL_MAX_HEIGHT_PX = 168
-
-data class PageEditorPage(
-    val id: Long,
-    val thumbnailPageIndex: Int
-)
-
-private data class PageEditorSession(
-    val directory: File,
-    val currentFile: File,
-    val generatedFiles: List<File>
-) {
-    fun withCurrent(newCurrentFile: File): PageEditorSession {
-        val updatedFiles = (generatedFiles + newCurrentFile)
-            .distinctBy { it.absolutePath }
-        return copy(
-            currentFile = newCurrentFile,
-            generatedFiles = updatedFiles
-        )
-    }
-}
 
 class PageEditorViewModel : ViewModel(), ToastBindable {
     var sourcePdf by mutableStateOf<PdfFile?>(null)
@@ -113,53 +83,24 @@ class PageEditorViewModel : ViewModel(), ToastBindable {
         viewModelScope.launch {
             val result = withContext(Dispatchers.IO) {
                 runCatching {
-                    ensurePdfBoxInitialized(context)
-
-                    val sessionPrefix = "page_editor_session_${System.currentTimeMillis()}"
-                    val outputDir = File(context.cacheDir, PAGE_EDITOR_DIRECTORY_NAME).apply { mkdirs() }
-                    cleanupGeneratedPdfFiles(
-                        dir = outputDir,
-                        prefix = PAGE_EDITOR_FILE_PREFIX,
-                        keepCount = 8
-                    )
-
-                    val initialFile = createSessionFile(
-                        directory = outputDir,
-                        sessionPrefix = sessionPrefix
-                    )
-                    copyUriToFile(context, pdf.uri, initialFile)
-
-                    val pageCount = readPdfPageCount(initialFile)
-                    val session = PageEditorSession(
-                        directory = outputDir,
-                        currentFile = initialFile,
-                        generatedFiles = listOf(initialFile)
-                    )
-                    val previewPdf = buildPreviewPdf(
-                        context = context,
-                        sourceName = pdf.name,
-                        currentFile = session.currentFile,
-                        pageCount = pageCount
-                    )
-
-                    Triple(session, pageCount, previewPdf)
+                    PageEditorSessionStore.openSession(context, pdf)
                 }
             }
 
             if (revision != openRevision) return@launch
 
-            result.onSuccess { (newSession, pageCount, newPreviewPdf) ->
-                val initialPages = List(pageCount) { index ->
+            result.onSuccess { openResult ->
+                val initialPages = List(openResult.pageCount) { index ->
                     PageEditorPage(
                         id = index.toLong(),
                         thumbnailPageIndex = index
                     )
                 }
-                session = newSession
+                session = openResult.session
                 pages = initialPages
                 committedPages = initialPages
                 currentPageIndex = 0
-                previewPdf = newPreviewPdf
+                previewPdf = openResult.previewPdf
                 previewVersion = 1L
                 isLoading = false
                 isApplyingOperation = false
@@ -184,11 +125,7 @@ class PageEditorViewModel : ViewModel(), ToastBindable {
             openRevision += 1
         }
         session?.let { activeSession ->
-            activeSession.generatedFiles
-                .distinctBy { it.absolutePath }
-                .forEach { file ->
-                    runCatching { file.delete() }
-                }
+            PageEditorSessionStore.deleteSession(activeSession)
         }
 
         sourcePdf = null
@@ -253,7 +190,7 @@ class PageEditorViewModel : ViewModel(), ToastBindable {
             previousPages = previousPages,
             previousCurrentPageIndex = previousCurrentPageIndex,
             applyChange = { sourceFile, outputFile ->
-                applyPdfPageMove(
+                PageEditorWriter.applyPageMove(
                     sourceFile = sourceFile,
                     outputFile = outputFile,
                     fromIndex = fromIndex,
@@ -283,7 +220,7 @@ class PageEditorViewModel : ViewModel(), ToastBindable {
             previousPages = previousPages,
             previousCurrentPageIndex = previousCurrentPageIndex,
             applyChange = { sourceFile, outputFile ->
-                applyPdfPageDelete(
+                PageEditorWriter.applyPageDelete(
                     sourceFile = sourceFile,
                     outputFile = outputFile,
                     pageIndex = deleteIndex
@@ -309,16 +246,14 @@ class PageEditorViewModel : ViewModel(), ToastBindable {
                     context = context,
                     sourcePdf = activeSourcePdf
                 ),
-                processingMessage = context.getString(R.string.page_editor_processing_message)
-            ) { exportContext, destinationUri, _ ->
-                val currentSession = session ?: error(exportContext.getString(R.string.page_editor_open_failed))
-                copyFileToUri(
-                    context = exportContext,
-                    sourceFile = currentSession.currentFile,
-                    destinationUri = destinationUri
-                )
-                exportContext.getString(R.string.page_editor_export_success)
-            }
+                processingMessage = context.getString(R.string.page_editor_processing_message),
+                successMessage = { it.getString(R.string.page_editor_export_success) },
+                prepareFile = { exportContext, _ ->
+                    val currentSession = session
+                        ?: throw PdfExportException(exportContext.getString(R.string.page_editor_open_failed))
+                    PreparedPdfFile.existing(currentSession.currentFile)
+                }
+            )
         )
     }
 
@@ -338,13 +273,10 @@ class PageEditorViewModel : ViewModel(), ToastBindable {
         viewModelScope.launch {
             val result = withContext(Dispatchers.IO) {
                 runCatching {
-                    val outputFile = createSessionFile(
-                        directory = activeSession.directory,
-                        sessionPrefix = PAGE_EDITOR_FILE_PREFIX + System.currentTimeMillis()
-                    )
+                    val outputFile = PageEditorSessionStore.createNextSessionFile(activeSession)
                     applyChange(activeSession.currentFile, outputFile)
                     val nextSession = activeSession.withCurrent(outputFile)
-                    val nextPreviewPdf = buildPreviewPdf(
+                    val nextPreviewPdf = PageEditorSessionStore.buildPreviewPdf(
                         context = context,
                         sourceName = sourceName,
                         currentFile = nextSession.currentFile,
@@ -352,13 +284,7 @@ class PageEditorViewModel : ViewModel(), ToastBindable {
                     )
                     nextSession to nextPreviewPdf
                 }.onFailure {
-                    activeSession.directory
-                        .listFiles()
-                        ?.filter { file ->
-                            file.name.startsWith(PAGE_EDITOR_FILE_PREFIX) &&
-                                file.absolutePath !in activeSession.generatedFiles.map { it.absolutePath }
-                        }
-                        ?.forEach { file -> runCatching { file.delete() } }
+                    PageEditorSessionStore.cleanupUntrackedGeneratedFiles(activeSession)
                 }
             }
 
@@ -380,7 +306,7 @@ class PageEditorViewModel : ViewModel(), ToastBindable {
                     0,
                     (previousPages.lastIndex).coerceAtLeast(0)
                 )
-                previewPdf = buildPreviewPdf(
+                previewPdf = PageEditorSessionStore.buildPreviewPdf(
                     context = context,
                     sourceName = sourceName,
                     currentFile = activeSession.currentFile,
@@ -395,157 +321,14 @@ class PageEditorViewModel : ViewModel(), ToastBindable {
         }
     }
 
-    private fun buildPreviewPdf(
-        context: Context,
-        sourceName: String,
-        currentFile: File,
-        pageCount: Int
-    ): PdfFile {
-        val now = System.currentTimeMillis() / 1000L
-        return PdfFile(
-            uri = buildFileProviderUri(context, currentFile),
-            name = sourceName,
-            sizeBytes = currentFile.length().coerceAtLeast(0L),
-            pagesCount = pageCount.coerceAtLeast(0),
-            storagePath = currentFile.absolutePath,
-            lastModifiedEpochSeconds = now,
-            createdEpochSeconds = now,
-            thumbnailBitmap = null,
-            isLocked = false
-        )
-    }
-
     private fun buildSuggestedOutputName(
         context: Context,
         sourcePdf: PdfFile
     ): String {
-        val baseName = me.notanoticed.pdfmanager.core.pdf.PdfDocumentActions.normalizeBaseName(
+        val baseName = PdfFileNamePolicy.normalizeBaseName(
             rawName = sourcePdf.name,
             fallbackName = context.getString(R.string.page_editor_output_fallback_name)
         )
         return context.getString(R.string.page_editor_output_name_format, baseName)
-    }
-
-    companion object {
-        private const val PAGE_EDITOR_DIRECTORY_NAME = "page_editor_pdf"
-        private const val PAGE_EDITOR_FILE_PREFIX = "page_editor_session_"
-
-        private fun createSessionFile(
-            directory: File,
-            sessionPrefix: String
-        ): File {
-            directory.mkdirs()
-            return File(
-                directory,
-                "${sessionPrefix}_${System.nanoTime()}.pdf"
-            )
-        }
-    }
-}
-
-private fun buildFileProviderUri(
-    context: Context,
-    file: File
-): Uri {
-    return FileProvider.getUriForFile(
-        context,
-        "${context.packageName}.fileprovider",
-        file
-    )
-}
-
-private fun readPdfPageCount(file: File): Int {
-    PDDocument.load(file).use { document ->
-        return document.numberOfPages.coerceAtLeast(0)
-    }
-}
-
-private fun copyUriToFile(
-    context: Context,
-    sourceUri: Uri,
-    outputFile: File
-) {
-    context.contentResolver.openInputStream(sourceUri)?.use { input ->
-        outputFile.outputStream().use { output ->
-            input.copyTo(output)
-            output.flush()
-        }
-    } ?: error("Failed to open source PDF")
-}
-
-private fun applyPdfPageDelete(
-    sourceFile: File,
-    outputFile: File,
-    pageIndex: Int
-) {
-    PDDocument.load(sourceFile).use { document ->
-        require(document.numberOfPages > 1) { "Cannot delete the last remaining page" }
-        document.removePage(pageIndex)
-        document.save(outputFile)
-    }
-}
-
-private fun applyPdfPageMove(
-    sourceFile: File,
-    outputFile: File,
-    fromIndex: Int,
-    toIndex: Int
-) {
-    PDDocument.load(sourceFile).use { document ->
-        if (fromIndex == toIndex) {
-            document.save(outputFile)
-            return
-        }
-
-        val pageTree = document.pages
-        val movedPage = document.getPage(fromIndex)
-        pageTree.remove(movedPage)
-
-        when {
-            toIndex <= 0 -> {
-                pageTree.insertBefore(movedPage, document.getPage(0))
-            }
-
-            toIndex >= document.numberOfPages -> {
-                document.addPage(movedPage)
-            }
-
-            else -> {
-                pageTree.insertBefore(movedPage, document.getPage(toIndex))
-            }
-        }
-
-        document.save(outputFile)
-    }
-}
-
-internal fun renderPdfPageThumbnail(
-    file: File,
-    pageIndex: Int,
-    maxWidthPx: Int = PAGE_EDITOR_THUMBNAIL_MAX_WIDTH_PX,
-    maxHeightPx: Int = PAGE_EDITOR_THUMBNAIL_MAX_HEIGHT_PX
-): Bitmap? {
-    if (!file.exists()) return null
-
-    ParcelFileDescriptor.open(file, ParcelFileDescriptor.MODE_READ_ONLY).use { descriptor ->
-        PdfRenderer(descriptor).use { renderer ->
-            if (pageIndex !in 0 until renderer.pageCount) return null
-
-            renderer.openPage(pageIndex).use { page ->
-                val sourceWidth = page.width.coerceAtLeast(1)
-                val sourceHeight = page.height.coerceAtLeast(1)
-                val scale = min(
-                    maxWidthPx.toFloat() / sourceWidth.toFloat(),
-                    maxHeightPx.toFloat() / sourceHeight.toFloat()
-                ).coerceAtMost(1f)
-
-                val outWidth = (sourceWidth * scale).roundToInt().coerceAtLeast(1)
-                val outHeight = (sourceHeight * scale).roundToInt().coerceAtLeast(1)
-                val bitmap = createBitmap(outWidth, outHeight)
-                bitmap.eraseColor(Color.WHITE)
-                page.render(bitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
-                return bitmap
-            }
-        }
     }
 }

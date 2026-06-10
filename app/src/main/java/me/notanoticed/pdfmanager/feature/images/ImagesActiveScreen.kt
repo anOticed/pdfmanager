@@ -1,10 +1,3 @@
-/**
- * Images-to-PDF "active" state.
- *
- * Displays selected images, supports drag-and-drop reorder and remove,
- * and opens the shared Preview screen via PreviewNav.
- */
-
 package me.notanoticed.pdfmanager.feature.images
 
 import android.content.Context
@@ -65,9 +58,8 @@ import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import me.notanoticed.pdfmanager.R
-import me.notanoticed.pdfmanager.core.pdf.formatFileSize
-import me.notanoticed.pdfmanager.core.toast.BindViewModelToasts
-import me.notanoticed.pdfmanager.feature.export.LocalPdfOutputFlow
+import me.notanoticed.pdfmanager.core.pdf.util.formatFileSize
+import me.notanoticed.pdfmanager.core.system.export.LocalPdfOutputFlow
 import me.notanoticed.pdfmanager.feature.preview.LocalPreviewNav
 import me.notanoticed.pdfmanager.ui.components.ExpandablePagesPerSheetSection
 import me.notanoticed.pdfmanager.ui.theme.Colors
@@ -77,12 +69,10 @@ import kotlin.math.max
 
 /* -------------------- ACTIVE SCREEN -------------------- */
 @Composable
-fun ImageActiveScreen(
+internal fun ImagesActiveScreen(
     modifier: Modifier = Modifier,
     viewModel: ImagesViewModel
 ) {
-    BindViewModelToasts(viewModel)
-
     val images = viewModel.selectedImages
     val listState = rememberLazyListState()
     val context = LocalContext.current

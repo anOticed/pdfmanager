@@ -1,7 +1,3 @@
-/**
- * Top bar for the Images tab.
- */
-
 package me.notanoticed.pdfmanager.feature.images
 
 import androidx.compose.foundation.background

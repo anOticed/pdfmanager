@@ -1,9 +1,3 @@
-/**
- * Merge tab "empty" state.
- *
- * Displayed when no PDFs are selected for merging yet.
- */
-
 package me.notanoticed.pdfmanager.feature.merge
 
 import androidx.compose.foundation.layout.Arrangement
@@ -24,7 +18,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import me.notanoticed.pdfmanager.R
-import me.notanoticed.pdfmanager.core.toast.BindViewModelToasts
+import me.notanoticed.pdfmanager.core.system.toast.BindViewModelToasts
 import me.notanoticed.pdfmanager.ui.theme.Colors
 
 /* -------------------- SCREEN -------------------- */
@@ -34,6 +28,14 @@ fun MergeScreen(
     viewModel: MergeViewModel
 ) {
     BindViewModelToasts(viewModel)
+
+    if (viewModel.isActive) {
+        MergeActiveScreen(
+            modifier = modifier,
+            viewModel = viewModel
+        )
+        return
+    }
 
     Column(
         modifier = modifier.fillMaxSize(),

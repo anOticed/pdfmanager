@@ -6,30 +6,27 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import me.notanoticed.pdfmanager.R
-import me.notanoticed.pdfmanager.core.pdf.PdfDocumentActions
-import me.notanoticed.pdfmanager.core.pdf.copyFileToUri
-import me.notanoticed.pdfmanager.core.pdf.createTempPdfFile
 import me.notanoticed.pdfmanager.core.pdf.model.PdfFile
-import me.notanoticed.pdfmanager.feature.export.PdfOutputRequest
-import java.io.File
+import me.notanoticed.pdfmanager.core.pdf.write.CompressPdfWriter
+import me.notanoticed.pdfmanager.core.system.export.PdfOutputRequest
 
 class CompressViewModel : ViewModel() {
     var selectedPdf by mutableStateOf<PdfFile?>(null)
         private set
 
-    var selectedPreset by mutableStateOf(PdfCompressionPreset.MEDIUM)
+    var selectedPreset by mutableStateOf(CompressionPreset.MEDIUM)
         private set
 
     fun open(pdf: PdfFile) {
         selectedPdf = pdf
-        selectedPreset = PdfCompressionPreset.MEDIUM
+        selectedPreset = CompressionPreset.MEDIUM
     }
 
     fun close() {
         selectedPdf = null
     }
 
-    fun selectPreset(preset: PdfCompressionPreset) {
+    fun selectPreset(preset: CompressionPreset) {
         selectedPreset = preset
     }
 
@@ -39,7 +36,7 @@ class CompressViewModel : ViewModel() {
     ) {
         val pdf = selectedPdf ?: return
         val preset = selectedPreset
-        val suggestedName = buildSuggestedCompressedFileName(
+        val suggestedName = CompressPdfWriter.buildSuggestedFileName(
             context = context,
             pdf = pdf
         )
@@ -51,79 +48,17 @@ class CompressViewModel : ViewModel() {
                 inputHint = context.getString(R.string.compress_save_dialog_hint),
                 confirmLabel = context.getString(R.string.output_choose_location),
                 suggestedName = suggestedName,
-                processingMessage = context.getString(R.string.compress_processing_message)
-            ) { requestContext, destinationUri, _ ->
-                val originalTempFile = createTempPdfFile(
-                    context = requestContext,
-                    directoryName = "compressed_pdf_output",
-                    filePrefix = "original_pdf_"
-                )
-                val compressedTempFile = createTempPdfFile(
-                    context = requestContext,
-                    directoryName = "compressed_pdf_output",
-                    filePrefix = "compressed_pdf_"
-                )
-
-                try {
-                    copySourcePdfToFile(
+                processingMessage = context.getString(R.string.compress_processing_message),
+                onCompleted = ::close,
+                successMessage = { it.getString(R.string.compress_export_success) },
+                prepareFile = { requestContext, _ ->
+                    CompressPdfWriter.prepareCompressedPdfFile(
                         context = requestContext,
-                        sourcePdf = pdf,
-                        outputFile = originalTempFile
-                    )
-
-                    compressPdf(
-                        context = requestContext,
-                        sourceUri = pdf.uri,
-                        outputFile = compressedTempFile,
+                        pdf = pdf,
                         preset = preset
                     )
-
-                    val fileToExport = if (compressedTempFile.length() < originalTempFile.length()) {
-                        compressedTempFile
-                    } else {
-                        originalTempFile
-                    }
-
-                    copyFileToUri(
-                        context = requestContext,
-                        sourceFile = fileToExport,
-                        destinationUri = destinationUri
-                    )
-
-                    close()
-                    requestContext.getString(R.string.compress_export_success)
-                } finally {
-                    runCatching { originalTempFile.delete() }
-                    runCatching { compressedTempFile.delete() }
                 }
-            }
+            )
         )
-    }
-}
-
-private fun buildSuggestedCompressedFileName(
-    context: Context,
-    pdf: PdfFile
-): String {
-    val baseName = PdfDocumentActions.normalizeBaseName(
-        rawName = pdf.name,
-        fallbackName = context.getString(R.string.compress_output_fallback_name)
-    )
-
-    return "${baseName}_compressed.pdf"
-}
-
-private fun copySourcePdfToFile(
-    context: Context,
-    sourcePdf: PdfFile,
-    outputFile: File
-) {
-    val inputStream = context.contentResolver.openInputStream(sourcePdf.uri)
-        ?: error("Failed to open source PDF")
-
-    inputStream.use { input ->
-        outputFile.outputStream().use { output ->
-            input.copyTo(output)
-        }
     }
 }

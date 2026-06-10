@@ -1,13 +1,3 @@
-/**
- * Merge tab "active" state.
- *
- * Displayed once at least one PDFs are selected.
- *
- * - Shows the selected files in a vertical list.
- * - Supports drag-and-drop reordering (updates MergeViewModel.movePdf).
- * - Provides the main actions (Preview / Merge).
- */
-
 package me.notanoticed.pdfmanager.feature.merge
 
 import androidx.compose.foundation.BorderStroke
@@ -55,10 +45,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import me.notanoticed.pdfmanager.R
-import me.notanoticed.pdfmanager.core.pdf.PdfThumbnail
+import me.notanoticed.pdfmanager.ui.components.PdfThumbnail
 import me.notanoticed.pdfmanager.core.pdf.model.PdfFile
-import me.notanoticed.pdfmanager.core.toast.BindViewModelToasts
-import me.notanoticed.pdfmanager.feature.export.LocalPdfOutputFlow
+import me.notanoticed.pdfmanager.core.system.export.LocalPdfOutputFlow
 import me.notanoticed.pdfmanager.feature.preview.LocalPreviewNav
 import me.notanoticed.pdfmanager.ui.components.ExpandablePagesPerSheetSection
 import me.notanoticed.pdfmanager.ui.theme.Colors
@@ -67,12 +56,10 @@ import sh.calvin.reorderable.rememberReorderableLazyListState
 
 /* -------------------- ACTIVE SCREEN -------------------- */
 @Composable
-fun MergeActiveScreen(
+internal fun MergeActiveScreen(
     modifier: Modifier = Modifier,
     viewModel: MergeViewModel
 ) {
-    BindViewModelToasts(viewModel)
-
     val mergeFiles = viewModel.pdfMergeFiles
     val listState = rememberLazyListState()
     val previewNav = LocalPreviewNav.current

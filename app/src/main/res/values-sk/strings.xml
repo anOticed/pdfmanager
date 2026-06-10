@@ -115,7 +115,7 @@
     <string name="compress_processing_message">Komprimuje sa PDF, čakajte...</string>
     <string name="compress_export_success">Komprimované PDF bolo uložené</string>
     <string name="compress_output_fallback_name">compressed_pdf</string>
-    <string name="pdf_option_reorder_pages">Poradie strán</string>
+    <string name="pdf_option_edit_pages">Upraviť strany</string>
     <string name="page_editor_title">Upraviť strany</string>
     <string name="page_editor_pages_button">Strany (%1$d)</string>
     <string name="page_editor_drawer_title">Strany</string>

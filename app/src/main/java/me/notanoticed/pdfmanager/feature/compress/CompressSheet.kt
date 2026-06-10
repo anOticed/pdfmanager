@@ -45,8 +45,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import me.notanoticed.pdfmanager.R
-import me.notanoticed.pdfmanager.core.pdf.PdfThumbnail
-import me.notanoticed.pdfmanager.feature.export.LocalPdfOutputFlow
+import me.notanoticed.pdfmanager.ui.components.PdfThumbnail
+import me.notanoticed.pdfmanager.core.system.export.LocalPdfOutputFlow
 import me.notanoticed.pdfmanager.ui.theme.Colors
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -156,7 +156,7 @@ fun CompressSheet(
                     )
 
                     CompressionPresetCard(
-                        preset = PdfCompressionPreset.LOW,
+                        preset = CompressionPreset.LOW,
                         title = stringResource(R.string.compress_preset_low_title),
                         subtitle = stringResource(R.string.compress_preset_low_subtitle),
                         selectedPreset = viewModel.selectedPreset,
@@ -164,7 +164,7 @@ fun CompressSheet(
                     )
 
                     CompressionPresetCard(
-                        preset = PdfCompressionPreset.MEDIUM,
+                        preset = CompressionPreset.MEDIUM,
                         title = stringResource(R.string.compress_preset_medium_title),
                         subtitle = stringResource(R.string.compress_preset_medium_subtitle),
                         selectedPreset = viewModel.selectedPreset,
@@ -172,7 +172,7 @@ fun CompressSheet(
                     )
 
                     CompressionPresetCard(
-                        preset = PdfCompressionPreset.HIGH,
+                        preset = CompressionPreset.HIGH,
                         title = stringResource(R.string.compress_preset_high_title),
                         subtitle = stringResource(R.string.compress_preset_high_subtitle),
                         selectedPreset = viewModel.selectedPreset,
@@ -249,11 +249,11 @@ fun CompressSheet(
 
 @Composable
 private fun CompressionPresetCard(
-    preset: PdfCompressionPreset,
+    preset: CompressionPreset,
     title: String,
     subtitle: String,
-    selectedPreset: PdfCompressionPreset,
-    onSelect: (PdfCompressionPreset) -> Unit
+    selectedPreset: CompressionPreset,
+    onSelect: (CompressionPreset) -> Unit
 ) {
     val isSelected = preset == selectedPreset
     val surfaceColor = if (isSelected) Colors.Surface.selectedCard else Colors.Surface.card

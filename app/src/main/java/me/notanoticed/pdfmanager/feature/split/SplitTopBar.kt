@@ -1,7 +1,3 @@
-/**
- * Top bar for the Split tab.
- */
-
 package me.notanoticed.pdfmanager.feature.split
 
 import androidx.compose.foundation.background

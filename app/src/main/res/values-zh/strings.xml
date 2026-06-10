@@ -115,7 +115,7 @@
     <string name="compress_processing_message">正在压缩 PDF，请稍候...</string>
     <string name="compress_export_success">压缩后的 PDF 已保存</string>
     <string name="compress_output_fallback_name">compressed_pdf</string>
-    <string name="pdf_option_reorder_pages">重排页面</string>
+    <string name="pdf_option_edit_pages">编辑页面</string>
     <string name="page_editor_title">编辑页面</string>
     <string name="page_editor_pages_button">页面（%1$d）</string>
     <string name="page_editor_drawer_title">页面</string>

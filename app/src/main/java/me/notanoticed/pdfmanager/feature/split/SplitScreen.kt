@@ -1,9 +1,3 @@
-/**
- * Split tab "empty" state.
- *
- * Displayed when no PDF is selected for splitting.
- */
-
 package me.notanoticed.pdfmanager.feature.split
 
 import androidx.compose.foundation.layout.Arrangement
@@ -26,7 +20,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import me.notanoticed.pdfmanager.R
-import me.notanoticed.pdfmanager.core.toast.BindViewModelToasts
+import me.notanoticed.pdfmanager.core.system.toast.BindViewModelToasts
 import me.notanoticed.pdfmanager.ui.theme.Colors
 
 /* -------------------- SCREEN -------------------- */
@@ -36,6 +30,14 @@ fun SplitScreen(
     viewModel: SplitViewModel
 ) {
     BindViewModelToasts(viewModel)
+
+    if (viewModel.isActive) {
+        SplitActiveScreen(
+            modifier = modifier,
+            viewModel = viewModel
+        )
+        return
+    }
 
     Column(
         modifier = modifier.fillMaxSize(),
