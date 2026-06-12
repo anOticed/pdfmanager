@@ -44,10 +44,10 @@ https://pdfmanager.dev
 ---
 
 ## Demo
-<video src=".assets/demo_1.mp4" width="240" autoplay loop muted playsinline></video> <video src=".assets/demo_2.mp4" width="240" autoplay loop muted playsinline></video> <video src=".assets/demo_3.mp4" width="240" autoplay loop muted playsinline></video>
-<video src=".assets/demo_4.mp4" width="240" autoplay loop muted playsinline></video> <video src=".assets/demo_5.mp4" width="240" autoplay loop muted playsinline></video> <video src=".assets/demo_6.mp4" width="240" autoplay loop muted playsinline></video>
-<video src=".assets/demo_7.mp4" width="240" autoplay loop muted playsinline></video> <video src=".assets/demo_8.mp4" width="240" autoplay loop muted playsinline></video> <video src=".assets/demo_9.mp4" width="240" autoplay loop muted playsinline></video>
-<video src=".assets/demo_10.mp4" width="240" autoplay loop muted playsinline></video> <video src=".assets/demo_11.mp4" width="240" autoplay loop muted playsinline></video> <video src=".assets/demo_12.mp4" width="240" autoplay loop muted playsinline></video>
+<img src = ".assets/demo_1.webp" width = "240"/> <img src = ".assets/demo_2.webp" width = "240"/> <img src = ".assets/demo_3.webp" width = "240"/> 
+<img src = ".assets/demo_4.webp" width = "240"/> <img src = ".assets/demo_5.webp" width = "240"/> <img src = ".assets/demo_6.webp" width = "240"/>
+<img src = ".assets/demo_7.webp" width = "240"/> <img src = ".assets/demo_8.webp" width = "240"/> <img src = ".assets/demo_9.webp" width = "240"/>
+<img src = ".assets/demo_10.webp" width = "240"/> <img src = ".assets/demo_11.webp" width = "240"/> <img src = ".assets/demo_12.webp" width = "240"/>
 
 ---
 
