@@ -40,14 +40,14 @@ https://pdfmanager.dev
 <img src = ".assets/screenshot-01.jpg" width = "240"/> <img src = ".assets/screenshot-02.jpg" width = "240"/> <img src = ".assets/screenshot-03.jpg" width = "240"/> 
 <img src = ".assets/screenshot-04.jpg" width = "240"/> <img src = ".assets/screenshot-05.jpg" width = "240"/> <img src = ".assets/screenshot-06.jpg" width = "240"/>
 <img src = ".assets/screenshot-07.jpg" width = "240"/> <img src = ".assets/screenshot-08.jpg" width = "240"/> <img src = ".assets/screenshot-09.jpg" width = "240"/>
-<img src = ".assets/screenshot-10.jpg" width = "240"/>
 
 ---
 
 ## Demo
-<img src = ".assets/demo_1.gif" width = "240"/> <img src = ".assets/demo_2.gif" width = "240"/> <img src = ".assets/demo_3.gif" width = "240"/> 
-<img src = ".assets/demo_4.gif" width = "240"/> <img src = ".assets/demo_5.gif" width = "240"/> <img src = ".assets/demo_6.gif" width = "240"/>
-<img src = ".assets/demo_7.gif" width = "240"/> <img src = ".assets/demo_8.gif" width = "240"/> <img src = ".assets/demo_9.gif" width = "240"/>
+<video src=".assets/demo_1.mp4" width="240" autoplay loop muted playsinline></video> <video src=".assets/demo_2.mp4" width="240" autoplay loop muted playsinline></video> <video src=".assets/demo_3.mp4" width="240" autoplay loop muted playsinline></video>
+<video src=".assets/demo_4.mp4" width="240" autoplay loop muted playsinline></video> <video src=".assets/demo_5.mp4" width="240" autoplay loop muted playsinline></video> <video src=".assets/demo_6.mp4" width="240" autoplay loop muted playsinline></video>
+<video src=".assets/demo_7.mp4" width="240" autoplay loop muted playsinline></video> <video src=".assets/demo_8.mp4" width="240" autoplay loop muted playsinline></video> <video src=".assets/demo_9.mp4" width="240" autoplay loop muted playsinline></video>
+<video src=".assets/demo_10.mp4" width="240" autoplay loop muted playsinline></video> <video src=".assets/demo_11.mp4" width="240" autoplay loop muted playsinline></video> <video src=".assets/demo_12.mp4" width="240" autoplay loop muted playsinline></video>
 
 ---
 
