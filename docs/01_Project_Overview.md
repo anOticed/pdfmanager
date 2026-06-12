@@ -1,61 +1,34 @@
 # Project Overview
 
-## What this project is
+## About the project
 
-**PDF Manager** is an **offline Android application** focused on local PDF operations and previews.
-The app uses Android’s system file access (Storage Access Framework / MediaStore) rather than relying on direct file paths.
+**PDF Manager** is an offline Android application designed to provide a simple and convenient way to work with PDF documents on a mobile device. All files are processed locally without requiring an account, internet connection, or uploads to external services. Changes and generated results can be reviewed through a live preview before saving.
 
-The main user flow is:
+## Features
 
-1. Select a PDF from the device
-2. Preview pages
-3. Choose an operation (merge, split, preview, images → PDF)
-4. Save the result back to storage (some operations are still under development)
+- PDF file management with thumbnails, search, sorting, selection, and file actions
+- Preview with page navigation, zoom, and text search
+- Merging and splitting documents
+- Converting images to PDF
+- Compression with three quality presets
+- Visual page reordering and deletion with live preview
+- Metadata and password management
+- Sharing, printing, and opening documents from other applications
+- Interface localization in 8 languages
 
-## Goals
+## Requirements
 
-1. Provide a clean and fast UI for common PDF tasks
-2. Keep all operations local
-3. Use modern Android stack (Kotlin + Jetpack Compose + ViewModels)
-4. Keep the code modular by feature (PDF list, merge, split, preview, images, settings)
+- Android 12 or newer
+- Storage access for displaying files available on the device
+- Camera permission only when taking a photo
 
-## Current scope (implemented in code)
+## Tech Stack
 
-- **PDF list**
-    - lists PDFs available on the device (via MediaStore)
-    - selection mode and basic per-file options
-- **Merge UI**
-    - selecting multiple PDFs
-    - reorder selected items
-    - entering preview
-- **Split UI**
-    - selecting a single PDF
-    - choosing a split method
-    - entering preview (rendering is currently stubbed)
-- **Images to PDF**
-    - "active screen" exists with a reorderable list
-    - gallery selection is currently stubbed with placeholder items
-- **Preview overlay**
-    - opens a PDF preview UI
-    - renders pages into bitmaps and displays them in a scrollable list
-
-
-## Features planned for future iterations
-
-The project is under active development. Some features are implemented only as UI stubs or partially implemented:
-
-- actual PDF manipulation and saving results for merge/split/images workflows
-- split-mode specific preview rendering
-- advanced page operations (rotate, delete, reorder within a PDF, etc.)
-- metadata editing, password operations, compression, N-up layouts
-
-## Repository structure
-
-- `app/`  
-  App entry point, global navigation/state, shared scaffolding (top/bottom bars), permission flow
-- `core/`  
-  Shared infrastructure: PDF repository access, system pickers integration, toast messaging, shared models
-- `feature/`  
-  Feature modules (PDF list, merge, split, preview, images, settings)
-- `ui/theme/`  
-  Theme, colors, and UI design tokens
+- Android Studio
+- Kotlin
+- Jetpack Compose and Material 3
+- AndroidX ViewModel and Navigation Compose
+- Storage Access Framework, MediaStore, and FileProvider
+- [PDFBox-Android](https://github.com/TomRoush/PdfBox-Android)
+- [AndroidX PDF Viewer](https://developer.android.com/jetpack/androidx/releases/pdf)
+- [Reorderable](https://github.com/Calvin-LL/Reorderable) for drag-and-drop ordering

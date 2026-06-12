@@ -1,121 +1,75 @@
 # Architecture
 
-## High-level design
+## Overview
 
-The project follows a **feature-based UI architecture** built with **Jetpack Compose** and **ViewModels**.
+`PDF Manager` is a single-activity Android application built with Kotlin and Jetpack Compose. It follows a feature-based MVVM architecture that separates feature state, PDF processing, and Android-specific operations.
 
-Main layers:
+The project is divided into four main areas:
 
-- **UI (Compose)** renders screens based on state
-- **State (ViewModels)** stores screen state and handles user actions
-- **Data (Repository)** reads PDF metadata from the device storage providers
+- `app` assembles the application and coordinates features
+- `feature` contains UI and state management for each tool
+- `core.pdf` provides shared document models and PDF operations
+- `core.system` handles Android APIs and storage access
 
-Navigation approach:
+## Application layer
 
-- **Tabs**: bottom bar switches between main screens using a pager
-- **Preview**: shown as an overlay above the main UI
+The `app` package serves as the application entry and coordination layer.
 
-## Module/package boundaries
+`MainActivity` starts Compose and handles PDF files received through `Open with` or sharing intents.
 
-- `app/`  
-  App entry, global scaffold, permission flow, top/bottom bars, routing between tabs
-- `feature/*`  
-  Feature UI + feature ViewModel logic (PDF list, merge, split, images, preview, settings)
-- `core/*`  
-  Shared infrastructure used by multiple features (repository, pickers, toast system, shared models)
-- `ui/theme/*`  
-  Theme and design tokens (colors, typography, shapes)
+`PdfManagerApp` acts as the composition root. It creates feature `ViewModel` instances and provides shared services for file selection, permissions, preview, export, page editing, and toast notifications.
 
-This separation is intentional: features can evolve independently while reusing shared services from `core/`.
+## Feature layer
 
-## UI layer (Jetpack Compose)
+The `feature` package is organized by application tool. Each feature owns its Compose UI, `ViewModel`, and feature-specific models.
 
-### “Empty” vs “Active” screens
+Compose functions display state and forward user actions. Document loading, modification, and saving are delegated to shared layers.
 
-Some features are split into two simple states:
+Each feature `ViewModel` manages:
 
-- **Empty state**: no input selected yet
-- **Active state**: input selected, user can configure the operation
+- Selected files or images
+- Operation settings
+- Input validation
+- Loading and processing state
+- Reordering and selection
+- Preview and export requests
 
-Examples:
-- `feature/merge`: MergeScreen vs MergeActiveScreen
-- `feature/split`: SplitScreen vs SplitActiveScreen
-- `feature/images`: ImagesScreen vs ImagesActiveScreen (currently stubbed)
+## PDF processing layer
 
-### Shared scaffold
+`core.pdf` contains document-related logic shared across features and is separated by responsibility:
 
-The app uses one `Scaffold` and swaps bars depending on the current tab/state:
+- `model` defines document and metadata models
+- `catalog` loads documents and manages their properties
+- `edit` contains validated editing data and page editor sessions
+- `render` prepares previews and page thumbnails
+- `write` performs document transformations
+- `util` provides filename, formatting, initialization, and page-layout utilities
 
-- `AppTopBar` selects the correct top bar composable
-- `AppBottomBar` shows tab navigation
+## Android integration layer
 
-## State layer (ViewModels)
+`core.system` isolates operations that depend on Android framework APIs and connects application logic with device storage.
 
-### Why ViewModels are used here
+Its main responsibilities include:
 
-Each feature has a ViewModel that owns:
-- current selection (chosen PDFs/images)
-- active mode flags
-- UI state (selected method, counts, etc.)
-- actions that update the state
+- File and folder selection through Activity Result APIs
+- Storage and camera permissions
+- Document access through `ContentResolver`
+- Temporary file management
+- Cache file sharing through `FileProvider`
+- Export destination handling
+- Toast notifications
 
-### Event handling
+## Preview and export
 
-Some actions should happen only once (open merge/split/preview/details).  
-This is handled by a simple event pattern:
+Preview and export use shared infrastructure across features. Each feature passes prepared input and operation settings to the corresponding PDF writer.
 
-- `PdfListViewModel` sets a `pendingEvent`
-- `PdfListEventHandler` reacts to it and performs the side effect
-- the event is cleared after handling
+For preview, the writer generates a temporary document in the application cache, which is opened with AndroidX PDF Viewer. Preview and export rely on the same PDF generation logic, so both operations produce an identical document.
 
-## Data layer (PDF repository)
+Export is handled through a shared process that:
 
-### PdfRepository
-
-`core/pdf/PdfRepository` is responsible for:
-- scanning PDFs via **MediaStore**
-- constructing `PdfFile` models with metadata needed by the UI
-
-It does not render pages and does not perform PDF manipulation yet.
-
-### PdfFile
-
-`PdfFile` is the shared model for a PDF entry and contains:
-- identity: `uri`, `name`
-- metadata: size, page count, storage path, timestamps, “locked” flag
-- formatting helpers used by UI
-
-## Storage access and pickers
-
-### Storage Access Framework (SAF)
-
-The app uses Android’s standard storage APIs:
-- **SAF pickers** for selecting PDFs/images
-- **MediaStore** for listing PDFs on the device
-
-### Pickers via CompositionLocal
-
-Pickers are provided through `LocalPickers` so screens can access them without passing objects through many composables.
-
-## Toast messaging
-
-The app uses a lightweight toast infrastructure:
-- `ToastManager` is provided via CompositionLocal
-- ViewModels can trigger messages through a simple binding helper
-
-## Preview architecture
-
-Preview is implemented as an overlay layer:
-
-- `ProvidePreview` sets up preview state in composition
-- Screens call `LocalPreviewNav.open...()` to open preview
-- The preview UI is displayed above the main content with slide animations
-
-Inside preview, pages are rendered into bitmaps and displayed vertically.
-The goal is to avoid reloading while scrolling (trade-off: memory usage on very large documents).
-
-## Permissions / app startup flow
-
-On startup, the app checks storage access.
-If access is missing, it shows a permission dialog and guides the user to system settings.
-On Android 11+, this can include requesting "All files access" (MANAGE_EXTERNAL_STORAGE) depending on the storage access mode.
+1. Normalizes the output name
+2. Requests a file or folder destination
+3. Generates the document in the background
+4. Writes it to the selected destination
+5. Reports success or failure
+6. Removes temporary or incomplete files

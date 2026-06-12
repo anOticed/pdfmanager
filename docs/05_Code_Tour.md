@@ -1,125 +1,259 @@
-# Code tour
+# Code Tour
 
-This document gives a practical overview of where key logic lives in the repository.
+This document describes the source structure of `PDF Manager` and explains where each part of the application is implemented.
 
-## 1) App entry point and global UI
+## `app`
 
-### MainActivity
+The `app` package starts the application, assembles shared services, and coordinates actions between features.
 
-`MainActivity` is the single Android entry point. It sets the Compose content and hosts the entire UI.
+| File | Purpose |
+|---|---|
+| `MainActivity.kt` | Android entry point that starts Compose and receives external PDF intents |
+| `PdfManagerApp.kt` | Creates feature ViewModels and installs shared providers for permissions, pickers, preview, export, page editing, and notifications |
+| `AppDestinations.kt` | Defines the five main pager destinations |
+| `AppScaffold.kt` | Contains the main `Scaffold`, top bars, bottom navigation, selection bar, and `HorizontalPager` |
+| `AppActiveScreen.kt` | Handles the animated transition between the light and dark application themes |
+| `AppStartup.kt` | Requests storage access and starts the initial PDF catalog load |
+| `AppEventDispatcher.kt` | Handles file-list actions such as previewing, merging, splitting, compressing, editing, sharing, and printing PDFs |
+| `AppOverlays.kt` | Places file options, details, dialogs, and compression UI above the main content |
+| `ExternalPdfIntentHandler.kt` | Imports a PDF received from another application and offers preview, split, or merge actions |
 
-### App shell (scaffold)
+## `core.pdf.model`
 
-Global app layout is built around a single `Scaffold`:
+This package contains document models shared across PDF features.
 
-- `AppTopBar` selects which top bar to show depending on the current tab/state
-- `AppBottomBar` renders the bottom tab navigation
+| File | Purpose |
+|---|---|
+| `PdfFile.kt` | Represents a PDF with its URI, name, size, page count, storage information, timestamps, thumbnail, and password state |
+| `PdfDocumentMetadata.kt` | Stores editable title, author, subject, and keyword values |
 
-### AppNav (tab routing)
+## `core.pdf.catalog`
 
-`AppNav` is the high-level router for the main tabs.  
-It controls which feature screen is visible and keeps the tab structure consistent.
+The catalog package reads existing documents and applies operations to their stored properties.
 
-### Storage permission flow
+| File | Purpose |
+|---|---|
+| `PdfCatalogRepository.kt` | Finds PDFs, loads metadata, renders thumbnails, detects locked documents, and caches visual data |
+| `PdfFileService.kt` | Renames, deletes, and prints PDF files |
+| `PdfMetadataService.kt` | Reads and updates standard PDF metadata |
+| `PdfPasswordService.kt` | Adds password protection and removes it after password validation |
 
-The app includes a small permission flow for storage access.
-If access is missing, a dialog is shown and the user is guided to system settings.
+## `core.pdf.edit`
 
-## 2) Core layer (shared infrastructure)
+This package contains validated editing data and temporary editing sessions.
 
-Shared code used by multiple features is placed in `core/`.
+| File | Purpose |
+|---|---|
+| `PdfSplitPlan.kt` | Converts split settings into validated groups of page numbers |
+| `PageEditorSession.kt` | Creates and manages temporary document versions used by `PageEditor` |
 
-### PDF model
+## `core.pdf.render`
 
-`core/pdf/model/PdfFile.kt` defines `PdfFile`, the main model for a PDF entry.
+This package contains logic for generating PDF previews and page thumbnails.
 
-It contains:
-- identity (`uri`, `name`)
-- basic metadata (size, page count, storage info, timestamps, locked flag)
-- small formatting helpers used by UI (for example meta line and date formatting)
+| File | Purpose |
+|---|---|
+| `GeneratedPreviewPdf.kt` | Stores basic information about a generated preview file |
+| `PreviewPdfBuilder.kt` | Creates managed preview files and converts them into `PdfFile` models |
+| `PdfThumbnailRenderer.kt` | Renders one PDF page into a bounded bitmap |
 
-### PDF repository
+## `core.pdf.util`
 
-`core/pdf/PdfRepository` is responsible for:
-- listing PDFs via MediaStore
-- reading metadata and building `PdfFile` instances
+This package provides shared PDF policies and calculations.
 
-It does not render pages and does not perform PDF manipulation yet.
+| File | Purpose |
+|---|---|
+| `FileSizeFormatter.kt` | Formats byte values using localized units |
+| `PagesPerSheet.kt` | Defines the supported 1, 2, and 4 items per output page |
+| `PagesPerSheetLayout.kt` | Calculates A4 page slots and places imported PDF pages or images inside them |
+| `PdfBoxInitializer.kt` | Initializes PDFBox once before document operations |
+| `PdfFileNamePolicy.kt` | Sanitizes names and normalizes the `.pdf` extension |
 
-### Pickers (SAF)
+## `core.pdf.write`
 
-The project uses the Android system pickers (Storage Access Framework) for selecting PDFs/images.
-Picker entry points are exposed through a CompositionLocal (`LocalPickers`) so screens can call them without passing objects through many layers.
+This package performs PDF document transformations.
 
-### Toast system
+| File | Purpose |
+|---|---|
+| `MergePdfWriter.kt` | Writes selected PDFs in the requested order and page layout |
+| `SplitPdfWriter.kt` | Generates split preview and writes each validated output part |
+| `ImagesPdfWriter.kt` | Creates A4 PDF pages from ordered images |
+| `CompressPdfWriter.kt` | Prepares original and compressed candidates and selects the smaller file |
+| `PdfCompressor.kt` | Finds image resources, scales and replaces them with smaller JPEG data |
+| `PageEditorWriter.kt` | Applies one page move or deletion to a cached PDF |
 
-A small toast system is used for user messages:
-- a toast manager is provided via CompositionLocal
-- ViewModels can trigger toasts through a binding helper
+## `core.system.export`
 
-## 3) Feature modules
+This package defines the shared PDF save process.
 
-Feature code lives under `feature/`.  
-Each feature typically contains:
+| File | Purpose |
+|---|---|
+| `PdfExportRequest.kt` | Defines single-file and folder export requests |
+| `PdfExportFile.kt` | Couples a prepared temporary file with its cleanup action |
+| `PdfExportError.kt` | Defines common PDF processing and export exceptions |
+| `PdfExportHost.kt` | Manages file naming, destination selection, export, result reporting, and partial-file cleanup |
 
-- composable screens
-- a ViewModel holding state and actions
-- UI components specific to that feature (top bars, cards, etc.)
+## `core.system.files`
 
-### PDF list
+This package handles URI access, temporary files, and cache file sharing.
 
-The PDF list feature is the main entry for selecting files.
+| File | Purpose |
+|---|---|
+| `DestinationWriter.kt` | Handles file and URI copying, document creation in selected folders, and failed-output cleanup |
+| `TempFileStore.kt` | Creates cache directories and temporary PDFs and removes older generated files |
+| `AppFileProvider.kt` | Converts cache file into a `content://` URI |
 
-Key ideas in this module:
-- normal browsing mode vs selection mode
-- one-time actions (open merge / split / preview / details) are triggered through a `pendingEvent` and handled in a dedicated handler
+## `core.system.permissions`
 
-### Merge
+This package manages runtime permissions and permission dialogs.
 
-The merge feature is split into:
-- an empty state screen (no selection yet)
-- an active screen (selected PDFs visible as a reorderable list)
+| File | Purpose |
+|---|---|
+| `AppPermissions.kt` | Checks storage and camera access and owns related Activity Result launchers |
+| `PermissionDialog.kt` | Displays the permission explanation and grant actions |
 
-The ViewModel stores:
-- selected PDFs
-- reorder logic
-- actions to open preview
+## `core.system.pickers`
 
-### Split
+This package provides shared file, folder, and camera pickers.
 
-The split feature is similar in structure:
-- empty screen (no PDF selected)
-- active screen (split options)
+| File | Purpose |
+|---|---|
+| `FilePickers.kt` | Wraps PDF, image, folder, output-document, and camera Activity Result contracts behind one interface |
 
-Split method selection is stored in the ViewModel.
-Preview for split is present as an entry point, but detailed rendering logic is currently stubbed.
+## `core.system.toast`
 
-### Preview
+This package manages in-app toast notifications.
 
-Preview is implemented as an overlay layer above the main UI.
+| File | Purpose |
+|---|---|
+| `ToastHost.kt` | Provides the notification sender, ViewModel binding, queue behavior, timing, and custom animated toast UI |
 
-Key parts:
-- a preview controller provided via `ProvidePreview`
-- screens open preview via `LocalPreviewNav.open...()`
-- preview UI renders pages into bitmaps and shows them in a vertical list
+## `feature.pdflist`
 
-The preview goal is “smooth scrolling without reloading”, which can use more memory on large documents.
+This package implements the document library and file actions.
 
-### Images to PDF
+| File | Purpose |
+|---|---|
+| `PdfListViewModel.kt` | Loads the catalog and manages search, sorting, selection, details, dialogs, metadata, passwords, rename, delete, and sharing |
+| `PdfListActions.kt` | Defines actions handled by `AppEventDispatcher` |
+| `PdfListModels.kt` | Defines available file actions and their UI metadata |
+| `PdfListScreen.kt` | Displays loading, empty, and document-list content |
+| `DocumentInfoRow.kt` | Displays document name and metadata |
+| `PdfListTopBar.kt` | Provides search, sorting, and normal top-bar actions |
+| `PdfListSelectionBar.kt` | Provides actions for multiple selected documents |
+| `PdfListOptionsSheet.kt` | Displays actions available for one document |
+| `PdfDetailsSheet.kt` | Displays document path, size, page count, and timestamps |
+| `PdfListDialogs.kt` | Contains rename, delete, metadata, and password dialogs |
 
-Images-to-PDF follows the same pattern (empty vs active).
-Currently, gallery selection and rendering are stubbed with placeholder items.
+## `feature.merge`
 
-### Settings
+This package manages PDF merging, document order, and page layout.
 
-The settings feature contains UI-only settings screens (no business logic).
+| File | Purpose |
+|---|---|
+| `MergeViewModel.kt` | Manages selected PDFs, order, page layout, preview generation, and export requests |
+| `MergeScreen.kt` | Chooses between empty and active content |
+| `MergeActiveScreen.kt` | Displays the reorderable document list and merge options |
+| `MergeTopBar.kt` | Provides add, save, and clear actions |
 
-## 4) UI theme
+## `feature.split`
 
-The project theme lives under `ui/theme/`.
+This package manages PDF splitting methods, validation, and output settings.
 
-This includes:
-- app color palette and design tokens
-- common styling constants used across features
+| File | Purpose |
+|---|---|
+| `SplitViewModel.kt` | Manages the source PDF, split configuration, validation result, preview, and folder export |
+| `SplitScreen.kt` | Chooses between empty and active content |
+| `SplitActiveScreen.kt` | Displays split methods, inputs, validation summary, and layout options |
+| `SplitTopBar.kt` | Provides source selection, save, and clear actions |
 
-The goal is consistent styling across all screens.
+## `feature.images`
+
+This package creates PDF documents from selected images.
+
+| File | Purpose |
+|---|---|
+| `ImagesModels.kt` | Defines the selected image model |
+| `ImageReader.kt` | Reads image name, dimensions, and size from a URI |
+| `ImagesViewModel.kt` | Manages selected images, ordering, layout, preview, and export |
+| `ImagesScreen.kt` | Chooses between empty and active content |
+| `ImagesActiveScreen.kt` | Displays the reorderable image list, thumbnails, and layout options |
+| `ImagesTopBar.kt` | Provides gallery, camera, save, and clear actions |
+
+## `feature.compress`
+
+This package manages PDF compression settings and export.
+
+| File | Purpose |
+|---|---|
+| `CompressionPreset.kt` | Defines JPEG quality and maximum image dimensions for each preset |
+| `CompressViewModel.kt` | Stores the selected PDF and preset and creates the export request |
+| `CompressSheet.kt` | Displays preset selection and save controls |
+
+## `feature.pageeditor`
+
+This package provides page reordering, deletion, and live preview.
+
+| File | Purpose |
+|---|---|
+| `PageEditorModels.kt` | Defines stable page identity and thumbnail position |
+| `PageEditorViewModel.kt` | Manages the editing session, page order, deletion, live preview, rollback, and export |
+| `PageEditorHost.kt` | Provides page editor navigation and the animated full-size overlay |
+| `PageEditorScreen.kt` | Displays the PDF viewer, page drawer, thumbnails, drag controls, delete and save actions |
+
+## `feature.preview`
+
+This package displays existing and generated PDF previews.
+
+| File | Purpose |
+|---|---|
+| `PreviewModels.kt` | Defines requests for existing documents and generated PDF previews |
+| `PreviewHost.kt` | Provides preview navigation and the animated full-size overlay |
+| `PreviewScaffold.kt` | Combines preview bars, content, insets, and search state |
+| `PreviewScreen.kt` | Opens an existing PDF or prepares split preview asynchronously |
+| `PdfPreviewFragment.kt` | Configures AndroidX `PdfViewerFragment` |
+| `PdfPreviewView.kt` | Hosts the PDF viewer fragment inside Compose |
+| `PreviewTopBar.kt` | Provides back, title, and text-search actions |
+| `PreviewBottomBar.kt` | Provides the lower preview layout area |
+
+## `feature.settings`
+
+This package manages application preferences and information.
+
+| File | Purpose |
+|---|---|
+| `AppLanguage.kt` | Defines supported languages and resolves locale codes |
+| `SettingsViewModel.kt` | Stores theme and language preferences and handles repository, license, and sharing actions |
+| `SettingsScreen.kt` | Displays appearance, language, and application information settings |
+| `SettingsTopBar.kt` | Provides the settings title bar |
+
+## `ui.components`
+
+This package provides reusable UI components shared across features.
+
+| File | Purpose |
+|---|---|
+| `PdfThumbnail.kt` | Displays a PDF thumbnail or the correct locked and missing-thumbnail fallback |
+| `PagesPerSheetSelector.kt` | Provides the shared 1, 2, or 4 pages-per-sheet control |
+
+## `ui.theme`
+
+This package defines application colors, typography, and theme behavior.
+
+| File | Purpose |
+|---|---|
+| `Color.kt` | Defines light and dark semantic color palettes and exposes them through `LocalAppPalette` |
+| `Theme.kt` | Applies palette, Material color scheme, shapes, typography, and system bar appearance |
+| `Type.kt` | Defines application typography |
+
+## Resources and build files
+
+| Path | Purpose |
+|---|---|
+| `src/main/AndroidManifest.xml` | Declares activity, permissions, PDF intents, launcher icon, and `FileProvider` |
+| `src/main/res/values/strings.xml` | Contains default strings and plurals |
+| `src/main/res/values-*/strings.xml` | Contains translated resources |
+| `src/main/res/xml/file_paths.xml` | Defines paths exposed through `FileProvider` |
+| `src/main/res/mipmap-*` | Contains launcher icon assets |
+| `app/build.gradle.kts` | Defines Android SDK levels, application version, Compose support, and dependencies |
+| `gradle/libs.versions.toml` | Stores plugin and library versions |

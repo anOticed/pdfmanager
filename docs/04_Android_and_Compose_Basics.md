@@ -1,169 +1,146 @@
-# Android and Jetpack Compose basics
+# Android and Compose Basics
 
-This document explains the Android and Jetpack Compose concepts needed to understand how this project works.
-Only the concepts that are relevant to this codebase are included.
+This document explains the main Android and Jetpack Compose concepts required to understand the application code.
 
-## 1) What an Android app is built from
+## Activity and lifecycle
 
-### Activity
+An `Activity` is an Android component that provides a window for application UI. It is created and managed by the operating system.
 
-An **Activity** is a screen-level Android component with a lifecycle managed by the system.
+An activity moves through lifecycle states as it becomes visible, enters the foreground, loses focus, or is destroyed. Android may recreate an activity after a configuration change or process termination. Code should therefore avoid treating an activity instance as permanent storage for application state.
 
-In this project, the Android entry point is a single Activity (MainActivity), which hosts the entire Compose UI. 
-Some files are named *...Activity*, but they are composable wrappers (not Android Activity classes).
+## Modern Android storage
 
-### Lifecycle
+### `Uri`
 
-An Activity can be created, paused, resumed, and destroyed.
-This matters because:
+A `Uri` identifies a resource without requiring the application to know its physical location:
 
-- UI should not hold long-lived resources directly
-- heavy work should be cancellable
-- resources should be released when a screen is closed
+```text
+content://media/external/file/123
+```
 
-In Compose, lifecycle-sensitive cleanup is usually done with `DisposableEffect`.
+A URI may refer to content from local storage, a document provider, another application, or a cloud-backed service.
 
-## 2) Storage access model used on modern Android
+### `ContentResolver`
 
-Android apps should not rely on raw file paths. Modern Android uses **URIs** and system-managed storage access.
+`ContentResolver` provides access to data identified by a content URI. It can:
 
-### Uri and ContentResolver
+- Query metadata
+- Open input and output streams
+- Open file descriptors
+- Insert, update, or delete content
 
-A `Uri` is an identifier for a document.
-The app reads the content through `ContentResolver`, typically by opening an input stream or a file descriptor.
+### `MediaStore`
 
-### MediaStore (listing files)
+`MediaStore` is an Android database that indexes shared media and document files. Applications can query it to retrieve content URIs and metadata such as name, size, and timestamps.
 
-**MediaStore** is a system database that indexes media and documents.
-This project uses it to list available PDF files and load metadata (name, size, timestamps, etc.).
+### Storage Access Framework
 
-Note: on Android 11+ the app may request "All files access" (MANAGE_EXTERNAL_STORAGE) to simplify PDF listing and access.
+The Storage Access Framework provides Android's system interface for selecting documents and folders. Instead of requesting access to an entire storage location, an application receives permission for the URI selected by the user.
 
-### Storage Access Framework (SAF) (user picks files)
+### `FileProvider`
 
-**SAF** is the system file picker.
-The user selects PDFs/images and the app receives a `Uri` that it can read.
+`FileProvider` securely exposes a private application file as a temporary `content://` URI.
 
-## 3) What Jetpack Compose is
+Only directories declared in the provider configuration can be shared. Access is granted through URI permissions, so another component can read the file without receiving its private filesystem path.
 
-Jetpack Compose is a **declarative UI toolkit**.
+## Jetpack Compose
 
-Instead of manually modifying UI elements, Compose works like this:
-
-- UI is described as functions
-- these functions are re-run automatically when relevant state changes
-- Compose updates only the parts of the UI that changed
-
-### Composable functions
-
-A `@Composable` function describes UI.
+Jetpack Compose is a declarative UI toolkit. UI is described as a set of functions based on current state instead of being updated manually through view references.
 
 ```kotlin
 @Composable
-fun MyScreen() {
-    Text("Hello")
+fun Example(isLoading: Boolean) {
+    if (isLoading) {
+        CircularProgressIndicator()
+    } else {
+        Text("Ready")
+    }
 }
 ```
 
-Composable functions can call other composables and build the UI tree.
+A function marked with `@Composable` can emit UI and call other composable functions. These calls form a UI tree managed by Compose.
 
-## 4) State and recomposition
+### State and recomposition
 
-### Recomposition
+Recomposition is the process of reevaluating composable functions after observable state changes.
 
-**Recomposition** is when Compose re-runs composable functions because some state they read has changed.
+```kotlin
+var expanded by remember { mutableStateOf(false) }
+```
 
-Key rule:
-- Composables should be side-effect free (they should only describe UI).
-- Side effects must be done using Compose effect APIs (see below).
+When `expanded` changes, Compose schedules recomposition for functions that read it. Compose then updates only the affected parts of the UI tree.
 
-### `remember` and state holders
+remember stores a value across recompositions:
 
-`remember` stores a value across recompositions.
+```kotlin
+val state = remember { mutableStateOf(false) }
+```
 
-Common patterns:
+## Compose effects
 
-- `remember { ... }` for objects that should not be recreated
-- `mutableStateOf(...)` for observable state
-
-When a `mutableStateOf` value changes, Compose triggers recomposition for the parts that read it.
-
-### `derivedStateOf`
-
-`derivedStateOf` creates a value derived from other state values and recalculates only when its inputs change.
-This is used for computed UI data.
-
-## 5) Side effects in Compose
-
-Composable functions should not perform side effects directly (such as I/O, opening files, or starting animations).
-Compose provides effect APIs for this:
+Effect APIs allow Compose to run work that cannot be expressed as UI.
 
 ### `LaunchedEffect`
 
-Runs a coroutine when a key changes (or once, if the key is stable).
+`LaunchedEffect` starts a coroutine tied to the composition:
 
-Used for:
-- loading data
-- running async work tied to a composable lifecycle
+```kotlin
+LaunchedEffect(key) {
+    loadData()
+}
+```
+
+It starts when it enters composition. If its key changes, the existing coroutine is cancelled and a new one starts.
 
 ### `DisposableEffect`
 
-Used to clean up resources when a composable leaves the composition.
+`DisposableEffect` manages resources that require cleanup:
 
-Used for:
-- closing file descriptors
-- releasing renderers/caches
-- removing listeners
+```kotlin
+DisposableEffect(key) {
+    registerListener()
 
-## 6) ViewModel in this project
+    onDispose {
+        unregisterListener()
+    }
+}
+```
 
-A **ViewModel** is a state holder designed for UI.
-It survives configuration changes (for example, screen rotation) and keeps UI state out of composables.
+The cleanup block runs when the effect leaves composition or its key changes.
 
-In this project, feature ViewModels typically store:
+### `SideEffect`
 
-- current selection (PDFs/images)
-- UI mode flags (empty vs active)
-- selected options (split method, etc.)
-- actions that mutate the state (select, clear, reorder, open preview)
+`SideEffect` runs after every successful recomposition. It is intended for synchronizing Compose state with objects outside Compose.
 
-Compose screens read the ViewModel state and call ViewModel methods on user interaction.
+## ViewModel
 
-## 7) Coroutines (used for background work)
+A `ViewModel` stores UI-related state and logic outside composable functions.
 
-Android UI must stay responsive, so heavier work runs off the main thread.
+It survives activity recreation caused by configuration changes, allowing state to remain available while the UI is rebuilt. A ViewModel is cleared when its owner is permanently destroyed.
 
-This project uses Kotlin coroutines for:
+Compose can observe state exposed by a ViewModel and call its methods in response to user input:
 
-- loading metadata
-- rendering preview pages (bitmap rendering)
+```kotlin
+@Composable
+fun Example(viewModel: ExampleViewModel) {
+    Text(text = viewModel.message)
+    Button(onClick = viewModel::updateMessage) {
+        Text("Update")
+    }
+}
+```
 
-Typical pattern:
+## Lazy lists
 
-- CPU/IO work is executed on `Dispatchers.IO`
-- the UI observes the resulting state and updates automatically
+`LazyColumn` and `LazyRow` compose only visible items and a small amount of nearby content. This makes them suitable for large or changing collections.
 
-## 8) Lists in Compose (`LazyColumn`)
-
-`LazyColumn` renders large vertical lists efficiently.
-
-Important details used in this project:
-
-- items can have stable `key`s to avoid UI glitches during reordering
-- only visible items are composed (and more are composed as the user scrolls)
-
-This is used for:
-- PDF lists
-- selected items lists (merge/images)
-- preview page lists
-
-## 9) Navigation approach used here
-
-This project does not rely on the Navigation Component.
-Instead it uses:
-
-- tab switching (pager + bottom bar)
-- preview opening as a separate layer (overlay-style preview flow)
-
-This keeps navigation simple and matches the app’s structure (features are mostly independent tabs with a shared preview experience).
-
+```kotlin
+LazyColumn {
+    items(
+        items = documents,
+        key = { it.id }
+    ) { document ->
+        DocumentItem(document)
+    }
+}
+```

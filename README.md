@@ -1,25 +1,35 @@
-# PDF Manager - Android
+# PDF Manager for Android
 
-The application works completely offline. The user opens a PDF through the system file dialog, previews pages, chooses an operation, and saves the result back to storage.
+**PDF Manager** is an offline Android application designed to provide a simple and convenient way to work with PDF documents on a mobile device. All files are processed locally without requiring an account, internet connection, or uploads to external services. Changes and generated results can be reviewed through a live preview before saving.
 
-## Planned features:
+## Features
 
-- display of page previews, multiple selection, moving, deleting, rotating;
-- merging multiple PDFs into one with visible page order;
-- splitting a PDF: by ranges, one page per file, or every N pages;
-- "pages per sheet": 1/2/4 pages per sheet, margins, orientation, fill order, live preview;
-- PDF size reduction by lowering image quality/resolution with estimated final size;
-- metadata editing (title, author, keywords, subject);
-- password management: set a password when saving or remove it after entering the correct one;
-- "from images → PDF": select photos, set order and orientation, preview, and save.
+- PDF file management with thumbnails, search, sorting, selection, and file actions
+- Preview with page navigation, zoom, and text search
+- Merging and splitting documents
+- Converting images to PDF
+- Compression with three quality presets
+- Visual page reordering and deletion with live preview
+- Metadata and password management
+- Sharing, printing, and opening documents from other applications
+- Interface localization in 8 languages
+
+## Requirements
+
+- Android 12 or newer
+- Storage access for displaying files available on the device
+- Camera permission only when taking a photo
 
 ## Tech Stack
+
 - Android Studio
 - Kotlin
-- Jetpack Compose (UI)
-- PDFBox-Android (PDF manipulation)
-- Storage Access Framework (SAF for file access)
-- System page rendering for previews
+- Jetpack Compose and Material 3
+- AndroidX ViewModel and Navigation Compose
+- Storage Access Framework, MediaStore, and FileProvider
+- [PDFBox-Android](https://github.com/TomRoush/PdfBox-Android)
+- [AndroidX PDF Viewer](https://developer.android.com/jetpack/androidx/releases/pdf)
+- [Reorderable](https://github.com/Calvin-LL/Reorderable) for drag-and-drop ordering
 
 ## Website
 https://pdfmanager.dev
@@ -42,20 +52,13 @@ https://pdfmanager.dev
 ---
 
 ## Documentation
+
 - [Project overview](docs/01_Project_Overview.md)
 - [Architecture](docs/02_Architecture.md)
-- [Kotlin concepts used in this codebase](docs/03_Kotlin_Concepts_Used.md)
-- [Android + Jetpack Compose basics](docs/04_Android_and_Compose_Basics.md)
+- [Kotlin concepts used](docs/03_Kotlin_Concepts_Used.md)
+- [Android and Jetpack Compose basics](docs/04_Android_and_Compose_Basics.md)
 - [Code tour](docs/05_Code_Tour.md)
-- [Known limitations / trade-offs](docs/06_Known_Limitations_and_Tradeoffs.md)
-
----
-
-## Status
-
-This app is under active development. 
-The demo and screenshots are illustrative and do not represent the final product. 
-Features, UI, and performance will continue to evolve, and changes may occur between previews.
 
 ## License
-GPL-3.0. See LICENSE.
+
+GNU GPL v3. See [LICENSE](LICENSE).
